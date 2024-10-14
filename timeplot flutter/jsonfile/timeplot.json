@@ -1,0 +1,39 @@
+{
+  "leaves":[
+  {
+    "text": "LWP",
+    "colorcode": "purple",
+    "remainDays": "6.0"
+  },
+  {
+    "text": "Approved Leave",
+    "colorcode": "blue",
+    "remainDays": "6.0"
+  },
+  {
+    "text": "Requested Leave",
+    "colorcode": "Yellow",
+    "remainDays": "-"
+  },
+  {
+    "text": "Holiday",
+    "colorcode": "green",
+    "remainDays": "5.0"
+  },
+  {
+    "text": "Compensatory",
+    "colorcode": "green",
+    "remainDays": "-"
+  },
+  {
+    "text": "TimeSheet Not Submitted",
+    "colorcode": "red",
+    "remainDays": "6.0"
+  },
+  {
+    "text": "Total Paid Leave",
+    "colorcode": "green",
+    "remainDays": "-"
+  }
+]
+}
