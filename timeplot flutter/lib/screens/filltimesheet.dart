@@ -197,7 +197,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     // Map<String, int> totalMinutes = await shareddata.getTotalMinutes();
     // print("Total minutes loaded.");
     setState(() {
-      empId = empData.Empid;
+      empId = empData.userId;
       print("id" + empId.toString());
       // totalNBNPMinutes = 0;
       // totalNBPMinutes = 0;

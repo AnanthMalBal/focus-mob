@@ -4,6 +4,7 @@ import 'package:timeplot_flutter/screens/applyleave.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
 import 'package:timeplot_flutter/screens/leavelist.dart';
 import 'package:timeplot_flutter/screens/login.dart';
+import 'package:timeplot_flutter/screens/scanner.dart';
 import 'package:timeplot_flutter/screens/ticket.dart';
 import 'package:timeplot_flutter/screens/welcome.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
@@ -156,53 +157,145 @@ elevation: 0, // Set to 0 if you don't want default shadow
 }
 
 Widget buildDrawer(BuildContext context) {
-  return Drawer(
-    child: ListView(
-      padding: EdgeInsets.zero,
-      children: <Widget>[
-        DrawerHeader(
-          decoration: BoxDecoration(
-            color: AppColors.primaryColor,
-          ),
-          child: Text(
-            'Employee Profile',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
+  // return Drawer(
+  //   child: ListView(
+  //     padding: EdgeInsets.zero,
+  //     children: <Widget>[
+  //       DrawerHeader(
+  //         decoration: BoxDecoration(
+  //           color: AppColors.primaryColor,
+  //         ),
+  //         child: Text(
+  //           'Employee Profile',
+  //           style: TextStyle(
+  //             color: Colors.white,
+  //             fontSize: 24,
+  //           ),
+  //         ),
+  //       ),
+  //       ListTile(
+  //         title: Text('Name:' + "Ananthi.N"),
+  //         // onTap: () {
+  //         //   Navigator.pop(context);
+  //         //   Navigator.pushReplacement(
+  //         //     context,
+  //         //     MaterialPageRoute(builder: (context) => welcomeScreen()),
+  //         //   );
+  //         // },
+  //       ),
+  //       ListTile(
+  //         title: Text('PhoneNumber:' + "9791397039"),
+  //         // onTap: () {
+  //         //   Navigator.pop(context);
+  //         //   Navigator.pushReplacement(
+  //         //     context,
+  //         //     MaterialPageRoute(builder: (context) => CalenderScreen()),
+  //         //   );
+  //         // },
+  //       ),
+  //       ListTile(
+  //         title: Text('Email:' + "ananthee89@gmail.com"),
+  //         onTap: () {},
+  //       ),
+  //       ListTile(
+  //         title: Text('ReportingTo:' + "Tamilselvan"),
+  //         onTap: () {},
+  //       ),
+  //     ],
+  //   ),
+  // );
+ return Drawer(
+  child: ListView(
+    padding: EdgeInsets.zero,
+    children: <Widget>[
+      DrawerHeader(
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, // Aligns text and icons to the start
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.person, // Profile icon
+                  color: Colors.white,
+                  size: 40, // Adjust size as needed
+                ),
+                SizedBox(width: 16), // Space between icon and text
+                Text(
+                  'Employee Profile',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
             ),
-          ),
+            SizedBox(height: 55), // Space between the profile and scanner icons
+            GestureDetector( // Wrap the scanner row with GestureDetector
+              onTap: () {
+                // Implement your scanner logic here
+                // For example, navigate to the scanner screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ScannerScreen()), // Replace with your scanner screen
+                );
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.qr_code_scanner, // Scanner icon
+                    color: Colors.white,
+                    size: 40, // Adjust size as needed
+                  ),
+                  SizedBox(width: 16), // Space between icon and text
+                  // Text(
+                  //   'Scan QR Code',
+                  //   style: TextStyle(
+                  //     color: Colors.white,
+                  //     fontSize: 18,
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+          ],
         ),
-        ListTile(
-          title: Text('Name:' + "Ananthi.N"),
-          // onTap: () {
-          //   Navigator.pop(context);
-          //   Navigator.pushReplacement(
-          //     context,
-          //     MaterialPageRoute(builder: (context) => welcomeScreen()),
-          //   );
-          // },
-        ),
-        ListTile(
-          title: Text('PhoneNumber:' + "9791397039"),
-          // onTap: () {
-          //   Navigator.pop(context);
-          //   Navigator.pushReplacement(
-          //     context,
-          //     MaterialPageRoute(builder: (context) => CalenderScreen()),
-          //   );
-          // },
-        ),
-        ListTile(
-          title: Text('Email:' + "ananthee89@gmail.com"),
-          onTap: () {},
-        ),
-        ListTile(
-          title: Text('ReportingTo:' + "Tamilselvan"),
-          onTap: () {},
-        ),
-      ],
-    ),
-  );
+      ),
+      ListTile(
+        title: Text('Name: Ananthi.N'),
+        // Uncomment and implement if needed
+        // onTap: () {
+        //   Navigator.pop(context);
+        //   Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => welcomeScreen()),
+        //   );
+        // },
+      ),
+      ListTile(
+        title: Text('Phone Number: 9791397039'),
+        // Uncomment and implement if needed
+        // onTap: () {
+        //   Navigator.pop(context);
+        //   Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => CalenderScreen()),
+        //   );
+        // },
+      ),
+      ListTile(
+        title: Text('Email: ananthee89@gmail.com'),
+        onTap: () {},
+      ),
+      ListTile(
+        title: Text('Reporting To: Tamilselvan'),
+        onTap: () {},
+      ),
+    ],
+  ),
+);
 }
 
 

@@ -1,11 +1,11 @@
 class EmployeeDetails {
   String accesstoken;
-  String Empid;
+  String userId;
   String message;
   
   EmployeeDetails(
       {
-        required this.Empid, 
+        required this.userId, 
       
       required this.accesstoken,
       required this.message,

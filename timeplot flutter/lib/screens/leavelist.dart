@@ -28,7 +28,7 @@ class _LeavelistState extends State<Leavelist> {
   void transferdata() async {
     final empData = await shareddata.getpatdata();
     setState(() {
-      empId = empData.Empid;
+      empId = empData.userId;
       print("id" + empId.toString());
     });
 

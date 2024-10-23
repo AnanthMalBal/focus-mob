@@ -1,13 +1,28 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:timeplot_flutter/screens/appbar.dart';
 
 class ApplyLeaveService {
+
+final String? Ip = dotenv.env['ENVIRONMENT']! =='dev' ? dotenv.env['LOCAL_IP']!:dotenv.env['SERVER_IP']!;
+
   Future getLeaveType(context) async {
     print("Leavetype");
-    final response = (await http
-        .get(Uri.parse('http://192.168.31.45:3007/timesheet/getLeaveType')));
+
+final token = await shareddata.getpatdata();
+var Token=token.accesstoken; 
+   print("+++++"+Token);
+
+    final response = (await http.get
+    // (Uri.parse('http://192.168.31.45:3007/timesheet/getLeaveType')));
+    (Uri.parse('$Ip/stashook/getLeaveTypeList'),
+    headers: {
+          'contentType':'application/json;charset=UTF-8',
+          'Authorization':'$Token',
+        }
+    ));
     List<dynamic> dataLeaveType = json.decode(response.body);
     print("LMS" + dataLeaveType.toString());
     return dataLeaveType;
@@ -23,9 +38,18 @@ class ApplyLeaveService {
         toDate +
         reason);
 
+final token = await shareddata.getpatdata();
+var Token=token.accesstoken; 
+   print("+++++"+Token);
+
     final response = await http.post(
-      Uri.parse("http://192.168.31.45:3007/users/addusersleave"),
-      body: ({
+      // Uri.parse("http://192.168.31.45:3007/users/addusersleave"),
+      Uri.parse("$Ip/stashook/applyLeave"),
+       headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization': ' $Token',
+            },
+      body:jsonEncode ({
         'employeeId': employeeId,
         'noOfDays': noOfDays.toString(),
         'symbol': symbol,
@@ -36,11 +60,13 @@ class ApplyLeaveService {
     );
     print("check");
     print(response.statusCode);
+    var result=json.decode(response.body);
     if (response.statusCode == 200) {
       print("check1");
-      showdialog(context, "RequestLeaveadded");
+      showdialog(context, result['message']);
       print("Request leave Sucess");
     } else {
+      showdialog(context, result['message']);
       print(" Invalid  ");
     }
     // return response.body;
@@ -49,10 +75,20 @@ class ApplyLeaveService {
  
 
   Future getLeaveList(String empid, context) async {
+
+    final token = await shareddata.getpatdata();
+var Token=token.accesstoken; 
+   print("+++++"+Token);
+
     print("Leavelist" + empid);
-    final response = (await http.get(Uri.parse(
-        'http://192.168.31.45:3007/users/userleavelist?employeeId=' +
-            empid.toString())));
+
+    final response = (await http.get
+    (Uri.parse('http://192.168.31.45:3007/users/userleavelist?employeeId=' +
+            empid.toString()),
+             headers: {
+          'contentType':'application/json;charset=UTF-8',
+          'Authorization':'$Token',
+        }));
     var listData = json.decode(response.body.toString());
     List<dynamic> leaveList = listData['result'];
     // print("listdata" + leaveList.toString());
@@ -61,10 +97,19 @@ class ApplyLeaveService {
   }
 
   Future cancelLeaveList(String leaveId, context) async {
+
+final token = await shareddata.getpatdata();
+var Token=token.accesstoken; 
+   print("+++++"+Token);
     print("cancelid"+leaveId);
     final response = await http.post(
-        Uri.parse("http://192.168.31.45:3007/users/userleavecancel"),
-        body: {'leaveId': leaveId});
+      Uri.parse("$Ip/stashook/cancelLeave"),
+       headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization': ' $Token',
+            },
+        // Uri.parse("http://192.168.31.45:3007/users/userleavecancel"),
+        body: jsonEncode ({'leaveId': leaveId}));
     if (response.statusCode == 200) {
       showdialog(context, "Leave Cancelled");
     }

@@ -40,7 +40,7 @@ class _ApplyleaveState extends State<Applyleave> {
   void transferdata() async {
     final empData = await shareddata.getpatdata();
     setState(() {
-      empId = empData.Empid;
+      empId = empData.userId;
       print("id" + empId.toString());
     });
     getBalanceLeave(empId.toString(), context);

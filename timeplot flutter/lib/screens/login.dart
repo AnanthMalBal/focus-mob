@@ -23,8 +23,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool passToggle = true;
   var usernameController = TextEditingController();
   var passwordController = TextEditingController();
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+
+      final NotificationHelper notificationHelper = NotificationHelper();
 
 
   @override
@@ -69,7 +69,7 @@ FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
                 child: TextFormField(
                   keyboardType: TextInputType.emailAddress,
                   controller: usernameController,
-                  maxLength: 10,
+                  // maxLength: 10,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     label: Text("Enter Name"),
@@ -77,7 +77,7 @@ FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
                   ),
                   validator: (val) {
                     if (val!.isEmpty ||
-                        !RegExp(r'^[a-z A-Z]+$').hasMatch(val)) {
+                        !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=/^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(val)) {
                       return "Please enter your Name";
                     }
                     return null;
@@ -129,7 +129,7 @@ FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
                           backgroundColor: AppColors.primaryColor,
                           padding: const EdgeInsets.all(10),
                         ),
-                        onPressed: () {
+                        onPressed: ()async {
                           logincall(
                             usernameController.text,
                             passwordController.text,
@@ -139,6 +139,10 @@ FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
                 'Test Notification',
                 'This is a test notification from the NotificationService class.',
               );
+              //  await notificationHelper.showImmediateNotification();
+               await notificationHelper.scheduleDailyNotification(); 
+              //  await notificationHelper.showImmediateNotification();
+            print('Daily notification scheduled.');
                         },
                         child: Text("Login",
                             style: TextStyle(

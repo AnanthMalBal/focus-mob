@@ -30,7 +30,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
   void transferdata() async {
     final empData = await shareddata.getpatdata();
     setState(() {
-      empId = empData.Empid;
+      empId = empData.userId;
       print("id" + empId.toString());
     });
   }
