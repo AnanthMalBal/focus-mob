@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
+import 'package:timeplot_flutter/screens/welcome.dart';
 // import 'package:timeplot_flutter/model/login';
 // import 'package:timeplot_flutter/screens/calender.dart';
 //  import 'package:http/http.dart' as http;
@@ -38,9 +42,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.backgroundColor,
-      child: SingleChildScrollView(
+    return Scaffold(
+      // color: AppColors.backgroundColor,
+    body: SingleChildScrollView(
         child: SafeArea(
           child: Column(
             children: [
@@ -133,16 +137,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           logincall(
                             usernameController.text,
                             passwordController.text,
+                            context
                           );
                           //  Show a notification when the button is pressed
-              NotificationService.showNotification(
-                'Test Notification',
-                'This is a test notification from the NotificationService class.',
-              );
+              // NotificationService.showNotification(
+              //   'Test Notification',
+              //   'This is a test notification from the NotificationService class.',
+              // );
               //  await notificationHelper.showImmediateNotification();
-               await notificationHelper.scheduleDailyNotification(); 
+              //  await notificationHelper.scheduleDailyNotification(); 
               //  await notificationHelper.showImmediateNotification();
-            print('Daily notification scheduled.');
+            // print('Daily notification scheduled.');
                         },
                         child: Text("Login",
                             style: TextStyle(
@@ -186,13 +191,29 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void logincall(String username, String password) async {
-    await LoginService().login(username, password, context);
+  void logincall(String username, String password,BuildContext context) async {
+   String  result = await LoginService().login(username, password, context);
 
-// var result = json.decode(response.body);
 
+// Decode the JSON response
+   // Check if the response is a valid JSON object
+  Map<String, dynamic> jsonResponse;
+  
+  try {
+    jsonResponse = json.decode(result);
+  } catch (e) {
+    // If decoding fails, treat the response as a plain message
+    jsonResponse = {
+      'message': result, // Store the plain response message
+    };
+  }
     usernameController.clear();
     passwordController.clear();
-    // Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {}));
+    
+String message = jsonResponse['message'];
+    bool isSuccess = message.contains("successfully");
+
+    // Show Snackbar using SnackbarHelper
+    CommonAppBar.showSnackbar(context, result, isSuccess: isSuccess);
   }
 }

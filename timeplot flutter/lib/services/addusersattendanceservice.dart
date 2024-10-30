@@ -14,16 +14,22 @@ SharedPreferences? prefs;
 class Addusersattendance{
 
 // Access environment variables
- final String? Ip = dotenv.env['ENVIRONMENT']! =='dev' ? dotenv.env['LOCAL_IP']!:dotenv.env['SERVER_IP']!;
+//  final String? Ip = dotenv.env['ENVIRONMENT']! =='dev' ? dotenv.env['LOCAL_IP']!:dotenv.env['SERVER_IP']!;
 
    Future userAttendance(String employeeId, String symbol,String WFH,context, ) async {
   print("DailyLog"+ employeeId+symbol+WFH);
- print('Local IP: $Ip');
+//  print('Local IP: $Ip');
 final token = await shareddata.getpatdata();
 var Token=token.accesstoken; 
    print("+++++"+Token);
+final String attendanceUrl = dotenv.env['markAttendanceUrl']!;
 
-   final  response = await  http.post(Uri.parse ("$Ip/stashook/markAttendance"),
+    // // Check if attendanceUrl is available
+    // if (attendanceUrl == null || attendanceUrl.isEmpty) {
+    //   print("Error: login URL is not defined or empty.");
+    //   return;
+    // }
+   final  response = await  http.post(Uri.parse (attendanceUrl),
   //  "http://192.168.31.45:3007/timesheet/addusersattendance"
   headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',

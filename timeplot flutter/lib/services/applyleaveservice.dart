@@ -16,8 +16,8 @@ var Token=token.accesstoken;
    print("+++++"+Token);
 
     final response = (await http.get
-    // (Uri.parse('http://192.168.31.45:3007/timesheet/getLeaveType')));
-    (Uri.parse('$Ip/stashook/getLeaveTypeList'),
+     (Uri.parse('http://192.168.31.45:3007/timesheet/getLeaveType'),
+    // (Uri.parse('$Ip/stashook/getLeaveTypeList'),
     headers: {
           'contentType':'application/json;charset=UTF-8',
           'Authorization':'$Token',
@@ -43,8 +43,8 @@ var Token=token.accesstoken;
    print("+++++"+Token);
 
     final response = await http.post(
-      // Uri.parse("http://192.168.31.45:3007/users/addusersleave"),
-      Uri.parse("$Ip/stashook/applyLeave"),
+       Uri.parse("http://192.168.31.45:3007/users/addusersleave"),
+      // Uri.parse("$Ip/stashook/applyLeave"),
        headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
               'Authorization': ' $Token',
@@ -103,12 +103,13 @@ var Token=token.accesstoken;
    print("+++++"+Token);
     print("cancelid"+leaveId);
     final response = await http.post(
-      Uri.parse("$Ip/stashook/cancelLeave"),
+       Uri.parse("http://192.168.31.45:3007/users/userleavecancel"),
+      // Uri.parse("$Ip/stashook/cancelLeave"),
        headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
               'Authorization': ' $Token',
             },
-        // Uri.parse("http://192.168.31.45:3007/users/userleavecancel"),
+        
         body: jsonEncode ({'leaveId': leaveId}));
     if (response.statusCode == 200) {
       showdialog(context, "Leave Cancelled");

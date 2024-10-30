@@ -1,4 +1,4 @@
- import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -9,89 +9,85 @@ import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/welcome.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 
- final shareddata = SharedPref();
+final shareddata = SharedPref();
 
 SharedPreferences? prefs;
 
-
-class LoginService{
-
+class LoginService {
 //  final String localIp = '${dotenv.env['LOCALLOGIN_IP'] }';
-final String? Ip = dotenv.env['ENVIRONMENT']! =='dev' ? dotenv.env['LOCALLOGIN_IP']!:dotenv.env['SERVER_IP']!;
+  // final String? Ip = dotenv.env['ENVIRONMENT']! == 'dev'
+  //     ? dotenv.env['LOCALLOGIN_IP']!
+  //     : dotenv.env['SERVER_IP']!;
 
-  Future login(String username, String password,context) async {
-  print("Login"+ username   +password);
- print('Local IP: $Ip');
-   final  response = await  http.post(Uri.parse ("$Ip/stashook/login"),
-    body: ({
-              'username': username,
-              'password': password,
-            }),
-            
-   );
+
+
+  Future login(String username, String password, BuildContext context) async {
+    print("Login" + username + password);
+    final String loginUrl = dotenv.env['loginUrl']!;
+
+    // Check if loginUrl is available
+    // if (loginUrl == null || loginUrl.isEmpty) {
+    //   print("Error: login URL is not defined or empty.");
+    //   return;
+    // }
+    final response = await http.post(
+      Uri.parse(loginUrl),
+      body: ({
+        'username': username,
+        'password': password,
+      }),
+    );
     print("check");
     var result = json.decode(response.body);
-     setToken(result);
+    setToken(result);
 // var result = json.decode(response.body);
-  
-if (response.statusCode == 200){
-  print("check1");
-  
-  print("Login Sucess");
-  
-      print("response"+response.body);
+
+    if (response.statusCode == 200) {
+      print("check1");
+
+      print("Login Sucess");
+
+      print("response" + response.body);
       // var result = json.decode(response.body);
       // loginData=result;
-       print("result"+result['user']['userId']);
-      
- Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => welcomeScreen(),
-            ));
-       showdialog(context, result['message']);   
-  }
-   
-else {
-        
+      print("result" + result['user']['userId']);
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => welcomeScreen(),
+          ));
+      //  showdialog(context, result['message']);
+      return result['message'];
+     
+    } else {
       print(" Invalid Login ");
-      showdialog(context, result['message']); 
-      }
+      //  showdialog(context, result['message']);
+        return result['message'];
+    }
 
-   
-      
-            return response.body;
-
+    //  return response.body;
   }
 
   Future<dynamic> setToken(dynamic value) async {
     prefs = await SharedPreferences.getInstance();
-   // print("value"+value);
-   
-    prefs!.setString('accesstoken',value['accesstoken']);
-     prefs!.setString('userId',value['user']['userId']);
-    prefs!.setString('message',value['message']);
-    
-    
+    // print("value"+value);
+
+    prefs!.setString('accesstoken', value['accesstoken']);
+    prefs!.setString('userId', value['user']['userId']);
+    prefs!.setString('message', value['message']);
 
     return prefs;
   }
 
   Future getToken() async {
     prefs = await SharedPreferences.getInstance();
-    print( prefs!.getString(('accesstoken') ));
-     print( prefs!.getString(('userId') ));
-  //  print( "gettoken:"+ prefs!.getInt(('appId') ).toString());
-     prefs!.getString(('accesstoken'));
-     prefs!.getString('userId');
-     
- 
+    print(prefs!.getString(('accesstoken')));
+    print(prefs!.getString(('userId')));
+    //  print( "gettoken:"+ prefs!.getInt(('appId') ).toString());
+    prefs!.getString(('accesstoken'));
+    prefs!.getString('userId');
+
     return prefs;
-   
-
   }
-
-
-
-  
 }

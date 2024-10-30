@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:timeplot_flutter/screens/login.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timeplot_flutter/services/notification_service.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz; // For timezone operations
+// import 'package:timezone/data/latest.dart' as tz;
+// import 'package:timezone/timezone.dart' as tz; // For timezone operations
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -13,6 +13,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 Future<void> main() async {
   // Load environment variables from the appropriate .env file
   await dotenv.load(fileName: ".env"); 
+  
 // WidgetsFlutterBinding.ensureInitialized();
 
 // //   // Initialize the notification service
@@ -55,9 +56,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
-void listTimeZones() {
-  final locations = tz.timeZoneDatabase.locations.keys;
-  for (var location in locations) {
-    print(location);
-  }
-}
+// void listTimeZones() {
+//   final locations = tz.timeZoneDatabase.locations.keys;
+//   for (var location in locations) {
+//     print(location);
+//   }
+// }

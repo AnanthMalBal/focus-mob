@@ -4,6 +4,7 @@ import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/calender.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
 import 'package:timeplot_flutter/screens/ticket.dart';
+import 'package:timeplot_flutter/screens/ticketraising.dart';
 import 'package:timeplot_flutter/services/addusersattendanceservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 
@@ -143,11 +144,11 @@ class _welcomeScreenState extends State<welcomeScreen> {
                   child: Text("Mark Attendance-WFH",
                       style: TextStyle(
                         color: AppColors.textColor,
-                        fontSize: 15,
+                        fontSize: 12,
                         fontWeight: FontWeight.w500,
                       )),
                 ),
-                Wrap(spacing: 2.0, runSpacing: 2.0, children: [
+                Wrap(spacing: 1.0, runSpacing: 1.0, children: [
                   CustomRadioButton("4H", 'P4'),
                   CustomRadioButton("6H", 'P6'),
                   CustomRadioButton("8H", 'P8'),
@@ -163,7 +164,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
               height: 60,
             ),
             Row(children: <Widget>[
-              Padding(padding: EdgeInsets.all(20)),
+              Padding(padding: EdgeInsets.all(10)),
               Material(
                 color: AppColors.primaryColor,
                 borderRadius: BorderRadius.circular(10),
@@ -199,7 +200,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TicketScreen(),
+                          builder: (context) => TicketRaisingScreen(),
                         ));
                   },
                   child: Padding(

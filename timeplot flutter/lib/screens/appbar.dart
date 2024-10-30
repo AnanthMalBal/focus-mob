@@ -154,6 +154,25 @@ elevation: 0, // Set to 0 if you don't want default shadow
         print('Invalid selection');
     }
   }
+
+  // static void showSnackbar(BuildContext context, String result) {
+
+  
+  //   final snackBar = SnackBar(content: Text(result));
+  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  // }
+   static void showSnackbar(BuildContext context, String message, {bool isSuccess = true}) {
+    final Color backgroundColor = isSuccess ? Colors.green : Colors.red;
+
+    final snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: backgroundColor,
+      duration: const Duration(seconds: 3), // Duration of Snackbar
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+  
 }
 
 Widget buildDrawer(BuildContext context) {
@@ -329,4 +348,7 @@ Widget buildDrawer(BuildContext context) {
         );
       },
     );
+
+ 
+
   }
