@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "774156194684",
+    "project_id": "push-notification-c06a1",
+    "storage_bucket": "push-notification-c06a1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774156194684:android:1723f2aca1725d12254af9",
+        "android_client_info": {
+          "package_name": "com.example.timeplot_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz4l-ROX1EnP0FAmTnsoJd-agxVEX7wR4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

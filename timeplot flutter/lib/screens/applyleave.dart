@@ -49,7 +49,7 @@ class _ApplyleaveState extends State<Applyleave> {
   @override
   void initState() {
     super.initState();
-    _fetchLeaveTypes();
+   _fetchLeaveTypes();
     transferdata();
   }
 

@@ -4,6 +4,8 @@ import 'package:timeplot_flutter/screens/applyleave.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
 import 'package:timeplot_flutter/screens/leavelist.dart';
 import 'package:timeplot_flutter/screens/login.dart';
+import 'package:timeplot_flutter/screens/qrcodegenerator.dart';
+import 'package:timeplot_flutter/screens/qrcodescan.dart';
 import 'package:timeplot_flutter/screens/scanner.dart';
 import 'package:timeplot_flutter/screens/ticket.dart';
 import 'package:timeplot_flutter/screens/welcome.dart';
@@ -140,6 +142,18 @@ elevation: 0, // Set to 0 if you don't want default shadow
         print('Navigating to settings');
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (c) => TicketScreen()));
+        // Navigate to settings
+        break;
+        case 'QRCodeGenerator':
+        print('Navigating to settings');
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (c) => Qrcodegenerator()));
+        // Navigate to settings
+        break;
+        case 'QRCodeScan':
+        print('Navigating to settings');
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (c) => Qrcodescan()));
         // Navigate to settings
         break;
       case 'Logout':

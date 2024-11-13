@@ -2,6 +2,7 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    // id 'com.google.gms.google-services'
 }
 
 def localProperties = new Properties()
@@ -67,4 +68,5 @@ flutter {
 dependencies {
     //  implementation 'com.jakewharton.threetenabp:threetenabp:2.3.0' 
      implementation 'com.dexterous.flutterlocalnotifications:flutter_local_notifications:latest_version' // Update this to the latest version
+    //  implementation platform('com.google.firebase:firebase-bom:33.5.1')
 }

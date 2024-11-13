@@ -6,7 +6,7 @@ import 'package:timeplot_flutter/screens/appbar.dart';
 
 class ApplyLeaveService {
 
-final String? Ip = dotenv.env['ENVIRONMENT']! =='dev' ? dotenv.env['LOCAL_IP']!:dotenv.env['SERVER_IP']!;
+
 
   Future getLeaveType(context) async {
     print("Leavetype");
@@ -45,11 +45,12 @@ var Token=token.accesstoken;
     final response = await http.post(
        Uri.parse("http://192.168.31.45:3007/users/addusersleave"),
       // Uri.parse("$Ip/stashook/applyLeave"),
-       headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization': ' $Token',
-            },
-      body:jsonEncode ({
+      //  headers: <String, String>{
+      //         'Content-Type': 'application/json; charset=UTF-8',
+      //         'Authorization': ' $Token',
+      //       },
+      // jsonEncode
+      body: ({
         'employeeId': employeeId,
         'noOfDays': noOfDays.toString(),
         'symbol': symbol,
@@ -85,10 +86,11 @@ var Token=token.accesstoken;
     final response = (await http.get
     (Uri.parse('http://192.168.31.45:3007/users/userleavelist?employeeId=' +
             empid.toString()),
-             headers: {
-          'contentType':'application/json;charset=UTF-8',
-          'Authorization':'$Token',
-        }));
+        //      headers: {
+        //   'contentType':'application/json;charset=UTF-8',
+        //   'Authorization':'$Token',
+        // }
+        ));
     var listData = json.decode(response.body.toString());
     List<dynamic> leaveList = listData['result'];
     // print("listdata" + leaveList.toString());
@@ -105,12 +107,12 @@ var Token=token.accesstoken;
     final response = await http.post(
        Uri.parse("http://192.168.31.45:3007/users/userleavecancel"),
       // Uri.parse("$Ip/stashook/cancelLeave"),
-       headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization': ' $Token',
-            },
-        
-        body: jsonEncode ({'leaveId': leaveId}));
+      //  headers: <String, String>{
+      //         'Content-Type': 'application/json; charset=UTF-8',
+      //         'Authorization': ' $Token',
+      //       },
+        // jsonEncode
+        body:  ({'leaveId': leaveId}));
     if (response.statusCode == 200) {
       showdialog(context, "Leave Cancelled");
     }

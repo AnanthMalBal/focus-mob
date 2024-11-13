@@ -105,7 +105,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
           //       ),
           //     ]),
           CommonAppBar(
-        menuItems: ['ApplyLeave', 'LeaveList', 'Logout'],
+        menuItems: ['ApplyLeave', 'LeaveList','QRCodeGenerator','QRCodeScan','Logout'],
         title: 'Welcome',
         showProfile: true,
         // onProfileTap: () {
@@ -134,7 +134,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
             //  Padding( padding: new EdgeInsets.all(10.0),
             Row(
               children: <Widget>[
-                Padding(padding: EdgeInsets.all(5)),
+                Padding(padding: EdgeInsets.all(10)),
 
                 Container(
                   decoration: BoxDecoration(
@@ -144,7 +144,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
                   child: Text("Mark Attendance-WFH",
                       style: TextStyle(
                         color: AppColors.textColor,
-                        fontSize: 12,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                       )),
                 ),
@@ -164,10 +164,10 @@ class _welcomeScreenState extends State<welcomeScreen> {
               height: 60,
             ),
             Row(children: <Widget>[
-              Padding(padding: EdgeInsets.all(10)),
+              Padding(padding: EdgeInsets.all(15)),
               Material(
                 color: AppColors.primaryColor,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(15),
                 //padding:EdgeInsets.all(10),
                 child: InkWell(
                   onTap: () {
@@ -193,7 +193,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
               SizedBox(width: 60),
               Material(
                 color: AppColors.primaryColor,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(15),
                 //padding:EdgeInsets.all(10),
                 child: InkWell(
                   onTap: () {

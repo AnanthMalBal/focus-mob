@@ -1,4 +1,6 @@
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:timeplot_flutter/screens/login.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -13,7 +15,9 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 Future<void> main() async {
   // Load environment variables from the appropriate .env file
   await dotenv.load(fileName: ".env"); 
-  
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
+  // getToken();
 // WidgetsFlutterBinding.ensureInitialized();
 
 // //   // Initialize the notification service
@@ -40,6 +44,12 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
+// Future<String?> getToken() async {
+//   FirebaseMessaging messaging = FirebaseMessaging.instance;
+//   String? token = await messaging.getToken();
+//   print("FCM Token: $token");
+//   return token;
+// }
 
 
 
