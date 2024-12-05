@@ -33,10 +33,10 @@ final String attendanceUrl = dotenv.env['markAttendanceUrl']!;
   //  "http://192.168.31.45:3007/timesheet/addusersattendance"
   headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization': ' $Token',
+              'Authorization': '$Token',
             },
     body: jsonEncode({
-              'employeeId': employeeId,
+              // 'employeeId': employeeId,
               'symbol': symbol,
               'mode':WFH,
               

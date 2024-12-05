@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/screens/welcome.dart';
+import 'package:timeplot_flutter/screens/menu.dart';
 // import 'package:timeplot_flutter/model/login';
 // import 'package:timeplot_flutter/screens/calender.dart';
 //  import 'package:http/http.dart' as http;
@@ -42,7 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+   
     return Scaffold(
+      // appBar: AppBar(title: Text('Login')),
       // color: AppColors.backgroundColor,
     body: SingleChildScrollView(
         child: SafeArea(
@@ -214,6 +217,6 @@ String message = jsonResponse['message'];
     bool isSuccess = message.contains("successfully");
 
     // Show Snackbar using SnackbarHelper
-    CommonAppBar.showSnackbar(context, result, isSuccess: isSuccess);
+     CommonAppBar.showSnackbar(context, result, isSuccess: isSuccess);
   }
 }

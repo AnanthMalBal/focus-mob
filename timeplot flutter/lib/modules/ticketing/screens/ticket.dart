@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
+import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/screens/productdetails.dart';
-import 'package:timeplot_flutter/screens/ticketraising.dart';
+import 'package:timeplot_flutter/modules/ticketing/screens/ticketraising.dart';
+import 'package:timeplot_flutter/screens/scanner.dart';
 import 'package:timeplot_flutter/services/customerlistservice.dart';
 
 
@@ -12,7 +15,10 @@ import 'package:timeplot_flutter/services/customerlistservice.dart';
 SharedPreferences? prefs;
 
 class TicketScreen extends StatefulWidget {
-  const TicketScreen({super.key});
+  // const TicketScreen({super.key});
+  final List<Map<String, dynamic>> resultMenu;  // Parameter for menuItems
+
+  TicketScreen({required this.resultMenu,});
 
   @override
   State<TicketScreen> createState() => _TicketScreenState();
@@ -21,6 +27,8 @@ class TicketScreen extends StatefulWidget {
 class _TicketScreenState extends State<TicketScreen> {
   
   String query = "";
+  var empId;
+  var roles;
 
   TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _contacts = [];
@@ -29,12 +37,21 @@ class _TicketScreenState extends State<TicketScreen> {
   final CustomerListService customerservice = CustomerListService();
 Map<String, dynamic>? _selectedContact;
 
+void transferdata() async {
+    final empData = await shareddata.getpatdata();
+    setState(() {
+      empId = empData.userId;
+      roles=empData.roles;
+      print("id" + empId.toString());
+    });
+  }
+
 
   @override
   void initState() {
     super.initState();
 
-    // transferdata();
+     transferdata();
   }
 
   Future<void> _fetchContacts(String text) async {
@@ -90,10 +107,12 @@ Map<String, dynamic>? _selectedContact;
 
   @override
   Widget build(BuildContext context) {
+ 
     return Scaffold(
         appBar: CommonAppBar(
-          menuItems: ['Welcome', 'Logout'],
+          menuItems:widget.resultMenu,
           title: 'Ticketing',
+         
           showProfile: true,
           // onProfileTap: () {
           //   print('Profile tapped!');
@@ -117,7 +136,28 @@ Map<String, dynamic>? _selectedContact;
                         .textColor, 
                       fontWeight: FontWeight.w500,
                   ),
-                  suffixIcon: Icon(Icons.search),
+                  suffixIcon: Row(
+      mainAxisSize: MainAxisSize.min, 
+      children: [
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            // Handle search action
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.qr_code_scanner),
+          onPressed: () {
+            Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ScannerScreen()), 
+                  );
+          },
+        ),
+      ],
+    ),
                 ),
               ),
             ),
@@ -125,7 +165,44 @@ Map<String, dynamic>? _selectedContact;
                       ? getList()
                       : getContactDetails(),
           ],
-        ));
+        )
+//         body: Column(
+//   children: [
+//     if (_selectedContact == null)
+//       Padding(
+//         padding: EdgeInsets.all(10),
+//         child: Row(
+//           children: [
+//             Expanded(
+//               child: TextField(
+//                 controller: _searchController,
+//                 onChanged: _onSearchChanged,
+//                 decoration: InputDecoration(
+//                   labelText: "Search Customer",
+//                   labelStyle: TextStyle(
+//                     color: AppColors.textColor,
+//                     fontWeight: FontWeight.w500,
+//                   ),
+//                   prefixIcon: Icon(Icons.search),
+//                 ),
+//               ),
+//             ),
+//             SizedBox(width: 10), // Add some spacing between the TextField and the icon
+//             IconButton(
+//               icon: Icon(Icons.qr_code_scanner,
+//               // color: Colors.white,
+//                       size: 40,),
+//               onPressed: () {
+//                 // Handle scan action here
+//               },
+//             ),
+//           ],
+//         ),
+//       ),
+//     _selectedContact == null ? getList() : getContactDetails(),
+//   ],
+// )
+        );
   }
 
   Widget getList() {

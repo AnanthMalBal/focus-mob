@@ -1,0 +1,93 @@
+class Menu {
+  final String menuId;
+  final String parentId;
+  final String menuName;
+  final String actionURL;
+  final String cssClassIcon;
+  final String cssClass;
+  final String level;
+  final String alignment;
+  final String toggle;
+  final String translate;
+  final String bullet;
+  final String title;
+  final List<Menu> subMenu; // Submenus for nested items
+
+  // Constructor
+  Menu({
+    required this.menuId,
+    required this.parentId,
+    required this.menuName,
+    required this.actionURL,
+    required this.cssClassIcon,
+    required this.cssClass,
+    required this.level,
+    required this.alignment,
+    required this.toggle,
+    required this.translate,
+    required this.bullet,
+    required this.title,
+    required this.subMenu,
+  });
+
+  // Factory method to create a Menu from JSON
+  factory Menu.fromJson(Map<String, dynamic> json) {
+    return Menu(
+      menuId: json['menuId'],
+      parentId: json['parentId'],
+      menuName: json['menuName'],
+      actionURL: json['actionURL'],
+      cssClassIcon: json['cssClassIcon'],
+      cssClass: json['cssClass'],
+      level: json['level'],
+      alignment: json['alignment'],
+      toggle: json['toggle'],
+      translate: json['translate'],
+      bullet: json['bullet'],
+      title: json['title'],
+      subMenu: json['subMenu'] != null
+          ? List<Menu>.from(json['subMenu'].map((x) => Menu.fromJson(x)))
+          : [],
+    );
+  }
+
+  // Method to convert the Menu object to a Map<String, dynamic> (toJson)
+  Map<String, dynamic> toJson() {
+    return {
+      'menuId': menuId,
+      'parentId': parentId,
+      'menuName': menuName,
+      'actionURL': actionURL,
+      'cssClassIcon': cssClassIcon,
+      'cssClass': cssClass,
+      'level': level,
+      'alignment': alignment,
+      'toggle': toggle,
+      'translate': translate,
+      'bullet': bullet,
+      'title': title,
+      'subMenu': subMenu.map((submenu) => submenu.toJson()).toList(),
+
+  toJson() {}
+    };
+  }
+
+  // Method to build the menu hierarchy
+  static List<Menu> buildMenuHierarchy(List<Map<String, dynamic>> data) {
+    Map<String, Menu> allMenus = {};
+    List<Menu> rootMenus = [];
+
+    for (var item in data) {
+      Menu menu = Menu.fromJson(item);
+      allMenus[menu.menuId] = menu;
+      if (menu.parentId == menu.menuId) {
+        rootMenus.add(menu);
+      } else {
+        // If the menu has a parent, add it to the parent's submenu
+        allMenus[menu.parentId]?.subMenu.add(menu);
+      }
+    }
+
+    return rootMenus;
+  }
+}

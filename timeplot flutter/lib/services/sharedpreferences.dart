@@ -6,6 +6,7 @@ class SharedPref {
     final preferences = await SharedPreferences.getInstance();
     
     await preferences.setString('userId', employeeDetails.userId);
+     await preferences.setStringList('roles', employeeDetails.roles);
     await preferences.setString('accesstoken', employeeDetails.accesstoken);
     await preferences.setString('message', employeeDetails.message);
     
@@ -15,13 +16,15 @@ class SharedPref {
     final preferences = await SharedPreferences.getInstance();
     
     final userId = preferences.getString('userId');
+    final roles = preferences.getStringList('roles')?? [];;
     final accesstoken = preferences.getString('accesstoken');
     final message = preferences.getString('message');
    
-    //print("inside shared get" + preferences.getInt('userId'));
+    // print("inside shared get" + accesstoken.toString());
     return EmployeeDetails(
                           
                           userId:userId.toString(),
+                          roles:roles,
                           accesstoken: accesstoken.toString(),
                           message: message.toString(),
                           

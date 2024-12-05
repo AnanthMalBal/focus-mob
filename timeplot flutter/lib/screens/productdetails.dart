@@ -16,14 +16,15 @@ class _ProductDetailsState extends State<ProductDetails> {
   @override
   Widget build(BuildContext context) {
      return Scaffold(
-      appBar: CommonAppBar(
-          menuItems: ['Welcome','Ticket', 'Logout'],
-          title: 'Products',
-          showProfile: true,
-          // onProfileTap: () {
-          //   print('Profile tapped!');
-          // },
-        ),
+      // appBar:
+      //  CommonAppBar(
+      //     menuItems: [],
+      //     title: 'Products',
+      //     showProfile: true,
+      // //     // onProfileTap: () {
+      // //     //   print('Profile tapped!');
+      // //     // },
+      //    ),
         body: Column(
           children: [
             // SizedBox(height:10),

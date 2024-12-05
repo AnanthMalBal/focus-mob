@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:intl/intl.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
+import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/applyleaveservice.dart';
 import 'package:timeplot_flutter/services/getholidaysservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
@@ -15,7 +17,10 @@ SharedPreferences? prefs;
 List<Map<String, dynamic>> _itemsBalance = [];
 
 class Applyleave extends StatefulWidget {
-  const Applyleave({super.key});
+  // const Applyleave({super.key});
+  final List<Map<String, dynamic>> resultMenu;  // Parameter for menuItems
+
+  Applyleave({required this.resultMenu,});
 
   @override
   State<Applyleave> createState() => _ApplyleaveState();
@@ -36,11 +41,13 @@ class _ApplyleaveState extends State<Applyleave> {
   final ApplyLeaveService applyleaveservice = ApplyLeaveService();
   final HolidayService leaveservice = HolidayService();
   var empId;
+var roles;
 
   void transferdata() async {
     final empData = await shareddata.getpatdata();
     setState(() {
       empId = empData.userId;
+      roles=empData.roles;
       print("id" + empId.toString());
     });
     getBalanceLeave(empId.toString(), context);
@@ -66,15 +73,16 @@ class _ApplyleaveState extends State<Applyleave> {
 
   @override
   Widget build(BuildContext context) {
+    
     double width = 260;
     return Scaffold(
        
         appBar:
 
             CommonAppBar(
-          menuItems: ['Welcome', 'Logout'],
-          title: 'ApplyLeave',
-
+          menuItems: widget.resultMenu,
+          title: 'Apply Leave',
+       
           showProfile: true,
           // onProfileTap: () {
           //   print('Profile tapped!');

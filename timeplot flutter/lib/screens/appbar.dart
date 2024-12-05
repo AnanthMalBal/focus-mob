@@ -1,31 +1,43 @@
 import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timeplot_flutter/screens/applyleave.dart';
+import 'package:timeplot_flutter/modules/lms/screens/applyleave.dart';
+import 'package:timeplot_flutter/modules/lms/screens/calender.dart';
+// import 'package:timeplot_flutter/modules/lms/screens/filltimesheet.dart';
+// import 'package:timeplot_flutter/modules/lms/screens/leavelist.dart';
+import 'package:timeplot_flutter/modules/lms/screens/login.dart';
+import 'package:timeplot_flutter/modules/lms/screens/welcome.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/screens/leavelist.dart';
-import 'package:timeplot_flutter/screens/login.dart';
-import 'package:timeplot_flutter/screens/qrcodegenerator.dart';
-import 'package:timeplot_flutter/screens/qrcodescan.dart';
-import 'package:timeplot_flutter/screens/scanner.dart';
-import 'package:timeplot_flutter/screens/ticket.dart';
-import 'package:timeplot_flutter/screens/welcome.dart';
+// import 'package:timeplot_flutter/screens/menu.dart';
+// import 'package:timeplot_flutter/screens/qrcodegenerator.dart';
+// import 'package:timeplot_flutter/screens/qrcodescan.dart';
+// import 'package:timeplot_flutter/modules/ticketing/screens/ticket.dart';
+import 'package:timeplot_flutter/services/menuservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 
 final shareddata = SharedPref();
 SharedPreferences? prefs;
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final List<String> menuItems;
+  final List<Map<String, dynamic>> menuItems;
 
   final String title;
   final bool showProfile;
+
+  final MenuService menuservice = MenuService();
+
   // final VoidCallback onProfileTap;
 
-  CommonAppBar(
-      {required this.title,
-      this.showProfile = false,
-      // required this.onProfileTap,
-      required this.menuItems});
+  CommonAppBar({
+    required this.title,
+    this.showProfile = false,
+    // required this.onProfileTap,
+    required this.menuItems,
+  });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Map<String, bool> expandedSubmenus = {};
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +60,12 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisSize: MainAxisSize.min, // To make the row size fit content
         children: [
           Image.asset(
-            'images/focus_topnav.jpg', 
-             fit: BoxFit.fill,
-            height: 50, 
-            width: 90, 
+            'images/focus_topnav.jpg',
+            fit: BoxFit.fill,
+            height: 50,
+            width: 90,
           ),
-
-          SizedBox(
-              width: 10), 
+          SizedBox(width: 10),
           Expanded(
             child: Text(
               title,
@@ -68,44 +78,72 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       backgroundColor: AppColors.backgroundColor,
-elevation: 0, // Set to 0 if you don't want default shadow
-    bottom: PreferredSize(
-      preferredSize: Size.fromHeight(1.0), // Set the height of the border
-      child: Container(
-        color:  Colors.grey,  // Border color
-        height: 1.0,         // Border height
+      elevation: 0, // Set to 0 if you don't want default shadow
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(1.0), // Set the height of the border
+        child: Container(
+          color: Colors.grey, // Border color
+          height: 1.0, // Border height
+        ),
       ),
-    ),
       actions: <Widget>[
         if (showProfile)
           Padding(
             padding: const EdgeInsets.only(right: 5.0),
             child: GestureDetector(
               onTap: () {
-                // Open the drawer when the profile image is tapped
                 Scaffold.of(context).openDrawer();
               },
               child: CircleAvatar(
                 radius: 20,
                 backgroundImage: AssetImage("images/image.jpeg"),
-                // NetworkImage(
-                //   'https://example.com/profile_picture.jpg', // Replace with your profile picture URL
-                // ),
               ),
             ),
           ),
         PopupMenuButton<String>(
           onSelected: (String value) {
-            // Handle menu item selection
-            handlePopupMenuSelection(context, value);
-            print('Selected: $value');
+            handlePopupMenuSelection(context, value, menuItems);
           },
           itemBuilder: (BuildContext context) {
-            return menuItems.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Text(choice),
-              );
+            return menuItems.map((menu) {
+              // Check if the menu has submenus
+              if (menu['subMenu'] != null && menu['subMenu'].isNotEmpty) {
+                return PopupMenuItem<String>(
+                  value: menu['menuName'],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(menu['menuName']),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20.0),
+                        child: Column(
+                          children:
+                              (menu['subMenu'] as List).map<Widget>((subMenu) {
+                            return InkWell(
+                              onTap: () {
+                                handleSubmenuSelection(
+                                    context, subMenu['menuName'], menuItems);
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(subMenu['menuName'],
+                                    style:
+                                        TextStyle(color: AppColors.textColor)),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return PopupMenuItem<String>(
+                  value: menu['menuName'],
+                  child: Text(menu['menuName']),
+                );
+              }
             }).toList();
           },
         ),
@@ -113,69 +151,107 @@ elevation: 0, // Set to 0 if you don't want default shadow
     );
   }
 
-  @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
-
-  Future<void> handlePopupMenuSelection(
-      BuildContext context, String menuItem) async {
+  // Method to handle menu item selection and navigate accordingly
+  Future<void> handlePopupMenuSelection(BuildContext context, String menuItem,
+      List<Map<String, dynamic>> resultMenu) async {
     // Switch-case for handling PopupMenu selection
     switch (menuItem) {
-      case 'Welcome':
-        print('Navigating to settings');
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (c) => welcomeScreen()));
-        // Navigate to settings
+      case 'Dashboard':
+        print('Navigating to Welcome Screen');
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (c) => welcomeScreen(
+            resultMenu: resultMenu,
+          ), // Pass resultMenu here
+        ));
         break;
-      case 'ApplyLeave':
-        print('Navigating to settings');
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (c) => Applyleave()));
-        // Navigate to settings
+      case 'WorkAllocation':
+        print('Navigating to Welcome Screen');
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (c) => welcomeScreen(
+            resultMenu: resultMenu,
+          ), // Pass resultMenu here
+        ));
         break;
-      case 'LeaveList':
-        print('Navigating to settings');
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (c) => Leavelist()));
-        // Navigate to settings
+      case 'Reports':
+        print('Navigating to LeaveList Screen');
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (c) => welcomeScreen(
+                  resultMenu: resultMenu,
+                )));
         break;
-        case 'Ticket':
-        print('Navigating to settings');
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (c) => TicketScreen()));
-        // Navigate to settings
-        break;
-        case 'QRCodeGenerator':
-        print('Navigating to settings');
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (c) => Qrcodegenerator()));
-        // Navigate to settings
-        break;
-        case 'QRCodeScan':
-        print('Navigating to settings');
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (c) => Qrcodescan()));
-        // Navigate to settings
-        break;
-      case 'Logout':
-        prefs = await SharedPreferences.getInstance();
-        await prefs?.clear();
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (c) => LoginScreen()), (route) => false);
-        print('Logging out');
-        // Add logout logic here
-        break;
+
+      // case 'LeaveList':
+      //   print('Navigating to LeaveList Screen');
+      //   Navigator.of(context).push(MaterialPageRoute(
+      //       builder: (c) => Leavelist(resultMenu: resultMenu)));
+      //   break;
+      // case 'Ticket':
+      //   print('Navigating to TicketScreen');
+      //   Navigator.of(context).push(MaterialPageRoute(
+      //       builder: (c) => TicketScreen(resultMenu: resultMenu)));
+      //   break;
+      // case 'QRCodeGenerator':
+      //   print('Navigating to QRCodeGenerator Screen');
+      //   Navigator.of(context)
+      //       .push(MaterialPageRoute(builder: (c) => Qrcodegenerator()));
+      //   break;
+      // case 'QRCodeScan':
+      //   print('Navigating to QRCodeScan Screen');
+      //   Navigator.of(context)
+      //       .push(MaterialPageRoute(builder: (c) => Qrcodescan()));
+      //   break;
+      // case 'Performance':
+      //   print('Navigating to QRCodeScan Screen');
+      //   Navigator.of(context).push(MaterialPageRoute(
+      //       builder: (c) => CalenderScreen(resultMenu: resultMenu)));
+      //   break;
+      // case 'Logout':
+      //   prefs = await SharedPreferences.getInstance();
+      //   await prefs?.clear();
+      //   Navigator.of(context).pushAndRemoveUntil(
+      //       MaterialPageRoute(builder: (c) => LoginScreen()), (route) => false);
+      //   print('Logging out');
+      //   break;
       default:
         print('Invalid selection');
     }
   }
 
-  // static void showSnackbar(BuildContext context, String result) {
+  Future<void> handleSubmenuSelection(BuildContext context, String submenuItem,
+      List<Map<String, dynamic>> resultMenu) async {
+    switch (submenuItem) {
+      case 'Performance':
+        print('Navigating to Welcome Screen');
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (c) => CalenderScreen(
+              resultMenu: resultMenu,
+            ), // Pass resultMenu here
+          ),
+        );
+        break;
+      case 'My Attendance':
+        print('Navigating to Welcome Screen');
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (c) => CalenderScreen(
+            resultMenu: resultMenu,
+          ), // Pass resultMenu here
+        ));
+        break;
+      case 'Apply Leave':
+        print('Navigating to ApplyLeave Screen');
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (c) => Applyleave(
+                  resultMenu: resultMenu,
+                )));
+        break;
+      default:
+        print('Invalid submenu selection');
+    }
+  }
 
-  
-  //   final snackBar = SnackBar(content: Text(result));
-  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  // }
-   static void showSnackbar(BuildContext context, String message, {bool isSuccess = true}) {
+  static void showSnackbar(BuildContext context, String message,
+      {bool isSuccess = true}) {
     final Color backgroundColor = isSuccess ? Colors.green : Colors.red;
 
     final snackbar = SnackBar(
@@ -186,183 +262,159 @@ elevation: 0, // Set to 0 if you don't want default shadow
 
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
-  
 }
 
 Widget buildDrawer(BuildContext context) {
-  // return Drawer(
-  //   child: ListView(
-  //     padding: EdgeInsets.zero,
-  //     children: <Widget>[
-  //       DrawerHeader(
-  //         decoration: BoxDecoration(
-  //           color: AppColors.primaryColor,
-  //         ),
-  //         child: Text(
-  //           'Employee Profile',
-  //           style: TextStyle(
-  //             color: Colors.white,
-  //             fontSize: 24,
-  //           ),
-  //         ),
-  //       ),
-  //       ListTile(
-  //         title: Text('Name:' + "Ananthi.N"),
-  //         // onTap: () {
-  //         //   Navigator.pop(context);
-  //         //   Navigator.pushReplacement(
-  //         //     context,
-  //         //     MaterialPageRoute(builder: (context) => welcomeScreen()),
-  //         //   );
-  //         // },
-  //       ),
-  //       ListTile(
-  //         title: Text('PhoneNumber:' + "9791397039"),
-  //         // onTap: () {
-  //         //   Navigator.pop(context);
-  //         //   Navigator.pushReplacement(
-  //         //     context,
-  //         //     MaterialPageRoute(builder: (context) => CalenderScreen()),
-  //         //   );
-  //         // },
-  //       ),
-  //       ListTile(
-  //         title: Text('Email:' + "ananthee89@gmail.com"),
-  //         onTap: () {},
-  //       ),
-  //       ListTile(
-  //         title: Text('ReportingTo:' + "Tamilselvan"),
-  //         onTap: () {},
-  //       ),
-  //     ],
-  //   ),
-  // );
- return Drawer(
-  child: ListView(
-    padding: EdgeInsets.zero,
-    children: <Widget>[
-      DrawerHeader(
-        decoration: BoxDecoration(
-          color: AppColors.primaryColor,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // Aligns text and icons to the start
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.person, // Profile icon
+  return Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor,
+          ),
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.start, // Aligns text and icons to the start
+            children: [
+              Text(
+                'Employee Profile', // Text added before the row
+                style: TextStyle(
                   color: Colors.white,
-                  size: 40, // Adjust size as needed
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold, // Optional: Make the title bold
                 ),
-                SizedBox(width: 16), // Space between icon and text
-                Text(
-                  'Employee Profile',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 55), // Space between the profile and scanner icons
-            GestureDetector( // Wrap the scanner row with GestureDetector
-              onTap: () {
-                // Implement your scanner logic here
-                // For example, navigate to the scanner screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ScannerScreen()), // Replace with your scanner screen
-                );
-              },
-              child: Row(
+              ),
+              SizedBox(height: 10), // Space between the title and the row
+              Row(
+                crossAxisAlignment: CrossAxisAlignment
+                    .center, // Vertically center items in the row
                 children: [
-                  Icon(
-                    Icons.qr_code_scanner, // Scanner icon
-                    color: Colors.white,
-                    size: 40, // Adjust size as needed
+                  // Icon(
+                  //   Icons.person, // Profile icon
+                  //   color: Colors.white,
+                  //   size: 40, // Adjust size as needed
+                  // ),
+                  CircleAvatar(
+                    radius: 20, // Adjust the size of the avatar
+                    backgroundImage: AssetImage(
+                        "images/image.jpeg"), // Replace with your image path
                   ),
                   SizedBox(width: 16), // Space between icon and text
-                  // Text(
-                  //   'Scan QR Code',
-                  //   style: TextStyle(
-                  //     color: Colors.white,
-                  //     fontSize: 18,
-                  //   ),
-                  // ),
+                  Text(
+                    'Ananthi.N', // Employee Name
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
+              SizedBox(height: 20),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment
+                    .center, // Vertically center items in the row
+                children: [
+                  InkWell(
+                    onTap: () {
+                      // Action when the lock icon is tapped
+                      print('Lock Icon Tapped!');
+                      // You can perform any action here like navigating to another screen
+                    },
+                    child: Icon(
+                      Icons.lock, // Lock icon
+                      color: Colors.white,
+                      size: 20, // Adjust size as needed
+                    ),
+                  ),
+                  SizedBox(width: 10), // Space between icon and text
+                  Text(
+                    'ChangePassword', // Text next to the icon
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-      ListTile(
-        title: Text('Name: Ananthi.N'),
-        // Uncomment and implement if needed
-        // onTap: () {
-        //   Navigator.pop(context);
-        //   Navigator.pushReplacement(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => welcomeScreen()),
-        //   );
-        // },
-      ),
-      ListTile(
-        title: Text('Phone Number: 9791397039'),
-        // Uncomment and implement if needed
-        // onTap: () {
-        //   Navigator.pop(context);
-        //   Navigator.pushReplacement(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => CalenderScreen()),
-        //   );
-        // },
-      ),
-      ListTile(
-        title: Text('Email: ananthee89@gmail.com'),
-        onTap: () {},
-      ),
-      ListTile(
-        title: Text('Reporting To: Tamilselvan'),
-        onTap: () {},
-      ),
-    ],
-  ),
-);
+        ListTile(
+          title: Text('Name: Ananthi.N'),
+          // Uncomment and implement if needed
+          // onTap: () {
+          //   Navigator.pop(context);
+          //   Navigator.pushReplacement(
+          //     context,
+          //     MaterialPageRoute(builder: (context) => welcomeScreen()),
+          //   );
+          // },
+        ),
+        ListTile(
+          title: Text('Phone Number: 9791397039'),
+          // Uncomment and implement if needed
+          // onTap: () {
+          //   Navigator.pop(context);
+          //   Navigator.pushReplacement(
+          //     context,
+          //     MaterialPageRoute(builder: (context) => CalenderScreen()),
+          //   );
+          // },
+        ),
+        ListTile(
+          title: Text('Email: ananthee89@gmail.com'),
+          onTap: () {},
+        ),
+        ListTile(
+          title: Text('Reporting To: Tamilselvan'),
+          onTap: () {},
+        ),
+        ListTile(
+          title: Text('Logout'),
+          onTap: () async {
+            prefs = await SharedPreferences.getInstance();
+            await prefs?.clear();
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (c) => LoginScreen()),
+                (route) => false);
+            print('Logging out');
+          },
+        ),
+      ],
+    ),
+  );
 }
 
+Future showdialog(
+  BuildContext context,
+  String message,
+) async {
+  return showDialog(
+      builder: (context) =>
+          new AlertDialog(title: new Text(message), actions: <Widget>[
+            new FloatingActionButton(
+                onPressed: () => Navigator.pop(context), child: new Text("OK"))
+          ]),
+      context: context);
+}
 
-  Future showdialog(BuildContext context, String message,) async {
-    return showDialog(
-        builder: (context) =>
-            new AlertDialog(title: new Text(message), actions: <Widget>[
-              new FloatingActionButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: new Text("OK"))
-            ]),
-        context: context);
-  }
-
-
-  void showAlert(String title, String message,BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-          ],
-        );
-      },
-    );
-
- 
-
-  }
+void showAlert(String title, String message, BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: Text("OK"),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
+}

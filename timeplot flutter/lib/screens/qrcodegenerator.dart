@@ -36,15 +36,15 @@ class _QrcodegeneratorState extends State<Qrcodegenerator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: CommonAppBar(
-        menuItems: ['Welcome', 'Logout'],
-        title: 'QRCodeGenerator',
-        showProfile: true,
-        // onProfileTap: () {
-        //   print('Profile tapped!');
+      //  appBar: CommonAppBar(
+      //   menuItems: [],
+      //   title: 'QRCodeGenerator',
+      //   showProfile: true,
+      //   // onProfileTap: () {
+      //   //   print('Profile tapped!');
 
-        // },
-      ),
+      //   // },
+      // ),
  body: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

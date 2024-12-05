@@ -2,6 +2,7 @@ class EmployeeDetails {
   String accesstoken;
   String userId;
   String message;
+  List<String> roles;
   
   EmployeeDetails(
       {
@@ -9,6 +10,7 @@ class EmployeeDetails {
       
       required this.accesstoken,
       required this.message,
+      required this.roles
       
       });
 }

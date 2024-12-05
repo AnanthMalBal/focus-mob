@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timeplot_flutter/modules/lms/screens/calender.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
-import 'package:timeplot_flutter/screens/calender.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/screens/ticket.dart';
-import 'package:timeplot_flutter/screens/ticketraising.dart';
+import 'package:timeplot_flutter/modules/ticketing/screens/ticket.dart';
+import 'package:timeplot_flutter/modules/ticketing/screens/ticketraising.dart';
+import 'package:timeplot_flutter/screens/menu.dart';
+
 import 'package:timeplot_flutter/services/addusersattendanceservice.dart';
+import 'package:timeplot_flutter/services/menuservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 
 final shareddata = SharedPref();
@@ -16,7 +20,10 @@ SharedPreferences? prefs;
 
 class welcomeScreen extends StatefulWidget {
   // const welcomeScreen({super.key,});
+ final List<Map<String, dynamic>> resultMenu; 
+ 
 
+  welcomeScreen({required this.resultMenu,});
   @override
   State<welcomeScreen> createState() => _welcomeScreenState();
 }
@@ -27,92 +34,59 @@ class _welcomeScreenState extends State<welcomeScreen> {
   // SampleItem? selectedMenu;
   var empId;
   var mode = 'WFH';
+  var roles;
+   
+   final MenuService menuservice = MenuService();
+late List<Map<String, dynamic>> menuItems;
+
 
   void transferdata() async {
     final empData = await shareddata.getpatdata();
     setState(() {
       empId = empData.userId;
-      print("id" + empId.toString());
+      roles=empData.roles;
+      // print("id" + empId.toString());
     });
   }
 
+  // Future<void> getMenu() async {
+  //   try {
+  //     List<Map<String, dynamic>>  resultMenu = await menuservice.fetchMenuItems();
+  //     setState(() {
+  //       menuItems = resultMenu;
+  //     });
+  //   } catch (e) {
+  //     print('Error fetching menu items: $e');
+  //   }
+  // }
+
   @override
   void initState() {
-    transferdata();
     super.initState();
+    transferdata();
+  //  getMenu(); 
+    menuItems = widget.resultMenu; 
   }
 
   @override
   Widget build(BuildContext context) {
+   
+  
     return Scaffold(
       appBar:
-          // AppBar(
-          //     centerTitle: true,
-          //     title: Text(
-          //       "Welcome",
-          //       style: TextStyle(
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //     backgroundColor:AppColors.primaryColor,
-          //     actions: [
-          //       PopupMenuButton<SampleItem>(
-          //         initialValue: selectedMenu,
-          //         // Callback that sets the selected popup menu item.
-          //         onSelected: (value) async {
-          //           // setState(() {
-          //           //   selectedMenu = item;
-
-          //           // });
-          //           switch (value) {
-          //             case SampleItem.itemOne:
-          //               Navigator.of(context)
-          //                   .push(MaterialPageRoute(builder: (c) => Applyleave()));
-          //               // }
-          //               break;
-
-          //             case SampleItem.itemTwo:
-          //               Navigator.of(context)
-          //                   .push(MaterialPageRoute(builder: (c) => Leavelist()));
-          //               break;
-          //             case SampleItem.itemThree:
-          //               prefs = await SharedPreferences.getInstance();
-          //               await prefs?.clear();
-          //               Navigator.of(context).pushAndRemoveUntil(
-          //                   MaterialPageRoute(builder: (c) => LoginScreen()),
-          //                   (route) => false);
-          //               break;
-          //           }
-          //         },
-          //         itemBuilder: (BuildContext context) =>
-          //             <PopupMenuEntry<SampleItem>>[
-          //           const PopupMenuItem<SampleItem>(
-          //             value: SampleItem.itemOne,
-          //             child: Text('Apply Leave '),
-          //           ),
-          //           const PopupMenuItem<SampleItem>(
-          //             value: SampleItem.itemTwo,
-          //             child: Text('LeaveList'),
-          //           ),
-          //           const PopupMenuItem<SampleItem>(
-          //             value: SampleItem.itemThree,
-          //             child: Text('Logout'),
-          //           ),
-          //         ],
-          //         // onSelected : (value){
-
-          //         // }
-          //       ),
-          //     ]),
+         
           CommonAppBar(
-        menuItems: ['ApplyLeave', 'LeaveList','QRCodeGenerator','QRCodeScan','Logout'],
-        title: 'Welcome',
+        menuItems: widget.resultMenu,
+         title: widget.resultMenu[0]['menuName'],
         showProfile: true,
-        // onProfileTap: () {
-        //   print('Profile tapped!');
+        // showProfile: true,
+        // // onProfileTap: () {
+        // //   print('Profile tapped!');
 
         // },
-      ),
+     
+       ),
+     
       drawer: buildDrawer(context),
       body: SingleChildScrollView(
           child: SafeArea(
@@ -164,7 +138,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
               height: 60,
             ),
             Row(children: <Widget>[
-              Padding(padding: EdgeInsets.all(15)),
+              Padding(padding: EdgeInsets.all(40)),
               Material(
                 color: AppColors.primaryColor,
                 borderRadius: BorderRadius.circular(15),
@@ -174,11 +148,11 @@ class _welcomeScreenState extends State<welcomeScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CalenderScreen(),
+                          builder: (context) => CalenderScreen(resultMenu: widget.resultMenu),
                         ));
                   },
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: Text(
                       "LMS",
                       style: TextStyle(
@@ -200,11 +174,11 @@ class _welcomeScreenState extends State<welcomeScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TicketRaisingScreen(),
+                          builder: (context) => TicketScreen(resultMenu: widget.resultMenu,),
                         ));
                   },
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: Text(
                       "Ticket",
                       style: TextStyle(

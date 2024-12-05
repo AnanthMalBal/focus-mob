@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
+import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/customerlistservice.dart';
 
 class TicketRaisingScreen extends StatefulWidget {
@@ -18,13 +20,25 @@ List<dynamic> customerList=[];
   int currentPage = 1; // Track the current page
    final int pageSize = 10; // Show only 10 items per page
  int displayLimit = 10; // Limit displayed items to 10 initially 
+ var empId;
+ var roles;
+
+
+void transferdata() async {
+    final empData = await shareddata.getpatdata();
+    setState(() {
+      empId = empData.userId;
+      roles=empData.roles;
+      print("id" + empId.toString());
+    });
+  }
 
 @override
   void initState() {
     super.initState();
     _fetchList();
     
-    // transferdata();
+     transferdata();
   }
 
  
@@ -85,15 +99,19 @@ List<dynamic> customerList=[];
 
   @override
   Widget build(BuildContext context) {
+
+    // Access menu items from the provider
+    final menuItems = Provider.of<MenuProvider>(context).menuItems;
      return Scaffold(
-       appBar: CommonAppBar(
-          menuItems: ['Welcome','Ticket', 'Logout'],
-          title: 'TicketRaising',
-          showProfile: true,
-          // onProfileTap: () {
-          //   print('Profile tapped!');
-          // },
-        ),
+      //  appBar: CommonAppBar(
+      //     menuItems: menuItems,
+      //     title: 'TicketRaising',
+         
+      //     showProfile: true,
+      //     // onProfileTap: () {
+      //     //   print('Profile tapped!');
+      //     // },
+      //   ),
         //  body: customerList.isEmpty
         //   ? Center(child: CircularProgressIndicator())  // Show loading indicator when list is empty
         //   : ListView.builder(

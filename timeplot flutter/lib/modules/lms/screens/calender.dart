@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:timeplot_flutter/model/event.dart';
+import 'package:timeplot_flutter/modules/lms/screens/filltimesheet.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/screens/filltimesheet.dart';
+import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/getholidaysservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 import 'package:intl/intl.dart';
@@ -20,9 +22,12 @@ List<Map<String, dynamic>> _itemsBalance = [];
 List<Map<String, dynamic>> dataColor = [];
 
 class CalenderScreen extends StatefulWidget {
-  const CalenderScreen({
-    super.key,
-  });
+  // const CalenderScreen({
+  //   super.key, 
+  // });
+  final List<Map<String, dynamic>> resultMenu;  // Parameter for menuItems
+ 
+  CalenderScreen({required this.resultMenu,});
 
   @override
   State<CalenderScreen> createState() => _CalenderScreenState();
@@ -36,9 +41,10 @@ class _CalenderScreenState extends State<CalenderScreen> {
   List<Event>? date;
   Map<String, dynamic> mapMonths = {};
   String? empId;
+  var roles;
   final HolidayService leaveservice = HolidayService();
   Map<DateTime, List<Map<String, dynamic>>> events = {};
-
+late List<Map<String, dynamic>> menuItems;
 
   void _onDaySelected(DateTime day, DateTime focusedDay) {
     String formattedDate = DateFormat('yyyy-MM-dd').format(_focusedDay);
@@ -49,7 +55,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
       Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FillTimeSheet(date: _focusedDay),
+            builder: (context) => FillTimeSheet(date: _focusedDay, resultMenu: widget.resultMenu,),
           ));
     });
   }
@@ -58,6 +64,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
     final empData = await shareddata.getpatdata();
     setState(() {
       empId = empData.userId;
+      roles=empData.roles;
       print("id" + empId.toString());
     });
     getLeaves(empId.toString(), _focusedDay.toString());
@@ -147,19 +154,21 @@ class _CalenderScreenState extends State<CalenderScreen> {
     super.initState();
     _events = {};
     transferdata();
-
+ 
   }
 
   
 
   @override
   Widget build(BuildContext context) {
+   
     return Scaffold(       
         appBar:
       
             CommonAppBar(
-          menuItems: ['Welcome', 'Logout'],
-          title: 'Daily Log',
+          menuItems: widget.resultMenu,
+          title: 'Performance',
+       
           showProfile: true,
           // onProfileTap: () {
           //   print('Profile tapped!');

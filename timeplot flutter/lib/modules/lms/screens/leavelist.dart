@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
+import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/applyleaveservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 import 'package:intl/intl.dart';
@@ -14,8 +16,10 @@ SharedPreferences? prefs;
 List<dynamic> _itemsLeave = [];
 
 class Leavelist extends StatefulWidget {
-  const Leavelist({super.key});
+  // const Leavelist({super.key});
+final List<Map<String, dynamic>> resultMenu;  // Parameter for menuItems
 
+  Leavelist({required this.resultMenu,});
   @override
   State<Leavelist> createState() => _LeavelistState();
 }
@@ -24,11 +28,13 @@ class _LeavelistState extends State<Leavelist> {
   SampleItem? selectedMenu;
   final ApplyLeaveService applyleaveservice = ApplyLeaveService();
   var empId;
+  var roles;
 
   void transferdata() async {
     final empData = await shareddata.getpatdata();
     setState(() {
       empId = empData.userId;
+      roles = empData.roles;
       print("id" + empId.toString());
     });
 
@@ -44,10 +50,13 @@ class _LeavelistState extends State<Leavelist> {
 
   @override
   Widget build(BuildContext context) {
+    // Access menu items from the provider
+    final menuItems = Provider.of<MenuProvider>(context).menuItems;
     return Scaffold(
         appBar: CommonAppBar(
-          menuItems: ['Welcome', 'Logout'],
+          menuItems: widget.resultMenu,
           title: 'LeaveList',
+         
           showProfile: true,
           // onProfileTap: () {
           //   print('Profile tapped!');

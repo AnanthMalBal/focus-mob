@@ -1,58 +1,31 @@
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:timeplot_flutter/screens/login.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timeplot_flutter/services/notification_service.dart';
-// import 'package:timezone/data/latest.dart' as tz;
-// import 'package:timezone/timezone.dart' as tz; // For timezone operations
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+import 'package:timeplot_flutter/modules/lms/screens/login.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:timeplot_flutter/modules/lms/screens/welcome.dart';
+import 'package:timeplot_flutter/screens/menu.dart';
+
+
+
+
+
 
 Future<void> main() async {
   // Load environment variables from the appropriate .env file
-  await dotenv.load(fileName: ".env"); 
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
-  // getToken();
-// WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  runApp(
 
-// //   // Initialize the notification service
-  
-// WidgetsFlutterBinding.ensureInitialized();
-//  await NotificationService.initialize();
 
-//  tz.initializeTimeZones();
-//   final String timeZone = 'Asia/Kolkata';
-
-// // Set the local timezone
-// final location = tz.getLocation(timeZone);
-// final tz.TZDateTime now = tz.TZDateTime.now(location);
-
-// // You can now use this `now` variable to schedule the notification correctly in the Asia/Kolkata timezone
-// print('Local time in Kolkata: $now');
-  
-//   NotificationHelper notificationHelper = NotificationHelper();
-//   // await notificationHelper.requestPermission(); // Request notification permission on Android 13+
-//    await notificationHelper.scheduleDailyNotification(); // Schedule the daily notification
-// await notificationHelper.showImmediateNotification();
-// //  await notificationHelper.scheduleNotificationForNextMinute();
-   
-  runApp(const MyApp());
+  const MyApp());
+  // runApp(
+  //   ChangeNotifierProvider(
+  //     create: (context) => MenuProvider(),
+  //     child: MyApp(),
+  //   ),
+  // );
 }
-
-// Future<String?> getToken() async {
-//   FirebaseMessaging messaging = FirebaseMessaging.instance;
-//   String? token = await messaging.getToken();
-//   print("FCM Token: $token");
-//   return token;
-// }
-
-
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -61,14 +34,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      
       home: LoginScreen(),
+      // routes: {
+      //   '/': (context) =>  welcomeScreen(),
+      //   '/dashboard': (context) => const welcomeScreen(),
+       
+      // },
     );
   }
 }
 
-// void listTimeZones() {
-//   final locations = tz.timeZoneDatabase.locations.keys;
-//   for (var location in locations) {
-//     print(location);
-//   }
-// }

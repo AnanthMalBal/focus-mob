@@ -114,15 +114,15 @@ Future<String?> decodeQRCodeFromImage(File imageFile) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: CommonAppBar(
-        menuItems: ['Welcome', 'Logout'],
-        title: 'QRCodeScan',
-        showProfile: true,
-        // onProfileTap: () {
-        //   print('Profile tapped!');
+      //  appBar: CommonAppBar(
+      //   menuItems: [],
+      //   title: 'QRCodeScan',
+      //   showProfile: true,
+      //   // onProfileTap: () {
+      //   //   print('Profile tapped!');
 
-        // },
-      ),
+      //   // },
+      // ),
  body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
+import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 import 'package:timeplot_flutter/services/timesheetservice.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +20,11 @@ SharedPreferences? prefs;
 class FillTimeSheet extends StatefulWidget {
   final DateTime date;
   // const FillTimeSheet({super.key, required this.date});
-  FillTimeSheet({required this.date});
+  final List<Map<String, dynamic>> resultMenu;  // Parameter for menuItems
+
+  FillTimeSheet({required this.date,required this.resultMenu,});
+  
+ 
 
   @override
   State<FillTimeSheet> createState() => _FillTimeSheetState();
@@ -62,9 +68,8 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   int totalNBNPMinutesInt = 0;
   int totalBMinutesInt = 0;
   int totalNBPMinutesInt = 0;
- 
-
   int autoId = 0;
+  var roles;
 
   @override
   void initState() {
@@ -198,13 +203,9 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     // print("Total minutes loaded.");
     setState(() {
       empId = empData.userId;
+      roles=empData.roles;
       print("id" + empId.toString());
-      // totalNBNPMinutes = 0;
-      // totalNBPMinutes = 0;
-      // totalBMinutes = 0;
-      // totalNBNPMinutes = totalMinutes['totalNBNPMinutes']!;
-      // totalNBPMinutes = totalMinutes['totalNBPMinutes']!;
-      // totalBMinutes = totalMinutes['totalBMinutes']!;
+      
     });
     getTimeMarked(empId.toString(), widget.date.toString().split(" ")[0]);
   }
@@ -231,11 +232,14 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     bool isAddButtonDisabled =
         workingHoursInMinutes > 0 && totalTime >= workingHoursInMinutes;
     bool isSubmitButtonEnabled = totalTime == workingHoursInMinutes;
+    
 
+    
     return Scaffold(
         appBar: CommonAppBar(
-          menuItems: ['Welcome', 'Logout'],
-          title: 'TimeSheet',
+          menuItems: widget.resultMenu,
+          title: 'MyAttendance',
+          
           showProfile: true,
           // onProfileTap: () {
           //   print('Profile tapped!');
