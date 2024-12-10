@@ -44,16 +44,22 @@ final String attendanceUrl = dotenv.env['markAttendanceUrl']!;
             
    );    
    print("check");
-    var result = json.decode(response.body);
+   var result = json.decode(response.body);
     print(response.statusCode);    
 if (response.statusCode == 200){
+  //  var result = json.decode(response.body);
   print("check1");
-   showdialog(context,result['message']);
-  print("addattendance Sucess");
+  //  showdialog(context,result['message']);
+   showSnackbar(context, result['message'], isSuccess: true); // Success Snackbar
+    print("Attendance Added Successfully");
+ 
     }
 else {   
-  showdialog(context,result['message']);     
+  //  var result = json.decode(response.body);
+  // showdialog(context,result['message']);     
       print(" Invalid  ");
+      showSnackbar(context, result['message'], isSuccess: false); // Failure Snackbar
+    print("Failed to add attendance");
       }
             // return response.body;
   }

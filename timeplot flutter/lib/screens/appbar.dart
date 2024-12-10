@@ -18,44 +18,212 @@ import 'package:timeplot_flutter/services/sharedpreferences.dart';
 final shareddata = SharedPref();
 SharedPreferences? prefs;
 
-class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final List<Map<String, dynamic>> menuItems;
+// class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
+//   final List<Map<String, dynamic>> menuItems;
 
+//   final String title;
+//   final bool showProfile;
+
+//   final MenuService menuservice = MenuService();
+
+//   // final VoidCallback onProfileTap;
+
+//   CommonAppBar({
+//     required this.title,
+//     this.showProfile = false,
+//     // required this.onProfileTap,
+//     required this.menuItems,
+//   });
+
+//   @override
+//   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+//   Map<String, bool> expandedSubmenus = {};
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return AppBar(  
+//       centerTitle: true,     
+//       title: Row(
+//         mainAxisSize: MainAxisSize.min, // To make the row size fit content
+//         children: [
+//           Image.asset(
+//             'images/focus_topnav.jpg',
+//             fit: BoxFit.fill,
+//             height: 50,
+//             width: 90,
+//           ),
+//           SizedBox(width: 10),
+//           Expanded(
+//             child: Text(
+//               title,
+//               style: TextStyle(
+//                 color: Colors.black,
+//                 fontWeight: FontWeight.w500,
+//               ),
+//             ),
+//           )
+//         ],
+//       ),
+//       backgroundColor: AppColors.backgroundColor,
+//       elevation: 0, // Set to 0 if you don't want default shadow
+//       bottom: PreferredSize(
+//         preferredSize: Size.fromHeight(1.0), // Set the height of the border
+//         child: Container(
+//           color: Colors.grey, // Border color
+//           height: 1.0, // Border height
+//         ),
+//       ),
+//       actions: <Widget>[
+//         if (showProfile)
+//           Padding(
+//             padding: const EdgeInsets.only(right: 5.0),
+//             child: GestureDetector(
+//               onTap: () {
+//                 Scaffold.of(context).openDrawer();
+//               },
+//               child: CircleAvatar(
+//                 radius: 20,
+//                 backgroundImage: AssetImage("images/image.jpeg"),
+//               ),
+//             ),
+//           ),
+//         PopupMenuButton<String>(
+//           onSelected: (String value) {
+//             handlePopupMenuSelection(context, value, menuItems);
+//           },
+//           itemBuilder: (BuildContext context) {
+//             return menuItems.map((menu) {
+//               // Check if the menu has submenus
+//               if (menu['subMenu'] != null && menu['subMenu'].isNotEmpty) {
+//                 return PopupMenuItem<String>(
+//                   value: menu['menuName'],
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Text(menu['menuName']),
+//                       Padding(
+//                         padding: const EdgeInsets.only(left: 20.0),
+//                         child: Column(
+//                           children:
+//                               (menu['subMenu'] as List).map<Widget>((subMenu) {
+//                             return InkWell(
+//                               onTap: () {
+//                                 handleSubmenuSelection(
+//                                     context, subMenu['menuName'], menuItems);
+//                               },
+//                               child: Padding(
+//                                 padding:
+//                                     const EdgeInsets.symmetric(vertical: 8.0),
+//                                 child: Text(subMenu['menuName'],
+//                                     style:
+//                                         TextStyle(color: AppColors.textColor)),
+//                               ),
+//                             );
+//                           }).toList(),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//               } else {
+//                 return PopupMenuItem<String>(
+//                   value: menu['menuName'],
+//                   child: Text(menu['menuName']),
+//                 );
+//               }
+//             }).toList();
+//           },
+//         ),
+//       ],
+//     );
+//   }
+
+//   // Method to handle menu item selection and navigate accordingly
+//   Future<void> handlePopupMenuSelection(BuildContext context, String menuItem,
+//       List<Map<String, dynamic>> resultMenu) async {
+//     // Switch-case for handling PopupMenu selection
+//     switch (menuItem) {
+//       case 'Dashboard':
+//         print('Navigating to Welcome Screen');
+//         Navigator.of(context).push(MaterialPageRoute(
+//           builder: (c) => welcomeScreen(
+//             resultMenu: resultMenu,
+//           ), // Pass resultMenu here
+//         ));
+//         break;
+//       case 'WorkAllocation':
+//         print('Navigating to Welcome Screen');
+//         Navigator.of(context).push(MaterialPageRoute(
+//           builder: (c) => welcomeScreen(
+//             resultMenu: resultMenu,
+//           ), // Pass resultMenu here
+//         ));
+//         break;
+//       case 'Reports':
+//         print('Navigating to LeaveList Screen');
+//         Navigator.of(context).push(MaterialPageRoute(
+//             builder: (c) => welcomeScreen(
+//                   resultMenu: resultMenu,
+//                 )));
+//         break;
+
+//       // case 'LeaveList':
+//       //   print('Navigating to LeaveList Screen');
+//       //   Navigator.of(context).push(MaterialPageRoute(
+//       //       builder: (c) => Leavelist(resultMenu: resultMenu)));
+//       //   break;
+//       // case 'Ticket':
+//       //   print('Navigating to TicketScreen');
+//       //   Navigator.of(context).push(MaterialPageRoute(
+//       //       builder: (c) => TicketScreen(resultMenu: resultMenu)));
+//       //   break;
+//       // case 'QRCodeGenerator':
+//       //   print('Navigating to QRCodeGenerator Screen');
+//       //   Navigator.of(context)
+//       //       .push(MaterialPageRoute(builder: (c) => Qrcodegenerator()));
+//       //   break;
+//       // case 'QRCodeScan':
+//       //   print('Navigating to QRCodeScan Screen');
+//       //   Navigator.of(context)
+//       //       .push(MaterialPageRoute(builder: (c) => Qrcodescan()));
+//       //   break;
+//       // case 'Performance':
+//       //   print('Navigating to QRCodeScan Screen');
+//       //   Navigator.of(context).push(MaterialPageRoute(
+//       //       builder: (c) => CalenderScreen(resultMenu: resultMenu)));
+//       //   break;
+//       // case 'Logout':
+//       //   prefs = await SharedPreferences.getInstance();
+//       //   await prefs?.clear();
+//       //   Navigator.of(context).pushAndRemoveUntil(
+//       //       MaterialPageRoute(builder: (c) => LoginScreen()), (route) => false);
+//       //   print('Logging out');
+//       //   break;
+//       default:
+//         print('Invalid selection');
+//     }
+//   }
+
+
+
+class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showProfile;
-
-  final MenuService menuservice = MenuService();
-
-  // final VoidCallback onProfileTap;
+  final List<Map<String, dynamic>> menuItems;
 
   CommonAppBar({
     required this.title,
     this.showProfile = false,
-    // required this.onProfileTap,
     required this.menuItems,
   });
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-  Map<String, bool> expandedSubmenus = {};
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      //  leading:Padding(
-      //   padding: const EdgeInsets.all(8.0),
-      //   child: Image.asset(
-      //         'images/focus_topnav.jpg', // Make sure to add your logo in the assets folder
-      //          fit: BoxFit.contain,
-      //          width:100,
-      //          height: 100,
-      //       ),
-      //  ),
-      centerTitle: true,
-      // title: Text(title,
-      //  style: TextStyle(
-      //        color: Colors.white,
-      //      ),),
+    return AppBar(  
+      centerTitle: true,     
       title: Row(
         mainAxisSize: MainAxisSize.min, // To make the row size fit content
         children: [
@@ -86,73 +254,111 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           height: 1.0, // Border height
         ),
       ),
-      actions: <Widget>[
+      actions: [
         if (showProfile)
-          Padding(
-            padding: const EdgeInsets.only(right: 5.0),
-            child: GestureDetector(
-              onTap: () {
-                Scaffold.of(context).openDrawer();
-              },
-              child: CircleAvatar(
-                radius: 20,
-                backgroundImage: AssetImage("images/image.jpeg"),
-              ),
+          GestureDetector(
+            onTap: () {
+              Scaffold.of(context).openDrawer();
+            },
+            child: CircleAvatar(
+              radius: 20,
+              backgroundImage: AssetImage("images/image.jpeg"),
             ),
           ),
         PopupMenuButton<String>(
           onSelected: (String value) {
-            handlePopupMenuSelection(context, value, menuItems);
+            // Handle menu item selection here
+             handlePopupMenuSelection(context, value, menuItems);
           },
           itemBuilder: (BuildContext context) {
-            return menuItems.map((menu) {
-              // Check if the menu has submenus
-              if (menu['subMenu'] != null && menu['subMenu'].isNotEmpty) {
-                return PopupMenuItem<String>(
-                  value: menu['menuName'],
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(menu['menuName']),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20.0),
-                        child: Column(
-                          children:
-                              (menu['subMenu'] as List).map<Widget>((subMenu) {
-                            return InkWell(
-                              onTap: () {
-                                handleSubmenuSelection(
-                                    context, subMenu['menuName'], menuItems);
-                              },
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text(subMenu['menuName'],
-                                    style:
-                                        TextStyle(color: AppColors.textColor)),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                return PopupMenuItem<String>(
-                  value: menu['menuName'],
-                  child: Text(menu['menuName']),
-                );
-              }
-            }).toList();
+            return _buildMenuItems(context);
           },
         ),
       ],
     );
   }
 
-  // Method to handle menu item selection and navigate accordingly
-  Future<void> handlePopupMenuSelection(BuildContext context, String menuItem,
+  List<PopupMenuEntry<String>> _buildMenuItems(BuildContext context) {
+    return menuItems.map((menu) {
+      final hasSubMenu = menu['subMenu'] != null && menu['subMenu'].isNotEmpty;
+
+      if (hasSubMenu) {
+        return PopupMenuItem<String>(
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return _buildExpandableMenu(context, menu, setState);
+            },
+          ),
+        );
+      } else {
+        return PopupMenuItem<String>(
+          value: menu['menuName'],
+          child: Text(menu['menuName']),
+        );
+      }
+    }).toList();
+  }
+
+  Widget _buildExpandableMenu(
+      BuildContext context, Map<String, dynamic> menu, StateSetter setState) {
+    final isExpanded = ValueNotifier<bool>(false);
+
+    return ValueListenableBuilder<bool>(
+      valueListenable: isExpanded,
+      builder: (context, expanded, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(menu['menuName']),
+                GestureDetector(
+                  onTap: () {
+                    isExpanded.value = !expanded; // Toggle the expanded state
+                  },
+                  child: Icon(
+                    expanded
+                        ? Icons.remove_circle_outline
+                        : Icons.add_circle_outline,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+            if (expanded)
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: (menu['subMenu'] as List)
+                      .map<Widget>((subMenu) {
+                    return InkWell(
+                      onTap: () {
+                        // Handle submenu selection here
+                         handleSubmenuSelection(
+                                    context, subMenu['menuName'], menuItems);
+                              
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          subMenu['menuName'],
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+   Future<void> handlePopupMenuSelection(BuildContext context, String menuItem,
       List<Map<String, dynamic>> resultMenu) async {
     // Switch-case for handling PopupMenu selection
     switch (menuItem) {
@@ -248,20 +454,32 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       default:
         print('Invalid submenu selection');
     }
-  }
+      
+//  void showSnackbar(BuildContext context, String message,
+//       {bool isSuccess = true}) {
+//     final Color backgroundColor = isSuccess ? Colors.green : Colors.red;
 
-  static void showSnackbar(BuildContext context, String message,
-      {bool isSuccess = true}) {
-    final Color backgroundColor = isSuccess ? Colors.green : Colors.red;
+//     final snackbar = SnackBar(
+//       content: Text(message),
+//       backgroundColor: backgroundColor,
+//       duration: const Duration(seconds: 3), // Duration of Snackbar
+//     );
 
-    final snackbar = SnackBar(
-      content: Text(message),
-      backgroundColor: backgroundColor,
-      duration: const Duration(seconds: 3), // Duration of Snackbar
-    );
+//     ScaffoldMessenger.of(context).showSnackBar(snackbar);
+//   }
+   
+}
 
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  }
+void showSnackbar(BuildContext context, String message, {bool isSuccess = true}) {
+  final Color backgroundColor = isSuccess ? Colors.green : Colors.red;
+
+  final snackbar = SnackBar(
+    content: Text(message),
+    backgroundColor: backgroundColor,
+    duration: const Duration(seconds: 3),
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }
 
 Widget buildDrawer(BuildContext context) {
@@ -418,3 +636,5 @@ void showAlert(String title, String message, BuildContext context) {
     },
   );
 }
+
+

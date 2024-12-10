@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeplot_flutter/modules/lms/screens/calender.dart';
+import 'package:timeplot_flutter/modules/lms/screens/dailylog.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
 import 'package:timeplot_flutter/modules/ticketing/screens/ticket.dart';
@@ -150,6 +151,11 @@ late List<Map<String, dynamic>> menuItems;
                         MaterialPageRoute(
                           builder: (context) => CalenderScreen(resultMenu: widget.resultMenu),
                         ));
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => Dailylog(resultMenu: widget.resultMenu),
+                    //     ));
                   },
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -226,5 +232,7 @@ late List<Map<String, dynamic>> menuItems;
   ) async {
     await attendanceservice.userAttendance(
         empid, value.toString(), mode, context);
+      
+
   }
 }

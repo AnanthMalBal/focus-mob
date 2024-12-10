@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   static const Color primaryColor = Color(0xFF1C8139);
@@ -12,3 +13,23 @@ class AppColors {
   // Color.fromARGB(255, 62, 201, 118);
 }
 // #1C8139
+
+TextStyle get subHeadingStyle{
+  return GoogleFonts.lato (
+    textStyle: TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color:AppColors.borderColor    
+    )
+  );
+}
+
+TextStyle get headingStyle{
+  return GoogleFonts.lato (
+    textStyle: TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,   
+        color:AppColors.textColor   
+    )
+  );
+}
