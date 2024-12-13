@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/customerlistservice.dart';
@@ -100,8 +100,7 @@ void transferdata() async {
   @override
   Widget build(BuildContext context) {
 
-    // Access menu items from the provider
-    final menuItems = Provider.of<MenuProvider>(context).menuItems;
+    
      return Scaffold(
       //  appBar: CommonAppBar(
       //     menuItems: menuItems,

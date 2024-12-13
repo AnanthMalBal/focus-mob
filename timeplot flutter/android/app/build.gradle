@@ -1,7 +1,8 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
+    id "org.jetbrains.kotlin.android"
+    // id "dev.flutter.flutter-gradle-plugin"
+    id 'dev.flutter.flutter-gradle-plugin'
     // id 'com.google.gms.google-services'
 }
 
@@ -24,17 +25,17 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.timeplot_flutter"
+    namespace "com.example.timeplot_flutter"   
     compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -51,12 +52,15 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
+    
 
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
+            shrinkResources false
+        minifyEnabled false 
         }
     }
 }
@@ -69,4 +73,5 @@ dependencies {
     //  implementation 'com.jakewharton.threetenabp:threetenabp:2.3.0' 
      implementation 'com.dexterous.flutterlocalnotifications:flutter_local_notifications:latest_version' // Update this to the latest version
     //  implementation platform('com.google.firebase:firebase-bom:33.5.1')
+    
 }
