@@ -107,6 +107,7 @@ class LoginService {
      preferences.setString('userId', value['user']['userId']);
     await preferences.setString('accesstoken', value['accesstoken']);
     await preferences.setString('message', value['message']);
+     await preferences.setString('userName', value['user']['userName']);
 
     // Print to check
     // print("Stored roles: $roles");
@@ -119,6 +120,7 @@ class LoginService {
     //  print( "gettoken:"+ prefs!.getInt(('appId') ).toString());
     prefs!.getString(('accesstoken'));
     prefs!.getString('userId');
+     prefs!.getString('userName');
     prefs!.getStringList('roles');
 
     return prefs;

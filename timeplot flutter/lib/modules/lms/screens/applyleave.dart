@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timeplot_flutter/modules/lms/screens/leavelist.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:intl/intl.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/applyleaveservice.dart';
 import 'package:timeplot_flutter/services/getholidaysservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
@@ -18,9 +17,11 @@ List<Map<String, dynamic>> _itemsBalance = [];
 
 class Applyleave extends StatefulWidget {
   // const Applyleave({super.key});
-  final List<Map<String, dynamic>> resultMenu;  // Parameter for menuItems
+  final List<Map<String, dynamic>> resultMenu; 
 
-  Applyleave({required this.resultMenu,});
+  Applyleave({
+    required this.resultMenu,
+  });
 
   @override
   State<Applyleave> createState() => _ApplyleaveState();
@@ -41,48 +42,51 @@ class _ApplyleaveState extends State<Applyleave> {
   final ApplyLeaveService applyleaveservice = ApplyLeaveService();
   final HolidayService leaveservice = HolidayService();
   var empId;
-var roles;
+  var roles;
 
   void transferdata() async {
     final empData = await shareddata.getpatdata();
     setState(() {
       empId = empData.userId;
-      roles=empData.roles;
+      roles = empData.roles;
       print("id" + empId.toString());
     });
-    getBalanceLeave(empId.toString(), context);
   }
 
   @override
   void initState() {
     super.initState();
-   _fetchLeaveTypes();
+    _fetchLeaveTypes();
+    _getBalanceLeave(context);
     transferdata();
   }
 
-  Future<void> _fetchLeaveTypes() async {
-    print("resultLMS");
+  
 
-    List<dynamic> resultLeaveType =
-        await applyleaveservice.getLeaveType(context);
-    print("resultLeaveType:" + resultLeaveType.toString());
-    setState(() {
-      _leaveTypes = resultLeaveType;
-    });
+  Future<void> _fetchLeaveTypes() async {
+    print("Fetching Leave Types in ApplyLeaveService...");
+
+    try {
+      List<dynamic> resultLeaveType =
+          await applyleaveservice.getLeaveType(context);
+      print("Fetched Leave Types: $resultLeaveType");
+
+      setState(() {
+        _leaveTypes = resultLeaveType;
+      });
+    } catch (e) {
+      print("Error fetching leave types: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    
     double width = 260;
     return Scaffold(
-       
-        appBar:
-
-            CommonAppBar(
+        appBar: CommonAppBar(
           menuItems: widget.resultMenu,
           title: 'Apply Leave',
-       
+
           showProfile: true,
           // onProfileTap: () {
           //   print('Profile tapped!');
@@ -94,22 +98,57 @@ var roles;
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Container(
+                //   padding: new EdgeInsets.all(10.0),
+                //   width: 500.0,
+                //   // height:20.0,
+                //   decoration: BoxDecoration(
+                //     color: AppColors.borderColor.withOpacity(0.1),
+                //     //  borderRadius: BorderRadius.circular(10)
+                //   ),
+                //   //  width: MediaQuery.of(context).size.width,
+                //   //       height: MediaQuery.of(context).size.height/1 ,
+                //   child: Text("Avaliable Leaves: 51",
+                //       style: TextStyle(
+                //         color: AppColors.textColor,
+                //         fontSize: 20,
+                //         fontWeight: FontWeight.w500,
+                //       )),
+                // ),
                 Container(
-                  padding: new EdgeInsets.all(10.0),
+                  padding: EdgeInsets.all(10.0),
                   width: 500.0,
-                  // height:20.0,
                   decoration: BoxDecoration(
                     color: AppColors.borderColor.withOpacity(0.1),
-                    //  borderRadius: BorderRadius.circular(10)
                   ),
-                  //  width: MediaQuery.of(context).size.width,
-                  //       height: MediaQuery.of(context).size.height/1 ,
-                  child: Text("Avaliable Leaves: 51",
-                      style: TextStyle(
-                        color: AppColors.textColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      )),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceBetween, // Aligns text and icon to the ends
+                    children: [
+                      Text(
+                        "Apply Leave ",
+                        style: TextStyle(
+                          color: AppColors.textColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.history, // Use any icon, e.g., Icons.history
+                          color: AppColors.textColor,
+                        ),
+                        onPressed: () {
+                         
+                         Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Leavelist(resultMenu: widget.resultMenu,),
+                        ));
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 Padding(
                     padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
@@ -129,7 +168,7 @@ var roles;
                                         children: [
                                           Text("Leave Type : ",
                                               style: TextStyle(
-                                                color:AppColors.borderColor,
+                                                color: AppColors.borderColor,
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w500,
                                               )),
@@ -153,53 +192,14 @@ var roles;
                                                 .map<DropdownMenuEntry<String>>(
                                                     (value) {
                                               return DropdownMenuEntry<String>(
-                                                value: value['leave_Type_Id']
+                                                value: value['leaveTypeId']
                                                     .toString(),
-                                                label: value['leave_Type_Name']
+                                                label: value['leaveTypeName']
                                                     .toString(),
                                               );
                                             }).toList(),
                                           )
                                         ]),
-                                    // SizedBox(
-                                    //   height: 10,
-                                    // ),
-                                    // Row(
-                                    //   mainAxisAlignment:
-                                    //       MainAxisAlignment.start,
-                                    //   children: [
-                                    //     Text("Leave For : ",
-                                    //         style: TextStyle(
-                                    //           color: Colors.grey,
-                                    //           fontSize: 15,
-                                    //           fontWeight: FontWeight.w500,
-                                    //         )),
-                                    //     SizedBox(width: 30),
-                                    //     DropdownMenu<String>(
-                                    //       // initialSelection: list.first,
-                                    //       hintText: "Select Menu",
-                                    //       width: width,
-                                    //       requestFocusOnTap: true,
-                                    //       enableFilter: true,
-                                    //       onSelected: (String? value) {
-                                    //         // This is called when the user selects an item.
-                                    //         setState(() {
-                                    //           dropdownValue = value!;
-                                    //           print("ProcessData" +
-                                    //               dropdownValue);
-                                    //         });
-                                    //       },
-                                    //       dropdownMenuEntries: list
-                                    //           .map<DropdownMenuEntry<String>>(
-                                    //               (value) {
-                                    //         return DropdownMenuEntry<String>(
-                                    //           value: value,
-                                    //           label: value,
-                                    //         );
-                                    //       }).toList(),
-                                    //     )
-                                    //   ],
-                                    // ),
                                     SizedBox(
                                       height: 10,
                                     ),
@@ -271,7 +271,7 @@ var roles;
                                         children: [
                                           Text("Reason : ",
                                               style: TextStyle(
-                                                color:AppColors.borderColor,
+                                                color: AppColors.borderColor,
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w500,
                                               )),
@@ -319,11 +319,11 @@ var roles;
                             width: 500.0,
                             // height:20.0,
                             decoration: BoxDecoration(
-                              color:AppColors.borderColor.withOpacity(0.1),
+                              color: AppColors.borderColor.withOpacity(0.1),
                               //  borderRadius: BorderRadius.circular(10)
                             ),
 
-                            child: Text("History",
+                            child: Text("Balance Leave",
                                 style: TextStyle(
                                   color: AppColors.textColor,
                                   fontSize: 20,
@@ -340,7 +340,7 @@ var roles;
                           Container(
                               padding: new EdgeInsets.all(5.0),
                               decoration: BoxDecoration(
-                                color:AppColors.backgroundColor,
+                                color: AppColors.backgroundColor,
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: SizedBox(
@@ -352,9 +352,9 @@ var roles;
                                     ),
                                     onPressed: () {
                                       requestLeave(
-                                          empId,
-                                          double.parse(
-                                              differenceInDays.toString()),
+                                          // empId,
+                                          // double.parse(
+                                          //     differenceInDays.toString()),
                                           newLeaveType,
                                           dateinputFrom.text,
                                           dateinputTo.text,
@@ -383,8 +383,9 @@ var roles;
           scrollDirection: Axis.vertical,
           itemCount: _itemsBalance.length,
           itemBuilder: (BuildContext context, index) {
-            int count = _itemsBalance[index]['Count'];
-            String description = _itemsBalance[index]['Description'];
+            int count = _itemsBalance[index]['Count'] ?? 0;
+            String description = _itemsBalance[index]['Description'] ??
+                'No description available';
             return Container(
                 height: 23,
                 child: ListTile(
@@ -427,29 +428,41 @@ var roles;
     }
   }
 
+
+
   Future<void> _selectToDate(BuildContext context) async {
-    if (fromDate == null) {
-      return; // Ensure "from date" is selected before "to date"
+    if (fromDate == null || newLeaveType == null || _leaveTypes == null) {
+      return; // Ensure "from date" and "leave type" are selected before proceeding
     }
 
     DateTime maxDate;
 
-    // Set the maximum date based on the leave type and the "from date"
-    if (newLeaveType == 'Leave') {
-      maxDate = fromDate!.add(Duration(days: 2));
-    } else if (newLeaveType == 'P4') {
-      maxDate = fromDate!.add(Duration(days: 0));
-    } else if (newLeaveType == 'Long_Leave') {
-      maxDate = fromDate!.add(Duration(days: 15));
+    // Get the max days from the API response based on selected leave type
+    final leaveType = _leaveTypes
+        .firstWhere((leave) => leave['leaveTypeId'] == newLeaveType);
+    final maxDays = leaveType['maxDays'];
+
+    // Ensure that maxDays is not null and is a valid number
+    if (maxDays == null || maxDays <= 0) {
+      return; // Handle error if maxDays is invalid
+    }
+
+    // Special case for "Half_Day" leave
+    if (newLeaveType == 'Half_Day') {
+      maxDate =
+          fromDate!; // For Half Day Leave, the max date is the same as the fromDate
     } else {
-      maxDate = fromDate!.add(Duration(days: 30));
+      // Calculate the maxDate based on the maxDays for other leave types
+      maxDate = fromDate!.add(Duration(
+          days: maxDays -
+              1)); // Subtract 1 because fromDate is counted as the first day
     }
 
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: fromDate!, // Start at the "from date"
       firstDate: fromDate!, // Minimum date is the "from date"
-      lastDate: maxDate, // Maximum date based on leave type
+      lastDate: maxDate, // Maximum date based on leave type's maxDays
     );
 
     if (picked != null && picked != toDate) {
@@ -465,40 +478,80 @@ var roles;
 
   void _calculateDifference() {
     if (fromDate != null && toDate != null) {
-      if (newLeaveType == 'P4') {
+      if (newLeaveType == 'Half_Day') {
+        // If the leave type is Half Day, consider the 0.5 day duration
         differenceInDays = (toDate!.difference(fromDate!).inDays + 0.5);
-      } else {
-        // Calculate the difference in days
-        differenceInDays = toDate!.difference(fromDate!).inDays + 1;
+      } else if (newLeaveType == 'Leave') {
+        // For Leave, treat it as 1 full day (from the start date to the same date)
+        differenceInDays = 1.0;
       }
-      print("differentdays" + differenceInDays.toString());
+      //  else if (newLeaveType == 'Paternity_Leave') {
+      //   // For Leave, treat it as 1 full day (from the start date to the same date)
+      //   differenceInDays = 5.0;
+      // }
+      else {
+        // For other leave types, calculate the full days difference
+        differenceInDays = toDate!.difference(fromDate!).inDays +
+            1; // Adding 1 to account for the day range
+      }
+      print("differenceInDays: " + differenceInDays.toString());
       setState(() {});
     }
   }
 
-  Future getBalanceLeave(String empId, context) async {
-    print("resultbalance" + empId);
-    List<dynamic> resultBalance =
-        await leaveservice.getLeaveBalance(empId, context);
-    print("resultbalance:" + resultBalance[0].toString());
-    List<Map<String, dynamic>> data =
-        List<Map<String, dynamic>>.from(resultBalance[0]);
-    setState(() {
-      _itemsBalance = data;
+  // Future getBalanceLeave( context) async {
+  //   print("resultbalance" + empId);
+  //   List<dynamic> resultBalance =
+  //       await leaveservice.getLeaveBalance( context);
+  //   print("resultbalance:" + resultBalance[0].toString());
+  //   List<Map<String, dynamic>> data =
+  //       List<Map<String, dynamic>>.from(resultBalance[0]);
+  //   setState(() {
+  //     _itemsBalance = data;
 
-      // int count =  _itemsBalance['Count'];
-      // print("count++"+count.toString());
-      // mapMonths.addEntries( _itemsBalance.entries);
-      // mapMonths.forEach((key, value) {
-      //   print("++++" '$key: $value');
-      // });
-    });
+  //     // int count =  _itemsBalance['Count'];
+  //     // print("count++"+count.toString());
+  //     // mapMonths.addEntries( _itemsBalance.entries);
+  //     // mapMonths.forEach((key, value) {
+  //     //   print("++++" '$key: $value');
+  //     // });
+  //   });
+  // }
+
+  Future<void> _getBalanceLeave(BuildContext context) async {
+    Map<String, dynamic> leaveBalance =
+        await leaveservice.getLeaveBalance(context);
+    // Now you have the leave balance data, and you can use it as needed
+    print('Leave Balance Count: ${leaveBalance['Count']}');
+    print('Leave Balance Description: ${leaveBalance['Description']}');
+
+    if (leaveBalance != null) {
+      // Update _itemsBalance with the leave balance data
+      setState(() {
+        // Assuming leaveBalance contains 'Count' and 'Description'
+        _itemsBalance = [
+          {
+            'Count': leaveBalance['Count'] ??
+                0, // Default to 0 if Count is not available
+            'Description': leaveBalance['Description'] ??
+                'No description available', // Default if Description is missing
+          },
+        ];
+      });
+      print('Updated Leave Count: ${_itemsBalance[0]['Count']}');
+      print('Updated Leave Description: ${_itemsBalance[0]['Description']}');
+    } else {
+      print('Leave balance data is null');
+      setState(() {
+        _itemsBalance = [];
+      });
+    }
   }
 
-  requestLeave(String empid, double days, String symbol, String fromDate,
-      String toDate, String reason, context) async {
+  requestLeave(String symbol, String fromDate, String toDate, String reason,
+      context) async {
     await applyleaveservice.applyLeave(
-        empid, days, symbol, fromDate, toDate, reason, context);
+        symbol, fromDate, toDate, reason, context);
 
     dateinputFrom.clear();
     dateinputTo.clear();

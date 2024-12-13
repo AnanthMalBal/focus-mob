@@ -8,31 +8,80 @@ class ApplyLeaveService {
 
 
 
-  Future getLeaveType(context) async {
-    print("Leavetype");
+//   Future <List<dynamic>> getLeaveType(context) async {
+//     print("fetching Leavetype");
 
-final token = await shareddata.getpatdata();
-var Token=token.accesstoken; 
-   print("+++++"+Token);
+// final token = await shareddata.getpatdata();
+// var Token=token.accesstoken; 
+//    print("+++++"+Token);
+//    final String leaveTypeUrl = dotenv.env['levetypeUrl']!;
+// print("+++++"+Token);
+//     final response = (await http.post
+//      (Uri.parse(leaveTypeUrl),
+//     // (Uri.parse('$Ip/stashook/getLeaveTypeList'),
+//     headers: {
+//           'Content-Type':'application/json;charset=UTF-8',
+//           'Authorization':'$Token',
+//         },
+//          body: json.encode({}),
+//     ));
+//      List<dynamic>dataLeaveType = json.decode(response.body);
+    
+//     print("LeaveType" + dataLeaveType.toString());
+//     return dataLeaveType;
+//   }
 
-    final response = (await http.get
-     (Uri.parse('http://192.168.31.45:3007/timesheet/getLeaveType'),
-    // (Uri.parse('$Ip/stashook/getLeaveTypeList'),
-    headers: {
-          'contentType':'application/json;charset=UTF-8',
-          'Authorization':'$Token',
-        }
-    ));
-    List<dynamic> dataLeaveType = json.decode(response.body);
-    print("LMS" + dataLeaveType.toString());
-    return dataLeaveType;
+Future<List<dynamic>> getLeaveType( context) async {
+  print("Fetching Leave Types...");
+
+  final token = await shareddata.getpatdata();
+  if (token == null || token.accesstoken == null) {
+    throw Exception("Access token is null. Please check authentication.");
+  }
+  var Token = token.accesstoken;
+  print("Token: $Token");
+
+  final String? leaveTypeUrl = dotenv.env['levetypeUrl'];
+  if (leaveTypeUrl == null) {
+    throw Exception("Leave type URL is not set in environment variables.");
   }
 
-  Future applyLeave(String employeeId, double noOfDays, String symbol,
+  try {
+    final response = await http.post(
+      Uri.parse(leaveTypeUrl),
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Authorization': '$Token',
+      },
+      body: json.encode({}), 
+    );
+
+    print("Response Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      
+      List<dynamic> decodedResponse = json.decode(response.body);
+
+     
+      if (decodedResponse is List) {
+        return decodedResponse;
+      } else {
+        throw Exception("Unexpected response format: Expected a JSON array.");
+      }
+    } else {
+      throw Exception(
+          "Failed to fetch leave types. Status: ${response.statusCode}, Body: ${response.body}");
+    }
+  } catch (e) {
+    print("Error fetching leave types: $e");
+    rethrow;
+  }
+}
+
+  Future applyLeave( String symbol,
       String fromDate, String toDate, String reason, context) async {
-    print("DailyLog" +
-        employeeId +
-        noOfDays.toString() +
+    print("DailyLog" +        
         symbol +
         fromDate +
         toDate +
@@ -41,18 +90,17 @@ var Token=token.accesstoken;
 final token = await shareddata.getpatdata();
 var Token=token.accesstoken; 
    print("+++++"+Token);
+   final String? applyLeaveUrl = dotenv.env['applyleaveUrl']!;
 
-    final response = await http.post(
-       Uri.parse("http://192.168.31.45:3007/users/addusersleave"),
-      // Uri.parse("$Ip/stashook/applyLeave"),
-      //  headers: <String, String>{
-      //         'Content-Type': 'application/json; charset=UTF-8',
-      //         'Authorization': ' $Token',
-      //       },
-      // jsonEncode
-      body: ({
-        'employeeId': employeeId,
-        'noOfDays': noOfDays.toString(),
+    final response = await http.post(Uri.parse(applyLeaveUrl!),
+     
+       headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization': '$Token',
+            },
+      
+      body:jsonEncode ({
+        
         'symbol': symbol,
         'fromDate': fromDate,
         'toDate': toDate,
@@ -64,10 +112,12 @@ var Token=token.accesstoken;
     var result=json.decode(response.body);
     if (response.statusCode == 200) {
       print("check1");
-      showdialog(context, result['message']);
+      // showdialog(context, result['message']);
+       showSnackbar(context, result['message'], isSuccess: true); // Success Snackbar
       print("Request leave Sucess");
     } else {
-      showdialog(context, result['message']);
+      // showdialog(context, result['message']);
+       showSnackbar(context, result['message'], isSuccess: false); // Success Snackbar
       print(" Invalid  ");
     }
     // return response.body;
@@ -75,46 +125,90 @@ var Token=token.accesstoken;
 
  
 
-  Future getLeaveList(String empid, context) async {
+  Future getLeaveList(int page,int perPage,String sort,String firstDate,String lastDate, context) async {
+    print("fetchapplyleavelist:");
 
     final token = await shareddata.getpatdata();
 var Token=token.accesstoken; 
-   print("+++++"+Token);
+   print("+++++____"+Token);
 
-    print("Leavelist" + empid);
+  
+    final String? leaveHistoryUrl = dotenv.env['searchLeaveUrl']!;
+    if (leaveHistoryUrl == null) {
+    print("Error: URL is not found in environment variables.");
+    return [];
+  }
 
-    final response = (await http.get
-    (Uri.parse('http://192.168.31.45:3007/users/userleavelist?employeeId=' +
-            empid.toString()),
-        //      headers: {
-        //   'contentType':'application/json;charset=UTF-8',
-        //   'Authorization':'$Token',
-        // }
+    final response = (await http.post
+    (Uri.parse(leaveHistoryUrl),
+             headers: {
+          'Content-Type':'application/json;charset=UTF-8',
+          'Authorization':'$Token',
+        }, 
+        body:jsonEncode ({
+        
+        "fromDate": firstDate,
+         "toDate": lastDate,
+         "page": page.toString(),
+         "perPage": perPage.toString(),
+          "sort":sort
+      }),
         ));
-    var listData = json.decode(response.body.toString());
-    List<dynamic> leaveList = listData['result'];
-    // print("listdata" + leaveList.toString());
-    print("listdata" + leaveList.toString());
-    return leaveList;
+        
+   if (response.statusCode == 200) {
+    // Decode the response body
+    var listData = json.decode(response.body);
+
+    // Check if 'data' exists and is not null
+    if (listData['data'] != null && listData['data'] is List) {
+      List<dynamic> leaveList = listData['data']; // Use 'data' instead of 'result'
+      print("leavelistdata: $leaveList");
+      return leaveList;
+    } 
+   }
+    // List<dynamic> leaveList = listData['result'];
+    // // print("listdata" + leaveList.toString());
+    // print("leavelistdata" + leaveList.toString());
+    // return leaveList;
   }
 
   Future cancelLeaveList(String leaveId, context) async {
-
+print ("cancelLeave:"+leaveId);
 final token = await shareddata.getpatdata();
 var Token=token.accesstoken; 
    print("+++++"+Token);
+
+
+
     print("cancelid"+leaveId);
+
+    final String? cancelLeavehistoryUrl = dotenv.env['cancelLeaveUrl'];
+    if (cancelLeavehistoryUrl == null) {
+    print("Error: URL is not found in environment variables.");
+    return [];
+  }
     final response = await http.post(
-       Uri.parse("http://192.168.31.45:3007/users/userleavecancel"),
-      // Uri.parse("$Ip/stashook/cancelLeave"),
-      //  headers: <String, String>{
-      //         'Content-Type': 'application/json; charset=UTF-8',
-      //         'Authorization': ' $Token',
-      //       },
+       Uri.parse(cancelLeavehistoryUrl),
+      
+       headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization': '$Token',
+            },
         // jsonEncode
-        body:  ({'leaveId': leaveId}));
+        body: jsonEncode ({
+          'leaveId': leaveId,
+          "comments":"No Needed at present {$leaveId}"
+
+        }));
+         print(response.statusCode);
+    var result=json.decode(response.body);
     if (response.statusCode == 200) {
-      showdialog(context, "Leave Cancelled");
+      // showdialog(context, "Leave Cancelled");
+      showSnackbar(context, result['message'], isSuccess: true);
+        print("LeaveCancled  ");
+    }else{
+ showSnackbar(context, result['message'], isSuccess: false); // Success Snackbar
+      print(" Invalid  ");
     }
   }
 }

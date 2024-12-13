@@ -9,6 +9,7 @@ class SharedPref {
      await preferences.setStringList('roles', employeeDetails.roles);
     await preferences.setString('accesstoken', employeeDetails.accesstoken);
     await preferences.setString('message', employeeDetails.message);
+     await preferences.setString('userName', employeeDetails.userName);
     
     //print(patientDetails.userId+"inside shared set" + preferences.getString('userId').toString());
   }
@@ -19,6 +20,7 @@ class SharedPref {
     final roles = preferences.getStringList('roles')?? [];;
     final accesstoken = preferences.getString('accesstoken');
     final message = preferences.getString('message');
+    final userName = preferences.getString('userName');
    
     // print("inside shared get" + accesstoken.toString());
     return EmployeeDetails(
@@ -27,6 +29,7 @@ class SharedPref {
                           roles:roles,
                           accesstoken: accesstoken.toString(),
                           message: message.toString(),
+                            userName: userName.toString(),
                           
                           );
   }

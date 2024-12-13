@@ -1,30 +1,26 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 import 'package:timeplot_flutter/services/timesheetservice.dart';
-import 'package:intl/intl.dart';
 
 final shareddata = SharedPref();
 
 enum SampleItem { itemOne, itemTwo, itemThree }
 
 SharedPreferences? prefs;
-// List<dynamic> _itemsProject = [];
 
 class FillTimeSheet extends StatefulWidget {
   final DateTime date;
   // const FillTimeSheet({super.key, required this.date});
-  final List<Map<String, dynamic>> resultMenu;  // Parameter for menuItems
+  final List<Map<String, dynamic>> resultMenu;
 
-  FillTimeSheet({required this.date,required this.resultMenu,});
-  
- 
+  FillTimeSheet({
+    required this.date,
+    required this.resultMenu,
+  });
 
   @override
   State<FillTimeSheet> createState() => _FillTimeSheetState();
@@ -40,11 +36,11 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   String? newProcessData;
   var newProjectData;
   var newTimesheetData;
-  var _itemProject = [];
+  List<Map<String, dynamic>> _itemProject = [];
   var _itemProcess = [];
-  var _itemTimesheet = [];
-  List<dynamic> _itemTimeMarked = [];
-  List<dynamic> _itemDailyLog = [];
+  List<Map<String, dynamic>>? _itemTimesheet;
+  Map<String, dynamic> _itemTimeMarked = {};
+  List<Map<String, dynamic>> _itemDailyLog = [];
   String? empId;
   var actualTimeController = TextEditingController();
   var descriptionController = TextEditingController();
@@ -60,6 +56,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   bool isSubmitButtonEnabled = false;
 
   String timesheetId = '';
+  String tsDate = '';
   TimeOfDay? selectedTime;
   String actualTimeInMinutes = '';
   int? B = 0;
@@ -70,6 +67,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   int totalNBPMinutesInt = 0;
   int autoId = 0;
   var roles;
+  String divisionId = "DEV";
 
   @override
   void initState() {
@@ -78,11 +76,11 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     print("date" + date);
     super.initState();
     transferdata();
-    getproject();
-    getprocess();
+    getproject(divisionId);
+
     getTimesheet(date);
+    getMarkedAttendance(date);
     //  getUsersDailyLog();
-    // loadTotalMinutes();
   }
 
   @override
@@ -92,19 +90,28 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     super.dispose();
   }
 
-  Future<void> getproject() async {
-    print("projectid");
-    final resultProject = await timesheetservice.getProjectId(context);
+  Future<void> getproject(String divisionId) async {
+    print("projectid:" + divisionId);
+    final resultProject =
+        await timesheetservice.getProjectId(divisionId, context);
     print("data:" + resultProject.toString());
+    for (var project in resultProject) {
+      String projectId = project['projectId'];
+      print("Calling getprocess with projectId: $projectId");
+
+      // Call the getprocess function with the projectId
+      getprocess(projectId);
+    }
     setState(() {
       _itemProject = resultProject;
     });
     print("itemproject" + _itemProject.toString());
   }
 
-  Future<void> getprocess() async {
-    print("processid");
-    final resultProcess = await timesheetservice.getProcessId(context);
+  Future<void> getprocess(String projectId) async {
+    print("processid:" + projectId);
+    final resultProcess =
+        await timesheetservice.getProcessId(projectId, context);
     print("data:" + resultProcess.toString());
     setState(() {
       _itemProcess = resultProcess;
@@ -113,59 +120,57 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   }
 
   Future<void> getTimesheet(String date) async {
-    print("itemTimesheet");
+    print("Timesheet");
     final resultTimesheet =
-        await timesheetservice.getTimesheetId(date, context);
+        await timesheetservice.fetchTimesheet(date, context);
     // widget.date.toString().split(" ")[0]
-    print("data:" + resultTimesheet.toString());
-    setState(() {
-      _itemTimesheet = resultTimesheet;
-    });
-    timesheetId = _itemTimesheet[0]['timesheetId'];
-    print("extracttimesheet" + timesheetId);
-    getUsersDailyLog();
+    print("receiveddata:" + resultTimesheet.toString());
+    if (resultTimesheet != null && resultTimesheet.isNotEmpty) {
+      setState(() {
+        _itemTimesheet = resultTimesheet;
+        timesheetId = _itemTimesheet![0]['timesheetId'];
+        tsDate = _itemTimesheet![0]['_date'];
+      });
+      print("Extracted Timesheet ID: $timesheetId");
+
+      // Call next function
+      getUsersDailyLog();
+    }
   }
 
-  Future<void> getTimeMarked(String empId, String date) async {
-    print("TimeMarked" + empId + date);
+  Future<void> getMarkedAttendance(String date) async {
+    print("MarkedAttendance:"+date);
     final resultTimeMarked =
-        await timesheetservice.getMarkedTime(empId, date, context);
-    // widget.date.toString().split(" ")[0]
+        await timesheetservice.fetchMarkedAttendance(date,context);
     print(" resultTimeMarked:" + resultTimeMarked.toString());
     setState(() {
       _itemTimeMarked = resultTimeMarked;
     });
-    print("_itemTimeMarked" + _itemTimeMarked.toString());
+    print("_itemTimeMarked: $_itemTimeMarked");
   }
 
   Future<void> getUsersDailyLog() async {
     print("DailyLog");
-    // deleteLogByAutoId(int autoId)
+
     final resultDailyLog =
         await timesheetservice.getDailyLog(timesheetId, context);
     // widget.date.toString().split(" ")[0]
     print("data:" + resultDailyLog.toString());
 
-    setState(() {
-      _itemDailyLog = resultDailyLog;
-    });
-
-    // // Calculate total time in minutes
-    // totalTime = _itemDailyLog.fold(0.0, (sum, log) {
-    //   double minutes = double.tryParse(log['actualTime'].toString()) ??
-    //       0; // Get actual time in minutes
-    //   return sum + minutes; // Sum up the actual time
-    // });
-    
-
-    // print('Total time calculated: $totalTime');
+    if (resultDailyLog != null && resultDailyLog is List) {
+      setState(() {
+        _itemDailyLog = List<Map<String, dynamic>>.from(resultDailyLog);
+      });
+    } else {
+      print("Invalid data received or empty response.");
+    }
 
 // Ensure _itemDailyLog is a list and iterate through it
     if (_itemDailyLog != null && _itemDailyLog is List) {
       // Initialize variables for B and NBP minutes
-       double totalBMinutes = 0.0;
+      double totalBMinutes = 0.0;
       double totalNBPMinutes = 0.0;
-      double  totalNBNPMinutes = 0.0;
+      double totalNBNPMinutes = 0.0;
       // Calculate total time in minutes and categorize into B and NBP
       totalTime = _itemDailyLog.fold(0.0, (sum, log) {
         double minutes = double.tryParse(log['actualTime'].toString()) ?? 0;
@@ -175,19 +180,19 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
           totalBMinutes += minutes;
         } else if (log['billType'] == 'NBP') {
           totalNBPMinutes += minutes;
-        }else{
-            totalNBNPMinutes += minutes;
+        } else {
+          totalNBNPMinutes += minutes;
         }
 
         return sum + minutes; // Sum up total minutes
       });
 
- // Convert double values to int
+      // Convert double values to int
       totalBMinutesInt = totalBMinutes.toInt();
       totalNBPMinutesInt = totalNBPMinutes.toInt();
       totalNBNPMinutesInt = totalNBNPMinutes.toInt();
       // Print the categorized minutes
-     // Print the categorized minutes as integers
+      // Print the categorized minutes as integers
       print('Total B Minutes: $totalBMinutesInt');
       print('Total NBP Minutes: $totalNBPMinutesInt');
       print('Total NBNP Minutes: $totalNBNPMinutesInt');
@@ -199,52 +204,38 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
 
   void transferdata() async {
     final empData = await shareddata.getpatdata();
-    // Map<String, int> totalMinutes = await shareddata.getTotalMinutes();
-    // print("Total minutes loaded.");
+
     setState(() {
       empId = empData.userId;
-      roles=empData.roles;
+      roles = empData.roles;
       print("id" + empId.toString());
-      
     });
-    getTimeMarked(empId.toString(), widget.date.toString().split(" ")[0]);
   }
 
   @override
   Widget build(BuildContext context) {
-    String formattedTime;
-
-    if (_itemTimeMarked.isNotEmpty) {
-      var item = _itemTimeMarked[0];
-
-      DateTime dateTime = DateTime.parse(item['markedTime']);
-      formattedTime = DateFormat('hh:mm a').format(dateTime);
-
-      workingHours = item['WorkingHours'];
-    } else {
-      print('No time entries found.');
-
-      formattedTime = 'N/A';
+    if (_itemTimeMarked == null || _itemTimeMarked!.isEmpty) {
+      return Center(child: CircularProgressIndicator()); // Show loading state
     }
-    double? workingHoursDouble = double.tryParse(workingHours);
+    double? workingHoursDouble =
+        double.tryParse(_itemTimeMarked!['workingHours']);
     double workingHoursInMinutes = (workingHoursDouble ?? 0) * 60;
     double width = 200;
     bool isAddButtonDisabled =
         workingHoursInMinutes > 0 && totalTime >= workingHoursInMinutes;
-    bool isSubmitButtonEnabled = totalTime == workingHoursInMinutes;
-    
+    bool isSubmitButtonEnabled = totalTime >= workingHoursInMinutes;
 
-    
     return Scaffold(
         appBar: CommonAppBar(
           menuItems: widget.resultMenu,
           title: 'MyAttendance',
-          
+
           showProfile: true,
           // onProfileTap: () {
           //   print('Profile tapped!');
           // },
         ),
+        // drawer: buildDrawer(context),
         body: SingleChildScrollView(
             child: SafeArea(
                 child: Column(
@@ -285,7 +276,9 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                             fontSize: 15,
                                             fontWeight: FontWeight.w500,
                                           )),
-                                      Text('$workingHours'.toString(),
+                                      Text(
+                                          _itemTimeMarked!['workingHours'] ??
+                                              'N/A', // Safe access,
                                           // '$workingHours',
                                           // '${item['WorkingHours']}'
                                           style: TextStyle(
@@ -298,18 +291,18 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                       SizedBox(
                                         width: 20,
                                       ),
-                                      // Text("Sign In : ",
-                                      //     style: TextStyle(
-                                      //       color: AppColors.borderColor,
-                                      //       fontSize: 15,
-                                      //       fontWeight: FontWeight.w500,
-                                      //     )),
-                                      // Text('$formattedTime',
-                                      //     style: TextStyle(
-                                      //       color: AppColors.textColor,
-                                      //       fontSize: 15,
-                                      //       fontWeight: FontWeight.w500,
-                                      //     )),
+                                      Text("Date: ",
+                                          style: TextStyle(
+                                            color: AppColors.borderColor,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                          )),
+                                      Text(tsDate.toString().split(" ")[0],
+                                          style: TextStyle(
+                                            color: AppColors.textColor,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                          )),
                                     ]),
                                 // SizedBox(
                                 //   height: 15,
@@ -368,8 +361,8 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                   child: Container(
                                     padding: EdgeInsets.all(8.0),
                                     decoration: BoxDecoration(
-                                       color:
-                                        AppColors.borderColor.withOpacity(0.1),
+                                      color: AppColors.borderColor
+                                          .withOpacity(0.1),
                                       // border: Border.all(color:AppColors.borderColor.withOpacity(0.1)),
                                       // borderRadius: BorderRadius.circular(5.0),
                                     ),
@@ -526,52 +519,53 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.29,
-                                        child: Text("TimesheetId : ",
-                                            style: TextStyle(
-                                              color: AppColors.borderColor,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
-                                            )),
-                                      ),
-                                      SizedBox(width: 10),
-                                      SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.5,
-                                          // height:40,
-                                          child: DropdownMenu<String>(
-                                            // initialSelection: list.first,
-                                            hintText: "Select TimesheetId",
-                                            width: width,
-                                            requestFocusOnTap: true,
-                                            enableFilter: true,
-                                            onSelected: (String? value) {
-                                              setState(() {
-                                                newTimesheetData = value!;
-                                                print("newTimesheetData" +
-                                                    newTimesheetData);
-                                              });
-                                            },
-                                            dropdownMenuEntries: _itemTimesheet
-                                                .map<DropdownMenuEntry<String>>(
-                                                    (value) {
-                                              return DropdownMenuEntry<String>(
-                                                  value: value['timesheetId']
-                                                      .toString(),
-                                                  label: value['timesheetId']
-                                                      .toString());
-                                            }).toList(),
-                                          ))
-                                    ],
-                                  ),
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.start,
+                                  //   children: [
+                                  //     SizedBox(
+                                  //       width:
+                                  //           MediaQuery.of(context).size.width *
+                                  //               0.29,
+                                  //       child: Text("TimesheetId : ",
+                                  //           style: TextStyle(
+                                  //             color: AppColors.borderColor,
+                                  //             fontSize: 15,
+                                  //             fontWeight: FontWeight.w500,
+                                  //           )),
+                                  //     ),
+                                  //     SizedBox(width: 10),
+                                  //     SizedBox(
+                                  //         width: MediaQuery.of(context)
+                                  //                 .size
+                                  //                 .width *
+                                  //             0.5,
+                                  //         // height:40,
+                                  //         child: DropdownMenu<String>(
+                                  //           // initialSelection: list.first,
+                                  //           hintText: "Select TimesheetId",
+                                  //           width: width,
+                                  //           requestFocusOnTap: true,
+                                  //           enableFilter: true,
+                                  //           onSelected: (String? value) {
+                                  //             setState(() {
+                                  //               newTimesheetData = value!;
+                                  //               print("newTimesheetData" +
+                                  //                   newTimesheetData);
+                                  //             });
+                                  //           },
+                                  //           dropdownMenuEntries: _itemTimesheet != null && _itemTimesheet!.isNotEmpty
+                                  //               ? _itemTimesheet!
+                                  //               .map<DropdownMenuEntry<String>>(
+                                  //                   (value) {
+                                  //             return DropdownMenuEntry<String>(
+                                  //                 value: value['timesheetId']
+                                  //                     .toString(),
+                                  //                 label: value['timesheetId']
+                                  //                     .toString());
+                                  //           }).toList() : [],
+                                  //         ))
+                                  //   ],
+                                  // ),
                                   SizedBox(
                                     height: 10,
                                   ),
@@ -627,7 +621,6 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                                 print("actualTimeController" +
                                                     actualTimeController.text +
                                                     actualTimeInMinutes);
-                                                
                                               }
                                             },
                                             child: AbsorbPointer(
@@ -696,15 +689,14 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                       ? null
                                       : () {
                                           addDailgLog(
-                                              newProcessData!,
                                               newProjectData,
-                                              newTimesheetData,
+                                              newProcessData!,
+                                              timesheetId,
                                               actualTimeInMinutes,
                                               descriptionController.text,
-                                              billTypeController.text);
-
-                                          // actualTimeController.clear();
-                                          // descriptionController.clear();
+                                              tsDate
+                                              // billTypeController.text,
+                                              );
                                         },
                                   child: Text("ADD",
                                       style: TextStyle(
@@ -732,24 +724,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                       children: [
                                         Row(
                                           children: [
-                                            //                   Text("Filled Time Sheet : ",
-                                            //                       style: TextStyle(
-                                            //                         color: AppColors.textColor,
-                                            //                         fontSize: 20,
-                                            //                       )),
-                                            //                   SizedBox(
-                                            //                     width: 10,
-                                            //                   ),
-                                            //                    // Display each filled time entry
-                                            // ...filledTimes.map((time) => Padding(
-                                            //       padding: const EdgeInsets.only(top: 5.0),
-                                            //       child: Row(
-                                            //         children: [
-                                            //           Text("${time.toStringAsFixed(2)} hr",
-                                            //               style: TextStyle(
-                                            //                 color: Colors.blue,
-                                            //                 fontSize: 16,
-                                            //               )),
+                                            //
                                           ],
                                         ),
                                         //     )),
@@ -774,12 +749,6 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                                 )),
                                           ],
                                         ),
-
-                                        // Text("00:00 hr ",
-                                        //     style: TextStyle(
-                                        //       color: Colors.blue,
-                                        //       fontSize: 20,
-                                        //     )),
                                       ])
                                 ])),
                       ])),
@@ -812,12 +781,21 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                   itemCount: _itemDailyLog.length,
                                   itemBuilder: (context, index) {
                                     final log = _itemDailyLog[index];
-                                    autoId = _itemDailyLog[index]['autoId'];
+                                    final autoId =
+                                        log['autoId'] ?? 'Unknown ID';
+                                    final processId =
+                                        log['processId'] ?? 'Unknown Process';
+                                    final projectId =
+                                        log['processName'] ?? 'Unknown Project';
+                                    final actualTime = log['actualTime'] ?? 0;
+                                    final billType =
+                                        log['billType'] ?? 'Unknown';
+                                    // final log = _itemDailyLog[index];
+                                    // autoId = _itemDailyLog[index]['autoId'];
                                     return ListTile(
-                                      title:
-                                          Text('Project: ${log['processId']}'),
-                                      subtitle:
-                                          Text('Process: ${log['projectId']}'),
+                                      title: Text('Project: $projectId'),
+                                      // subtitle:
+                                      //     Text('Process: $processId'),
                                       // \nTime: ${log['actualTime']} minutes
                                       trailing: Wrap(
                                         spacing: 8,
@@ -828,7 +806,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                                   height:
                                                       12.0), // Adjust height to control space
                                               Text(
-                                                '${log['actualTime']} min',
+                                                '$actualTime min',
                                                 style: TextStyle(
                                                   color: AppColors.textColor,
                                                   fontSize: 15,
@@ -837,20 +815,20 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                                             ],
                                           ),
                                           // Tooltip(
-                                            // message: "Totalminutes-" + '${log['actualTime']}',
-                                            // preferBelow: false,
-                                            // child: IconButton(
-                                            //   icon: const Icon(Icons.lock_clock_rounded),
-                                            //   color: Colors.green,
-                                            //   onPressed: () {},
-                                            // ),
-                                            // Text(
-                                            //     '${log['billType']}',
-                                            //     style: TextStyle(
-                                            //       color: AppColors.textColor,
-                                            //       fontSize: 15,
-                                            //     ),
-                                            //   ),
+                                          // message: "Totalminutes-" + '${log['actualTime']}',
+                                          // preferBelow: false,
+                                          // child: IconButton(
+                                          //   icon: const Icon(Icons.lock_clock_rounded),
+                                          //   color: Colors.green,
+                                          //   onPressed: () {},
+                                          // ),
+                                          // Text(
+                                          //     '${log['billType']}',
+                                          //     style: TextStyle(
+                                          //       color: AppColors.textColor,
+                                          //       fontSize: 15,
+                                          //     ),
+                                          //   ),
                                           // ),
 
                                           Tooltip(
@@ -903,33 +881,30 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   }
 
   List<String> projectEntries = [];
-  void addDailgLog(String newProcessData, String newProjectData,
-      String newTimesheetData, String time, String description,String bill) async {
-    await timesheetservice.userDailyLog(newProcessData, newProjectData,
-        newTimesheetData, time, description,bill, context);
-    await getUsersDailyLog();
-
-    //  double minutes = double.tryParse(time) ?? 0;
-
+  void addDailgLog(String newProjectData, String newProcessData,
+      String timesheetId, String time, String description, String date) async {
+    await timesheetservice.userDailyLog(newProjectData, newProcessData,
+        timesheetId, time, description, date, context);
+    await getUsersDailyLog();   
     setState(() {
-      // filledTimes.add(minutes); // Add to the list
-      // totalTime += minutes; // Update total time
-      // Check if totalTime exceeds workingHours
-      double? workingHoursDouble = double.tryParse(workingHours);
+      // Safely parse workingHours to a double
+      double? workingHoursDouble =
+          double.tryParse(_itemTimeMarked?['workingHours'] ?? '0');
       double workingHoursInMinutes = (workingHoursDouble ?? 0) * 60;
+
       print("Total Time: $totalTime");
       print("Working Hours in Minutes: $workingHoursInMinutes");
-      // Set the button states
-      // this.isAddButtonDisabled = isAddButtonDisabled;
-      // this.isSubmitButtonDisabled = !isSubmitButtonEnabled; // Submit button is enabled only if total time equals working hours
 
-      // Show alert if total time exceeds working hours
+      // Compare totalTime with working hours in minutes
       if (totalTime > workingHoursInMinutes) {
         showAlert(
-          "Warning" ,
-          "Total time (${totalTime.toStringAsFixed(2)}) exceeds working hours (${workingHoursInMinutes.toStringAsFixed(2)} minutes).",context
+          "Warning",
+          "Total time (${totalTime.toStringAsFixed(2)} minutes) exceeds the allowed working hours (${workingHoursInMinutes.toStringAsFixed(2)} minutes).",
+          context,
         );
       }
+      // Enable Submit button if totalTime equals working hours
+      isSubmitButtonEnabled = (totalTime >= workingHoursInMinutes);
     });
     actualTimeController.clear();
     descriptionController.clear();
@@ -937,21 +912,15 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
 
   Future updateUserTimesheet() async {
     print("timesheet");
-    await timesheetservice.updateTimesheet(
-        totalBMinutesInt, totalNBNPMinutesInt, totalNBPMinutesInt, timesheetId, context);
+    await timesheetservice.updateTimesheet(timesheetId, totalBMinutesInt,
+        totalNBNPMinutesInt, totalNBPMinutesInt, context);
   }
 
-// Save total minutes
-  // void saveTotalMinutes() async {
-  //   await shareddata.storeTotalMinutes(
-  //       totalNBNPMinutes, totalNBPMinutes, totalBMinutes);
-  //   print("Total minutes saved!");
-  // }
 
-  deleteLogByAutoId(int autoId) async {
+
+  deleteLogByAutoId(String autoId) async {
+    print("deletedailylog:" + autoId.toString());
     await timesheetservice.deleteTimesheet(autoId, context);
     getUsersDailyLog();
   }
-
-  
 }

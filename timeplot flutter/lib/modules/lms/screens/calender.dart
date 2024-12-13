@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:timeplot_flutter/model/event.dart';
 import 'package:timeplot_flutter/modules/lms/screens/filltimesheet.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/getholidaysservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +23,7 @@ class CalenderScreen extends StatefulWidget {
   // const CalenderScreen({
   //   super.key, 
   // });
-  final List<Map<String, dynamic>> resultMenu;  // Parameter for menuItems
+  final List<Map<String, dynamic>> resultMenu;  
  
   CalenderScreen({required this.resultMenu,});
 
@@ -67,28 +65,32 @@ late List<Map<String, dynamic>> menuItems;
       roles=empData.roles;
       print("id" + empId.toString());
     });
-    getLeaves(empId.toString(), _focusedDay.toString());
-    getBalanceLeave(empId.toString(), context);
+    getLeaves( _focusedDay.toString());
+    
   }
 
-  Future getLeaves(String empId, String today) async {
-    print("iddate" + empId + today);
-    List<dynamic> posts = await leaveservice.getHolidays(empId, today, context);
-    print("data:" + posts.toString());
+  Future getLeaves( String today) async {
+    print("iddate"  + today);
+    List<dynamic> posts = await leaveservice.fetchLeaveColor( today, context);
+    print("datacolor:" + posts.toString());
 
     setState(() {
       _events = _groupEventsByDate(posts[0]);
       _items = posts[1];
+      
     });
+    print("postcolor:"+_items.toString());
   }
 
+ 
+
   Map<DateTime, List<dynamic>> _groupEventsByDate(List<dynamic> events) {
-    print("events" + events.toString());
+    print("events:" + events.toString());
     //  print("events"+events[0]['sdate']);
     Map<DateTime, List<dynamic>> groupedEvents = {};
     for (var event in events) {
       if (event is Map<String, dynamic>) {
-        DateTime eventDate = DateTime.parse(event['sdate'] as String);
+        DateTime eventDate = DateTime.parse(event['cDate'] as String);
         Color color = _getColorFromString(event['color'] as String);
 
         if (groupedEvents[eventDate] == null) {
@@ -96,7 +98,7 @@ late List<Map<String, dynamic>> menuItems;
         }
 
         groupedEvents[eventDate]!.add(
-            {"date": event['sdate'], "title": event['title'], "color": color});
+            {"date": event['cDate'], "title": event['title'], "color": color});
         // events[date]!.add({"title": event['title'], "color": color})
       }
     }
@@ -116,34 +118,37 @@ late List<Map<String, dynamic>> menuItems;
     return events;
   }
 
-  Future getLMSList(context) async {
-    print("resultLMS");
+  
 
-    List<dynamic> resultLMS = await leaveservice.getLMS(context);
-    print("resultLMS:" + resultLMS.toString());
-    setState(() {
-      // _items = resultLMS;
-    });
+
+  Future<void> _getBalanceLeave(BuildContext context) async {
+  
+    Map<String, dynamic> leaveBalance = await leaveservice.getLeaveBalance(context);
+    // Now you have the leave balance data, and you can use it as needed
+    print('Leave Balance Count: ${leaveBalance['Count']}');
+    print('Leave Balance Description: ${leaveBalance['Description']}');
+  
+    if (leaveBalance != null) {
+      
+      setState(() {
+        
+        _itemsBalance = [
+          {
+            'Count': leaveBalance['Count'] ?? 0, 
+            'Description': leaveBalance['Description'] ?? 'No description available', 
+          },
+        ];
+      });
+      print('Updated Leave Count: ${_itemsBalance[0]['Count']}');
+      print('Updated Leave Description: ${_itemsBalance[0]['Description']}');
+    } else {
+      print('Leave balance data is null');
+      setState(() {
+        _itemsBalance = [];
+      });
+    }
   }
-
-  Future getBalanceLeave(String empId, context) async {
-    print("resultbalance" + empId);
-    List<dynamic> resultBalance =
-        await leaveservice.getLeaveBalance(empId, context);
-    print("resultbalance:" + resultBalance[0].toString());
-    List<Map<String, dynamic>> data =
-        List<Map<String, dynamic>>.from(resultBalance[0]);
-    setState(() {
-      _itemsBalance = data;
-
-      // int count =  _itemsBalance['Count'];
-      // print("count++"+count.toString());
-      // mapMonths.addEntries( _itemsBalance.entries);
-      // mapMonths.forEach((key, value) {
-      //   print("++++" '$key: $value');
-      // });
-    });
-  }
+  
 
   @override
   void initState() {
@@ -154,6 +159,7 @@ late List<Map<String, dynamic>> menuItems;
     super.initState();
     _events = {};
     transferdata();
+    _getBalanceLeave(context);
  
   }
 
@@ -279,7 +285,7 @@ late List<Map<String, dynamic>> menuItems;
                             setState(() {
                               _focusedDay = focusedDay;
                             });
-                            getLeaves(empId.toString(), focusedDay.toString());
+                            getLeaves( focusedDay.toString());
                             //  getBalanceLeave(empId.toString(),context);
                           },
                         ),
@@ -350,21 +356,7 @@ late List<Map<String, dynamic>> menuItems;
           itemCount: _items.length,
           itemBuilder: (BuildContext context, index) {
             var item = _items[index];
-            // var colors = [
-            //   // _items[index]["colorcode"],
-            //   Colors.orange,
-            //   Colors.green,
-            //   Colors.blue,
-            //   Colors.yellow,
-            // ];
-
-            // Color color = new Color(0x12345678);
-            // String colorString =color.toString(); // Color(0x12345678)
-            // String valueString =
-            //     colorString.split('(0x')[1].split(')')[0]; // kind of hacky..
-            // int value = int.parse( valueString, radix: 16);
-
-            // Color otherColor = new Color(value);
+            print("itemcolor:$item");
             return Container(
                 height: 23,
                 child: ListTile(
@@ -384,8 +376,8 @@ late List<Map<String, dynamic>> menuItems;
           scrollDirection: Axis.vertical,
           itemCount: _itemsBalance.length,
           itemBuilder: (BuildContext context, index) {
-            int count = _itemsBalance[index]['Count'];
-            String description = _itemsBalance[index]['Description'];
+            int count = _itemsBalance[index]['Count'] ?? 0;
+            String description = _itemsBalance[index]['Description'] ?? 'No description available';
             return Container(
                 height: 23,
                 child: ListTile(
@@ -401,32 +393,33 @@ late List<Map<String, dynamic>> menuItems;
   }
 
 //  Map<DateTime, List<Map<String, dynamic>>> events = {};
-  void _mapApiDataToEvents() {
-    for (var event in dataColor) {
-      DateTime date = DateTime.parse(event['sdate']!);
-      Color color = _getColorFromString(event['color']);
+  // void _mapApiDataToEvents() {
+  //   for (var event in dataColor) {
+  //     DateTime date = DateTime.parse(event['cDate']!);
+  //     Color color = _getColorFromString(event['color']);
 
-      if (events[date] == null) {
-        events[date] = [];
-      }
-      events[date]!.add(
-          {"date": event['sdate'], "title": event['title'], "color": color});
-    }
-  }
+  //     if (events[date] == null) {
+  //       events[date] = [];
+  //     }
+  //     events[date]!.add(
+  //         {"date": event['cDate'], "title": event['title'], "color": color});
+  //   }
+  // }
 
-  Color _getColorFromString(String? colorString) {
-    // if (colorString == null) {
-    //   return Colors.blue; // default color if colorString is null
-    // }
-    switch (colorString) {
-      case "Orange":
-        return Colors.orange;
-      case "Green":
-        return Colors.green;
-      case "Yellow":
-        return Colors.yellow;
-      default:
-        return Colors.blue; // default color if none matched
-    }
+  Color _getColorFromString(String colorString) {
+  switch (colorString) {
+    case "Orange":
+      return Colors.orange;
+    case "Green":
+      return Colors.green;
+    case "Red":
+      return Colors.red;
+    case "White":
+      return Colors.white;
+    case "Grey":
+      return Colors.grey;
+    default:
+      return Colors.blue; // Default color
   }
+}
 }

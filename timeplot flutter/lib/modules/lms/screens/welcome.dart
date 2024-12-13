@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeplot_flutter/modules/lms/screens/calender.dart';
-import 'package:timeplot_flutter/modules/lms/screens/dailylog.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
 import 'package:timeplot_flutter/modules/ticketing/screens/ticket.dart';
-import 'package:timeplot_flutter/modules/ticketing/screens/ticketraising.dart';
-import 'package:timeplot_flutter/screens/menu.dart';
-
 import 'package:timeplot_flutter/services/addusersattendanceservice.dart';
 import 'package:timeplot_flutter/services/menuservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
+import 'package:timeplot_flutter/services/timesheetservice.dart';
 
 final shareddata = SharedPref();
+ final sharedPref = SharedPref(); 
 
-// enum SampleItem { itemOne, itemTwo, itemThree }
 
 SharedPreferences? prefs;
 
@@ -32,11 +29,13 @@ class welcomeScreen extends StatefulWidget {
 class _welcomeScreenState extends State<welcomeScreen> {
 
   final Addusersattendance attendanceservice = Addusersattendance();
-  // SampleItem? selectedMenu;
+  
   var empId;
   var mode = 'WFH';
   var roles;
-   
+    final TimeSheetService timesheetservice = TimeSheetService();
+     Map<String, dynamic> _itemTimeMarked ={};
+
    final MenuService menuservice = MenuService();
 late List<Map<String, dynamic>> menuItems;
 
@@ -50,24 +49,36 @@ late List<Map<String, dynamic>> menuItems;
     });
   }
 
-  // Future<void> getMenu() async {
-  //   try {
-  //     List<Map<String, dynamic>>  resultMenu = await menuservice.fetchMenuItems();
-  //     setState(() {
-  //       menuItems = resultMenu;
-  //     });
-  //   } catch (e) {
-  //     print('Error fetching menu items: $e');
-  //   }
-  // }
 
+void main() {
+  DateTime now = DateTime.now();
+  String formattedDate = DateFormat('yyyy-MMM-dd').format(now); // e.g., "13-Dec-2024"
+  print("Current Date: $formattedDate");
+  getMarkedAttendance(formattedDate); 
+}
   @override
   void initState() {
     super.initState();
     transferdata();
-  //  getMenu(); 
-    menuItems = widget.resultMenu; 
+  
+    menuItems = widget.resultMenu;
+   main();
+     
+   
   }
+
+ Future<void> getMarkedAttendance(String formattedDate) async {
+    print("MarkedAttendance" );
+    final resultTimeMarked =
+        await timesheetservice. fetchMarkedAttendance( formattedDate,context);    
+    print(" resultTimeMarked:" + resultTimeMarked.toString());
+    setState(() {
+      _itemTimeMarked = resultTimeMarked; // Default to an empty map if null
+      value = _itemTimeMarked['symbol'] ?? 'P4';
+    });
+    print("_itemTimeMarked: $_itemTimeMarked");
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,21 +99,13 @@ late List<Map<String, dynamic>> menuItems;
      
        ),
      
-      drawer: buildDrawer(context),
+      drawer: buildDrawer(),
       body: SingleChildScrollView(
           child: SafeArea(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-            // Container(
-            //   padding: new EdgeInsets.all(25.0),
-            //   child: Text("Mark Attendance-WFH",
-            //       style: TextStyle(
-            //         color: Colors.blue,
-            //         fontSize: 20,
-            //         fontWeight: FontWeight.w500,
-            //       )),
-            // ),
+            
             SizedBox(
               height: 20,
             ),
@@ -201,29 +204,35 @@ late List<Map<String, dynamic>> menuItems;
     );
   }
 
-  var value = 'P0';
-  Widget CustomRadioButton(String text, var index) {
+ 
+  
+ String  value = 'P4';
+Widget CustomRadioButton(String text, String index) {
     return OutlinedButton(
-        onPressed: () {
-          setState(() {
-            value = index;
-          });
-          addUserAttendance(empId, value, mode);
-        },
-        child: Text(
-          text,
-          style: TextStyle(
-            color: (value == index) ? AppColors.backgroundColor :AppColors.textColor,
-          ),
+      onPressed: () async {
+        setState(() {
+          // If the selected value is the same, reset to 'P0', otherwise toggle to the new value
+          value = index ;
+        });
+       
+        addUserAttendance(empId, value, mode);
+      },
+      child: Text(
+        text,
+        style: TextStyle(
+          color: (value == index) ?AppColors.backgroundColor :AppColors.textColor, // Text color based on selection
         ),
-        style: OutlinedButton.styleFrom(
-            shape: CircleBorder(),
-            // (borderRadius: BorderRadius.circular(10)),
-             backgroundColor: (value == index) ? AppColors.primaryColor : Colors.transparent,
-            side: BorderSide(
-                color:
-                    (value == index) ? AppColors.backgroundColor : AppColors.primaryColor)));
+      ),
+      style: OutlinedButton.styleFrom(
+        shape: CircleBorder(),
+        backgroundColor: (value == index) ? AppColors.primaryColor : Colors.transparent, // Background color based on selection
+        side: BorderSide(
+          color: (value == index) ? AppColors.backgroundColor : AppColors.primaryColor, // Border color based on selection
+        ),
+      ),
+    );
   }
+
 
   addUserAttendance(
     String empid,
@@ -231,8 +240,7 @@ late List<Map<String, dynamic>> menuItems;
     String mode,
   ) async {
     await attendanceservice.userAttendance(
-        empid, value.toString(), mode, context);
-      
+        empid, value.toString(), mode, context);     
 
   }
 }

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeplot_flutter/screens/appbar.dart';
 import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/screens/menu.dart';
 import 'package:timeplot_flutter/services/applyleaveservice.dart';
 import 'package:timeplot_flutter/services/sharedpreferences.dart';
 import 'package:intl/intl.dart';
@@ -17,9 +15,11 @@ List<dynamic> _itemsLeave = [];
 
 class Leavelist extends StatefulWidget {
   // const Leavelist({super.key});
-final List<Map<String, dynamic>> resultMenu;  // Parameter for menuItems
+  final List<Map<String, dynamic>> resultMenu; 
 
-  Leavelist({required this.resultMenu,});
+  Leavelist({
+    required this.resultMenu,
+  });
   @override
   State<Leavelist> createState() => _LeavelistState();
 }
@@ -29,6 +29,11 @@ class _LeavelistState extends State<Leavelist> {
   final ApplyLeaveService applyleaveservice = ApplyLeaveService();
   var empId;
   var roles;
+  int page = 1;
+  int perPage = 5;
+  String sort = "modifiedDate desc";
+  String firstDate = "";
+  String lastDate = "";
 
   void transferdata() async {
     final empData = await shareddata.getpatdata();
@@ -37,8 +42,29 @@ class _LeavelistState extends State<Leavelist> {
       roles = empData.roles;
       print("id" + empId.toString());
     });
+  }
 
-    getListLeave(empId.toString(), context);
+  String getFirstDateOfYear() {
+    DateTime now = DateTime.now();
+    return DateTime(now.year, 1, 1)
+        .toIso8601String()
+        .split('T')[0]; // January 1st of the current year
+  }
+
+  String getLastDateOfYear() {
+    DateTime now = DateTime.now();
+    return DateTime(now.year, 12, 31)
+        .toIso8601String()
+        .split('T')[0]; // December 31st of the current year
+  }
+
+  void main() {
+    firstDate = getFirstDateOfYear();
+    lastDate = getLastDateOfYear();
+
+    print("First Date of Year: $firstDate");
+    print("Last Date of Year: $lastDate");
+    getListLeave(page, perPage, sort, firstDate, lastDate, context);
   }
 
   @override
@@ -46,17 +72,16 @@ class _LeavelistState extends State<Leavelist> {
     super.initState();
     transferdata();
     _itemsLeave.clear();
+    main();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Access menu items from the provider
-    final menuItems = Provider.of<MenuProvider>(context).menuItems;
     return Scaffold(
         appBar: CommonAppBar(
           menuItems: widget.resultMenu,
           title: 'LeaveList',
-         
+
           showProfile: true,
           // onProfileTap: () {
           //   print('Profile tapped!');
@@ -73,12 +98,9 @@ class _LeavelistState extends State<Leavelist> {
                 width: 500.0,
                 // height:20.0,
                 decoration: BoxDecoration(
-                  color:AppColors.borderColor.withOpacity(0.1),
-                  //  borderRadius: BorderRadius.circular(10)
-                ),
-                //  width: MediaQuery.of(context).size.width,
-                //       height: MediaQuery.of(context).size.height/1 ,
-                child: Text("Leave List :" + empId,
+                  color: AppColors.borderColor.withOpacity(0.1),                  
+                ),                
+                child: Text("Leave List :",
                     style: TextStyle(
                       color: AppColors.textColor,
                       fontSize: 20,
@@ -91,13 +113,31 @@ class _LeavelistState extends State<Leavelist> {
                       scrollDirection: Axis.vertical,
                       itemCount: _itemsLeave.length,
                       itemBuilder: (BuildContext context, index) {
-                        var days = _itemsLeave[index]['noOfDays'];
-                        double noOfDaysAsDouble =
-                            (days is int) ? days.toDouble() : days;
-                        String noOfDaysStr =
+                        // var days = _itemsLeave[index]['noOfDays'];
+                        // double noOfDaysAsDouble =
+                        //     (days is int) ? days.toDouble() : days;
+                        // String noOfDaysStr =
+                        //     noOfDaysAsDouble.toStringAsFixed(1);
+                        // String status = _itemsLeave[index]['status'];
+                        var daysStr = _itemsLeave[index]
+                            ['noOfDays']; // "1 day(s)" or "3 day(s)"
+
+                        // Use regex to extract the number part of the string (e.g., "1", "3")
+                        RegExp regExp = RegExp(
+                            r'(\d+(\.\d+)?)'); // Regex to capture a number (integer or decimal)
+                        var match = regExp.firstMatch(daysStr);
+
+                        // Convert the captured number to a double
+                        double noOfDaysAsDouble = 0.0;
+                        if (match != null) {
+                          noOfDaysAsDouble =
+                              double.tryParse(match.group(0) ?? '0') ?? 0.0;
+                        }
+
+                        String noOfDaysStrFormatted =
                             noOfDaysAsDouble.toStringAsFixed(1);
                         String status = _itemsLeave[index]['status'];
-                        // Color cardColor;
+                        // // Color cardColor;
                         BorderSide borderSide;
 
                         // switch (status) {
@@ -150,7 +190,7 @@ class _LeavelistState extends State<Leavelist> {
                                 spacing: 8,
                                 children: [
                                   Tooltip(
-                                    message: "noOfDays-" + noOfDaysStr,
+                                    message: "noOfDays-" + noOfDaysStrFormatted,
                                     preferBelow: false,
                                     child: IconButton(
                                       icon: const Icon(Icons.calendar_month),
@@ -187,6 +227,9 @@ class _LeavelistState extends State<Leavelist> {
                                                   'Cancel leave requested for ' +
                                                       _itemsLeave[index]
                                                           ['reason']);
+                                              String leaveId =
+                                                  _itemsLeave[index]['leaveId'];
+                                              print("leaveId" + leaveId);
                                               leaveCancel(
                                                   _itemsLeave[index]['leaveId'],
                                                   context);
@@ -202,27 +245,45 @@ class _LeavelistState extends State<Leavelist> {
             ]))));
   }
 
-  Future getListLeave(String empId, context) async {
+  Future getListLeave(int page, int perPage, String sort, String firstDate,
+      String lastDate, context) async {
     _itemsLeave.clear();
-    print("list" + empId);
-    List<dynamic> resultListLeave =
-        await applyleaveservice.getLeaveList(empId, context);
-    print("resultlist:" + resultListLeave.toString());
+    print("list" +
+        page.toString() +
+        perPage.toString() +
+        sort +
+        firstDate +
+        lastDate);
+    List<dynamic> resultListLeave = await applyleaveservice.getLeaveList(
+        page, perPage, sort, firstDate, lastDate, context);
+    print("leaveresultlist:" + resultListLeave.toString());
 
     setState(() {
       _itemsLeave = resultListLeave;
     });
   }
 
+  
+
+  // Define a helper function to format the date properly
   String formatDate(String dateString) {
-    DateTime dateTime = DateTime.parse(dateString);
-    return DateFormat('yyyy-MM-dd')
-        .format(dateTime); // Change the format as per your need
+    try {
+      // Define the correct date format
+      final DateFormat dateFormat = DateFormat("dd-MMM-yyyy HH:mm:ss");
+
+      // Parse the date string and return the formatted date
+      DateTime parsedDate = dateFormat.parse(dateString);
+      return DateFormat('dd-MMM-yyyy').format(parsedDate);
+    } catch (e) {
+      // Handle the error and return a default string if parsing fails
+      return "Invalid Date";
+    }
   }
 
+  String leaveId = "";
   leaveCancel(String leaveId, context) async {
     print("cancel" + leaveId);
     await applyleaveservice.cancelLeaveList(leaveId, context);
-    getListLeave(empId.toString(), context);
+    getListLeave(page, perPage, sort, firstDate, lastDate, context);
   }
 }
