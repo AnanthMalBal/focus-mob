@@ -25,7 +25,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.timeplot_flutter"   
+    namespace "com.example.focusontime"   
     compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 

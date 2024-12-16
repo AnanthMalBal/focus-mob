@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.timeplot_flutter">
+    package="com.example.focusontime">
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -14,7 +14,7 @@
 
     <application
     
-        android:label="timeplot_flutter"
+        android:label="focusontime"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="true">

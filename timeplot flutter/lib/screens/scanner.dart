@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:timeplot_flutter/screens/appbar.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class ScannerScreen extends StatefulWidget {

@@ -1,5 +1,6 @@
+import 'package:focusontime/model/employeedetails.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timeplot_flutter/model/employeedetails.dart';
+
 
 class SharedPref {
   Future setdata(EmployeeDetails employeeDetails) async {

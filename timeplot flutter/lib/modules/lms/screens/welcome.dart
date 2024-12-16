@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:focusontime/modules/lms/screens/calender.dart';
+import 'package:focusontime/modules/ticketing/screens/ticket.dart';
+import 'package:focusontime/screens/appbar.dart';
+import 'package:focusontime/screens/colors.dart';
+import 'package:focusontime/services/addusersattendanceservice.dart';
+import 'package:focusontime/services/menuservice.dart';
+import 'package:focusontime/services/sharedpreferences.dart';
+import 'package:focusontime/services/timesheetservice.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timeplot_flutter/modules/lms/screens/calender.dart';
-import 'package:timeplot_flutter/screens/appbar.dart';
-import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/modules/ticketing/screens/ticket.dart';
-import 'package:timeplot_flutter/services/addusersattendanceservice.dart';
-import 'package:timeplot_flutter/services/menuservice.dart';
-import 'package:timeplot_flutter/services/sharedpreferences.dart';
-import 'package:timeplot_flutter/services/timesheetservice.dart';
+
 
 final shareddata = SharedPref();
  final sharedPref = SharedPref(); 
@@ -74,7 +75,7 @@ void main() {
     print(" resultTimeMarked:" + resultTimeMarked.toString());
     setState(() {
       _itemTimeMarked = resultTimeMarked; // Default to an empty map if null
-      value = _itemTimeMarked['symbol'] ?? 'P4';
+      value = _itemTimeMarked['symbol'] ?? 'P0';
     });
     print("_itemTimeMarked: $_itemTimeMarked");
   }
@@ -82,7 +83,8 @@ void main() {
 
   @override
   Widget build(BuildContext context) {
-   
+   final screenWidth = MediaQuery.of(context).size.width;
+   final screenHeight = MediaQuery.of(context).size.height;
   
     return Scaffold(
       appBar:
@@ -114,19 +116,28 @@ void main() {
               children: <Widget>[
                 Padding(padding: EdgeInsets.all(10)),
 
-                Container(
-                  decoration: BoxDecoration(
-                      color: AppColors.backgroundColor.withOpacity(1),
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: new EdgeInsets.all(5.0),
-                  child: Text("Mark Attendance-WFH",
-                      style: TextStyle(
-                        color: AppColors.textColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      )),
+                Flexible(
+                  child: Container(
+                    //  width: screenWidth * 0.5, 
+                    decoration: BoxDecoration(
+                        color: AppColors.backgroundColor.withOpacity(1),
+                        borderRadius: BorderRadius.circular(10)),
+                    padding: new EdgeInsets.all(5.0),
+                    child: Text("Mark Attendance",
+                        style: TextStyle(
+                          color: AppColors.textColor,
+                          fontSize: screenWidth < 400 ? 14 : 16, // Responsive font size
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis, // Prevent overflow
+                        ),
+                        
+                  ),
                 ),
-                Wrap(spacing: 1.0, runSpacing: 1.0, children: [
+                //  Spacer(),
+                Wrap(
+                  spacing: 5.0, 
+                  children: [
                   CustomRadioButton("4H", 'P4'),
                   CustomRadioButton("6H", 'P6'),
                   CustomRadioButton("8H", 'P8'),
@@ -206,7 +217,7 @@ void main() {
 
  
   
- String  value = 'P4';
+ String  value = 'P0';
 Widget CustomRadioButton(String text, String index) {
     return OutlinedButton(
       onPressed: () async {

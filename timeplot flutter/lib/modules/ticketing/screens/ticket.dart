@@ -1,17 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:focusontime/modules/lms/screens/applyleave.dart';
+import 'package:focusontime/modules/ticketing/screens/ticketraising.dart';
+import 'package:focusontime/screens/appbar.dart';
+import 'package:focusontime/screens/colors.dart';
+import 'package:focusontime/screens/scanner.dart';
+import 'package:focusontime/services/customerlistservice.dart';
+import 'package:focusontime/services/sharedpreferences.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timeplot_flutter/screens/appbar.dart';
-import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/screens/menu.dart';
-import 'package:timeplot_flutter/screens/productdetails.dart';
-import 'package:timeplot_flutter/modules/ticketing/screens/ticketraising.dart';
-import 'package:timeplot_flutter/screens/scanner.dart';
-import 'package:timeplot_flutter/services/customerlistservice.dart';
 
 
 
+final shareddata = SharedPref();
 SharedPreferences? prefs;
 
 class TicketScreen extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:timeplot_flutter/screens/appbar.dart';
-import 'package:timeplot_flutter/screens/colors.dart';
+import 'package:focusontime/screens/colors.dart';
+
 
 class ProductDetails extends StatefulWidget {
   const ProductDetails({super.key});

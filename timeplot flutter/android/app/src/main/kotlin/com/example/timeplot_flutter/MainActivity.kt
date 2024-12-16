@@ -1,4 +1,4 @@
-package com.example.timeplot_flutter
+package com.example.focusontime
 
 import io.flutter.embedding.android.FlutterActivity
 

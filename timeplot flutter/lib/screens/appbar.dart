@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:focusontime/modules/lms/screens/applyleave.dart';
+import 'package:focusontime/modules/lms/screens/calender.dart';
+import 'package:focusontime/modules/lms/screens/login.dart';
+import 'package:focusontime/modules/lms/screens/welcome.dart';
+import 'package:focusontime/screens/colors.dart';
+import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timeplot_flutter/modules/lms/screens/applyleave.dart';
-import 'package:timeplot_flutter/modules/lms/screens/calender.dart';
 
-import 'package:timeplot_flutter/modules/lms/screens/login.dart';
-import 'package:timeplot_flutter/modules/lms/screens/welcome.dart';
-import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/services/sharedpreferences.dart';
 
 final shareddata = SharedPref();
 SharedPreferences? prefs;

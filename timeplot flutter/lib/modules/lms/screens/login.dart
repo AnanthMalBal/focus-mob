@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:timeplot_flutter/screens/appbar.dart';
-import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/services/loginservice.dart';
-import 'package:timeplot_flutter/services/notification_service.dart';
+import 'package:focusontime/screens/appbar.dart';
+import 'package:focusontime/screens/colors.dart';
+import 'package:focusontime/services/loginservice.dart';
+import 'package:focusontime/services/notification_service.dart';
+
 
 List<dynamic> loginData = [];
 

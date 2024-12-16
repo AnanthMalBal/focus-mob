@@ -2,12 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timeplot_flutter/model/employeedetails.dart';
-import 'package:timeplot_flutter/screens/menu.dart';
-import 'package:timeplot_flutter/services/sharedpreferences.dart';
+
 
 final shareddata = SharedPref();
 

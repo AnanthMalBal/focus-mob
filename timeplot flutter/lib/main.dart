@@ -1,11 +1,8 @@
 
 import 'package:flutter/material.dart';
-
-
-import 'package:timeplot_flutter/modules/lms/screens/login.dart';
+import 'package:focusontime/modules/lms/screens/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:timeplot_flutter/modules/lms/screens/welcome.dart';
-import 'package:timeplot_flutter/screens/menu.dart';
+
 
 
 

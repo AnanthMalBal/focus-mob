@@ -3,10 +3,11 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:focusontime/screens/colors.dart';
 import 'package:open_file/open_file.dart';
-import 'package:timeplot_flutter/screens/appbar.dart';
+
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:timeplot_flutter/screens/colors.dart';
+
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';

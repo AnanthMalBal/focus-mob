@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:focusontime/model/event.dart';
+import 'package:focusontime/modules/lms/screens/filltimesheet.dart';
+import 'package:focusontime/screens/appbar.dart';
+import 'package:focusontime/screens/colors.dart';
+import 'package:focusontime/services/getholidaysservice.dart';
+import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:timeplot_flutter/model/event.dart';
-import 'package:timeplot_flutter/modules/lms/screens/filltimesheet.dart';
-import 'package:timeplot_flutter/screens/appbar.dart';
-import 'package:timeplot_flutter/screens/colors.dart';
-import 'package:timeplot_flutter/services/getholidaysservice.dart';
-import 'package:timeplot_flutter/services/sharedpreferences.dart';
+
 import 'package:intl/intl.dart';
 
 final shareddata = SharedPref();
