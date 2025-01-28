@@ -12,10 +12,10 @@ class TimeSheetService {
   Future <List<Map<String, dynamic>>> getProjectId(String id,context) async {
     print("ProjectId:"+id);
      final token = await shareddata.getpatdata();
-    if (token == null || token.accesstoken == null) {
+    if (token == null || token.authToken == null) {
       throw Exception("Access token is null. Please check authentication.");
     }
-    var Token = token.accesstoken;
+    var Token = token.authToken;
     print("Token: $Token");
     final String? getProjectListUrl = dotenv.env['projectListUrl'];
     if (getProjectListUrl == null) {
@@ -51,20 +51,16 @@ class TimeSheetService {
       rethrow;
     }
 
-    // final response = (await http
-    //     .get(Uri.parse('http://192.168.31.45:3007/timesheet/getProjectList')));
-    // List<dynamic> dataProjectId = await json.decode(response.body);
-    // print("projectId****" + dataProjectId.toString());
-    // return dataProjectId;
+    
   }
 
   Future <List<Map<String, dynamic>>>getProcessId( String id, context) async {
     print("ProcessId:"+id);
     final token = await shareddata.getpatdata();
-    if (token == null || token.accesstoken == null) {
+    if (token == null || token.authToken == null) {
       throw Exception("Access token is null. Please check authentication.");
     }
-    var Token = token.accesstoken;
+    var Token = token.authToken;
     print("Token: $Token");
     final String? getProcessListUrl = dotenv.env['processListUrl'];
     if (getProcessListUrl == null) {
@@ -98,24 +94,16 @@ class TimeSheetService {
     } catch (e) {
       print("Error fetching leave types: $e");
       rethrow;
-    }
-
-
-
-    // final response = (await http
-    //     .get(Uri.parse('http://192.168.31.45:3007/timesheet/getProcessList')));
-    // List<dynamic> dataProcessId = await json.decode(response.body);
-    // print("projectId====" + dataProcessId.toString());
-    // return dataProcessId;
+    }   
   }
 
   Future <List<Map<String, dynamic>>> fetchTimesheet(String date, context) async {
     print("Timesheet:" + date);
     final token = await shareddata.getpatdata();
-    if (token == null || token.accesstoken == null) {
+    if (token == null || token.authToken == null) {
       throw Exception("Access token is null. Please check authentication.");
     }
-    var Token = token.accesstoken;
+    var Token = token.authToken;
     print("Token: $Token");
     final String? getTimesheetUrl = dotenv.env['timesheetUrl'];
     if (getTimesheetUrl == null) {
@@ -151,13 +139,7 @@ class TimeSheetService {
       rethrow;
     }
 
-    // final response = (await http.get(Uri.parse(
-    //     'http://192.168.31.45:3007/timesheet/getTimesheetId?markedTime=' +
-    //         date.toString())));
-    // //
-    // List<dynamic> dataTimesheetId = await json.decode(response.body);
-    // print("TimesheetId++++" + dataTimesheetId.toString());
-    // return dataTimesheetId;
+    
   }
 
   Future userDailyLog(String projectId, String processId, String timesheetId,
@@ -171,7 +153,7 @@ class TimeSheetService {
          date);
 
          final token = await shareddata.getpatdata();
-var Token=token.accesstoken; 
+var Token=token.authToken; 
    print("+++++"+Token);
 final String addDailyLogUrl = dotenv.env['addDailylogUrl']!;
 
@@ -199,11 +181,14 @@ final String addDailyLogUrl = dotenv.env['addDailylogUrl']!;
     if (response.statusCode == 200) {
       print("check1");
       // showdialog(context, "Added Sucessfully");
-      showSnackbar(context, result['message'], isSuccess: true);
+       String messageInfo = result['info'] ?? 'No message info available';
+  showSnackbar(context, messageInfo, isSuccess: true);
+      // showSnackbar(context, result['message'], isSuccess: true);
       print("add timesheet Sucess");
     } else {
       print(" Invalid  ");
-      showSnackbar(context, result['message'], isSuccess: false);
+       showSnackbar(context, 'No message available', isSuccess: false);
+      // showSnackbar(context, result['message'], isSuccess: false);
     }
     // return response.body;
   }
@@ -211,10 +196,10 @@ final String addDailyLogUrl = dotenv.env['addDailylogUrl']!;
   Future<Map<String, dynamic>> fetchMarkedAttendance( String date,context) async {
     print("fetch mark attendance:"+date);
     final token = await shareddata.getpatdata();
-    if (token == null || token.accesstoken == null) {
+    if (token == null || token.authToken == null) {
       throw Exception("Access token is null. Please check authentication.");
     }
-    var Token = token.accesstoken;
+    var Token = token.authToken;
     print("Token: $Token");
     final String? getMarkedAttendanceUrl = dotenv.env['markedAttendanceUrl'];
     if (getMarkedAttendanceUrl == null) {
@@ -251,24 +236,16 @@ final String addDailyLogUrl = dotenv.env['addDailylogUrl']!;
       print("Error fetching leave types: $e");
       rethrow;
     }
-    // final response = (await http.get(Uri.parse(
-    //     'http://192.168.31.45:3007/timesheet//getmarkedtime?employeeId=' +
-    //         empid +
-    //         "&date=" +
-    //         date.toString())));
-    // var listData = json.decode(response.body.toString());
-    // List<dynamic> dataMarkedTime = listData['result'];
-    // print("TimesheetId++++" + dataMarkedTime.toString());
-    // return dataMarkedTime;
+    
   }
 
   Future <List<Map<String, dynamic>>> getDailyLog(dynamic id, context) async {
     print("getDailyLog" + id.toString());
     final token = await shareddata.getpatdata();
-    if (token == null || token.accesstoken == null) {
+    if (token == null || token.authToken == null) {
       throw Exception("Access token is null. Please check authentication.");
     }
-    var Token = token.accesstoken;
+    var Token = token.authToken;
     print("Token: $Token");
     final String? dailyLogUrl = dotenv.env['getDailyLogUrl'];
     if (dailyLogUrl  == null) {
@@ -307,14 +284,7 @@ final String addDailyLogUrl = dotenv.env['addDailylogUrl']!;
       rethrow;
     }
 
-    // final response = (await http.get(Uri.parse(
-    //     'http://192.168.31.45:3007/timesheet//getUsersDailyLog?timesheetId=' +
-    //         id.toString())));
-    // print('API Response: ${response.body}');
-    // final listDailyLog = json.decode(response.body.toString());
-    // // List<dynamic> dataDailyLog = listDailyLog['result'];
-    // print("dailylog++++" + listDailyLog.toString());
-    // return listDailyLog;
+    
   }
 
   Future updateTimesheet( String timesheetId, int hoursBillable, int hoursNBNP, int hoursNBP,
@@ -325,7 +295,7 @@ final String addDailyLogUrl = dotenv.env['addDailylogUrl']!;
         hoursNBP.toString()+timesheetId.toString());
 
 final token = await shareddata.getpatdata();
-var Token=token.accesstoken; 
+var Token=token.authToken; 
    print("+++++"+Token);
 final String updateTimesheetUrl = dotenv.env['updateUsertimesheetUrl']!;
     final response = await http.post(
@@ -348,10 +318,13 @@ final String updateTimesheetUrl = dotenv.env['updateUsertimesheetUrl']!;
     if (response.statusCode == 200) {
       print("check1");
       // showdialog(context, "update Sucessfully");
-       showSnackbar(context, result['message'], isSuccess: true);
+       String messageInfo = result['info'] ?? 'No message info available';
+  showSnackbar(context, messageInfo, isSuccess: true);
+      //  showSnackbar(context, result['message'], isSuccess: true);
       print("update timesheet Sucess");
     } else {
-       showSnackbar(context, result['message'], isSuccess: false);
+       showSnackbar(context, 'No message available', isSuccess: false);
+      //  showSnackbar(context, result['message'], isSuccess: false);
       print(" Invalid  ");
     }
     // return response.body;
@@ -360,10 +333,10 @@ final String updateTimesheetUrl = dotenv.env['updateUsertimesheetUrl']!;
   Future deleteTimesheet(String autoId, context) async {
     print("autoid" + autoId);
 final token = await shareddata.getpatdata();
-    if (token == null || token.accesstoken == null) {
+    if (token == null || token.authToken == null) {
       throw Exception("Access token is null. Please check authentication.");
     }
-    var Token = token.accesstoken;
+    var Token = token.authToken;
     print("Token: $Token");
     final String? deleteDailyLogUrl = dotenv.env['deleteDailylogUrl'];
     if (deleteDailyLogUrl  == null) {
@@ -387,10 +360,13 @@ final token = await shareddata.getpatdata();
     if (response.statusCode == 200) {
       print("check1");
       // showdialog(context, "delete Sucessfully");
-      showSnackbar(context, result['message'], isSuccess: true); 
+       String messageInfo = result['info'] ?? 'No message info available';
+  showSnackbar(context, messageInfo, isSuccess: true);
+      // showSnackbar(context, result['message'], isSuccess: true); 
       print("delete Sucess");
     } else {
-      showSnackbar(context, result['message'], isSuccess: true); 
+       showSnackbar(context, 'No message available', isSuccess: false);
+      // showSnackbar(context, result['message'], isSuccess: true); 
       print(" Invalid  ");
     }
   }

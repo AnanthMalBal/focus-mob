@@ -21,7 +21,7 @@ class Addusersattendance{
   print("DailyLog"+ employeeId+symbol+WFH);
 //  print('Local IP: $Ip');
 final token = await shareddata.getpatdata();
-var Token=token.accesstoken; 
+var Token=token.authToken; 
    print("+++++"+Token);
 final String attendanceUrl = dotenv.env['markAttendanceUrl']!;
 
@@ -51,7 +51,10 @@ if (response.statusCode == 200){
   //  var result = json.decode(response.body);
   print("check1");
   //  showdialog(context,result['message']);
-   showSnackbar(context, result['message'], isSuccess: true); // Success Snackbar
+  //  showSnackbar(context, result['message'], isSuccess: true); // Success Snackbar
+   String messageInfo = result['info'] ?? 'No message info available';
+  showSnackbar(context, messageInfo, isSuccess: true);
+   
     print("Attendance Added Successfully");
  
     }
@@ -59,7 +62,7 @@ else {
   //  var result = json.decode(response.body);
   // showdialog(context,result['message']);     
       print(" Invalid  ");
-      showSnackbar(context, result['message'], isSuccess: false); // Failure Snackbar
+     showSnackbar(context, 'No message available', isSuccess: false);
     print("Failed to add attendance");
       }
             // return response.body;

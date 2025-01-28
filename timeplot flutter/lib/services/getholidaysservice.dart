@@ -8,7 +8,7 @@ class HolidayService {
    Future fetchLeaveColor( String date, context) async {
     print("getcolor:"+ date);
      final token = await shareddata.getpatdata();
-     var Token = token.accesstoken;
+     var Token = token.authToken;
   print("Token: $Token");
   final String? leaveColourUrl = dotenv.env['leavecolourUrl'];
     final response = (await http.post(Uri.parse(
@@ -119,10 +119,10 @@ Future<Map<String, dynamic>> getLeaveBalance( context) async {
   print("Fetching Leave Balance...");
 
   final token = await shareddata.getpatdata();
-  if (token == null || token.accesstoken == null) {
+  if (token == null || token.authToken == null) {
     throw Exception("Access token is null. Please check authentication.");
   }
-  var Token = token.accesstoken;
+  var Token = token.authToken;
   print("Token: $Token");
 
   final String? leaveBalanceUrl = dotenv.env['leavebalanceUrl'];

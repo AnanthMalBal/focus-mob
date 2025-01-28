@@ -215,11 +215,15 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
 
   @override
   Widget build(BuildContext context) {
-    if (_itemTimeMarked == null || _itemTimeMarked!.isEmpty) {
-      return Center(child: CircularProgressIndicator()); // Show loading state
-    }
-    double? workingHoursDouble =
-        double.tryParse(_itemTimeMarked!['workingHours']);
+    // if (_itemTimeMarked == null || _itemTimeMarked!.isEmpty) {
+    //   return Center(child: CircularProgressIndicator()); // Show loading state
+    // }
+    // double? workingHoursDouble =
+    //     double.tryParse(_itemTimeMarked!['workingHours']);
+    double? workingHoursDouble;
+if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
+  workingHoursDouble = double.tryParse(_itemTimeMarked!['workingHours']);
+}
     double workingHoursInMinutes = (workingHoursDouble ?? 0) * 60;
     double width = 200;
     bool isAddButtonDisabled =

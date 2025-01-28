@@ -38,10 +38,10 @@ Future<List<dynamic>> getLeaveType( context) async {
   print("Fetching Leave Types...");
 
   final token = await shareddata.getpatdata();
-  if (token == null || token.accesstoken == null) {
+  if (token == null || token.authToken == null) {
     throw Exception("Access token is null. Please check authentication.");
   }
-  var Token = token.accesstoken;
+  var Token = token.authToken;
   print("Token: $Token");
 
   final String? leaveTypeUrl = dotenv.env['levetypeUrl'];
@@ -91,7 +91,7 @@ Future<List<dynamic>> getLeaveType( context) async {
         reason);
 
 final token = await shareddata.getpatdata();
-var Token=token.accesstoken; 
+var Token=token.authToken; 
    print("+++++"+Token);
    final String? applyLeaveUrl = dotenv.env['applyleaveUrl']!;
 
@@ -116,11 +116,14 @@ var Token=token.accesstoken;
     if (response.statusCode == 200) {
       print("check1");
       // showdialog(context, result['message']);
-       showSnackbar(context, result['message'], isSuccess: true); // Success Snackbar
+       
+       String messageInfo = result['info'] ?? 'No message info available';
+  showSnackbar(context, messageInfo, isSuccess: true);
       print("Request leave Sucess");
     } else {
       // showdialog(context, result['message']);
-       showSnackbar(context, result['message'], isSuccess: false); // Success Snackbar
+      //  showSnackbar(context, result['message'], isSuccess: false); // Success Snackbar
+       showSnackbar(context, 'No message available', isSuccess: false);
       print(" Invalid  ");
     }
     // return response.body;
@@ -132,7 +135,7 @@ var Token=token.accesstoken;
     print("fetchapplyleavelist:");
 
     final token = await shareddata.getpatdata();
-var Token=token.accesstoken; 
+var Token=token.authToken; 
    print("+++++____"+Token);
 
   
@@ -178,7 +181,7 @@ var Token=token.accesstoken;
   Future cancelLeaveList(String leaveId, context) async {
 print ("cancelLeave:"+leaveId);
 final token = await shareddata.getpatdata();
-var Token=token.accesstoken; 
+var Token=token.authToken; 
    print("+++++"+Token);
 
 

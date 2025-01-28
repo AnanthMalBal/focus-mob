@@ -267,7 +267,24 @@ class _CommonAppBarState extends State<CommonAppBar> {
  
 }
 
-void showSnackbar(BuildContext context, String message, {bool isSuccess = true}) {
+// snackbar
+// void showSnackbar(BuildContext context, String message, {bool isSuccess = true}) {
+//   final Color backgroundColor = isSuccess ? Colors.green : Colors.red;
+
+//   final snackbar = SnackBar(
+//     content: Text(message),
+//     backgroundColor: backgroundColor,
+//     duration: const Duration(seconds: 3),
+//   );
+
+//   ScaffoldMessenger.of(context).showSnackBar(snackbar);
+// }
+
+void showSnackbar(
+  BuildContext context,
+  String message, {
+  bool isSuccess = true,
+}) {
   final Color backgroundColor = isSuccess ? Colors.green : Colors.red;
 
   final snackbar = SnackBar(
@@ -278,7 +295,6 @@ void showSnackbar(BuildContext context, String message, {bool isSuccess = true})
 
   ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }
-
 
 
 class buildDrawer extends StatefulWidget {
@@ -292,7 +308,9 @@ class _buildDrawerState extends State<buildDrawer> {
 
  var empId;
  var roles;
- var name;
+ String? name;
+ String?leadBy;
+ String? emailId;
 
  @override
   void initState() {
@@ -305,7 +323,10 @@ void _loadEmployeeData() async {
     setState(() {
       empId = empData.userId;
       roles=empData.roles;
+      emailId=empData.emailId;
       name=empData.userName;
+      // .replaceAll(RegExp(r'\s*\(\d+\)'), '')
+      leadBy=empData.leadBy.replaceAll(RegExp(r'\s*\(\d+\)'), '');
       roles = roles.where((role) => role != "Employee").toList();
       print("id:" + empId.toString());
       print("name:" + name.toString());
@@ -352,7 +373,7 @@ void _loadEmployeeData() async {
                   ),
                   SizedBox(width: 16), // Space between icon and text
                   Text(
-                    name != null ? name : "Loading...",
+                     name ?? "Loading...",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -391,7 +412,7 @@ void _loadEmployeeData() async {
           ),
         ),
         ListTile(
-          title: Text('Name: $name  '),
+          title: Text('Name:${name ?? "Loading..."}  '),
           // Uncomment and implement if needed
           // onTap: () {
           //   Navigator.pop(context);
@@ -407,6 +428,14 @@ void _loadEmployeeData() async {
         ),
         ListTile(
           title: Text('Roles: ${roles != null && roles.isNotEmpty ? roles.first : "No role assigned"}',),
+          onTap: () {},
+        ),
+          ListTile(
+          title: Text('leadBy:${leadBy ?? "Loading..."}  '),
+          onTap: () {},
+        ),
+        ListTile(
+          title: Text('emailId:${emailId ?? "Loading..."}  '),
           onTap: () {},
         ),
        
