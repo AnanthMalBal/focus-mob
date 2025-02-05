@@ -27,7 +27,8 @@ if (flutterVersionName == null) {
 android {
     namespace "com.example.focusontime"   
     compileSdkVersion 34
-    ndkVersion flutter.ndkVersion
+    // ndkVersion flutter.ndkVersion
+     ndkVersion = "25.1.8937393" // Set NDK version explicitly
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -37,6 +38,7 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
+  
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -70,8 +72,9 @@ flutter {
 }
 
 dependencies {
-    //  implementation 'com.jakewharton.threetenabp:threetenabp:2.3.0' 
-     implementation 'com.dexterous.flutterlocalnotifications:flutter_local_notifications:latest_version' // Update this to the latest version
-    //  implementation platform('com.google.firebase:firebase-bom:33.5.1')
+   
+
+   // Add this for desugaring JDK libs to support Java 8 features
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
     
 }

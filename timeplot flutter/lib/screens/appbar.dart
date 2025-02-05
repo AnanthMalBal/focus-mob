@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:focusontime/modules/lms/screens/applyleave.dart';
 import 'package:focusontime/modules/lms/screens/calender.dart';
+
 import 'package:focusontime/modules/lms/screens/login.dart';
 import 'package:focusontime/modules/lms/screens/welcome.dart';
+ import 'package:focusontime/screens/changepassword_modal.dart';
 import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 
 final shareddata = SharedPref();
@@ -280,6 +283,9 @@ class _CommonAppBarState extends State<CommonAppBar> {
 //   ScaffoldMessenger.of(context).showSnackBar(snackbar);
 // }
 
+
+// for SnackBar
+
 void showSnackbar(
   BuildContext context,
   String message, {
@@ -296,6 +302,8 @@ void showSnackbar(
   ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }
 
+
+// for open Drawer 
 
 class buildDrawer extends StatefulWidget {
   const buildDrawer({super.key});
@@ -382,32 +390,62 @@ void _loadEmployeeData() async {
                 ],
               ),
               SizedBox(height: 20),
+              // Row(
+              //   crossAxisAlignment: CrossAxisAlignment
+              //       .center, // Vertically center items in the row
+              //   children: [
+              //     InkWell(
+              //       onTap: () {
+              //         // Action when the lock icon is tapped
+              //        ForgetPasswordModal(context);
+              //         print('Lock Icon Tapped!');
+                      
+  
+              //       },
+              //       child: Icon(
+              //         Icons.lock, // Lock icon
+              //         color: Colors.white,
+              //         size: 20, // Adjust size as needed
+              //       ),
+              //     ),
+              //     SizedBox(width: 10), // Space between icon and text
+              //     Text(
+              //       'ChangePassword', // Text next to the icon
+              //       style: TextStyle(
+              //         color: Colors.white,
+              //         fontSize: 18,
+              //       ),
+              //     ),
+              //   ],
+              // ),
               Row(
-                crossAxisAlignment: CrossAxisAlignment
-                    .center, // Vertically center items in the row
-                children: [
-                  InkWell(
-                    onTap: () {
-                      // Action when the lock icon is tapped
-                      print('Lock Icon Tapped!');
-                      // You can perform any action here like navigating to another screen
-                    },
-                    child: Icon(
-                      Icons.lock, // Lock icon
-                      color: Colors.white,
-                      size: 20, // Adjust size as needed
-                    ),
-                  ),
-                  SizedBox(width: 10), // Space between icon and text
-                  Text(
-                    'ChangePassword', // Text next to the icon
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+    InkWell(
+      onTap: () {
+        ForgetPasswordModal(context);
+        print('Lock Icon & Change Password Clicked!');
+      },
+      child: Row(
+        children: [
+          Icon(
+            Icons.lock, // Lock icon
+            color: Colors.white,
+            size: 20, // Adjust size as needed
+          ),
+          SizedBox(width: 10), // Space between icon and text
+          Text(
+            'Change Password', // Text next to the icon
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+)
             ],
           ),
         ),
@@ -469,7 +507,7 @@ void _loadEmployeeData() async {
   }
 
 
-
+// for dialog 
 Future showdialog(
   BuildContext context,
   String message,
@@ -478,7 +516,8 @@ Future showdialog(
       builder: (context) =>
           new AlertDialog(title: new Text(message), actions: <Widget>[
             new FloatingActionButton(
-                onPressed: () => Navigator.pop(context), child: new Text("OK"))
+                onPressed: () => Navigator.pop(context),
+                 child: new Text("OK"))
           ]),
       context: context);
 }
@@ -503,4 +542,6 @@ void showAlert(String title, String message, BuildContext context) {
   );
 }
 
+
+// for change password
 

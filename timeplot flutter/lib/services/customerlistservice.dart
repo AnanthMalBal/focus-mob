@@ -27,7 +27,7 @@ Future<dynamic> getList( context, {required int page, required int pageSize}) as
   print("Response: " + result.toString());
 
   if (response.statusCode == 200) {
-    showdialog(context, "List");
+    // showdialog(context, "List");
   }
 
   return result;  // Return the entire Map

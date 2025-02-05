@@ -55,6 +55,9 @@ dependencies:
   intl: 
   google_fonts:
   date_picker_timeline: ^1.2.6
+  timezone: ^0.9.4
+  permission_handler: ^10.0.0
+  android_intent_plus: ^3.0.5 
 
 dev_dependencies:
   flutter_test:

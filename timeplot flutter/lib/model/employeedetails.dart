@@ -6,6 +6,7 @@ class EmployeeDetails {
   String userName;
   String leadBy;
   String emailId;
+  String passwordToken;
 
   EmployeeDetails(
       {required this.userId,
@@ -14,5 +15,7 @@ class EmployeeDetails {
       required this.roles,
       required this.userName,
       required this.leadBy,
-      required this.emailId});
+      required this.emailId,
+      required this.passwordToken
+      });
 }

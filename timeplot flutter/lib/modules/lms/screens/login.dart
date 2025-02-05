@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/services/loginservice.dart';
-import 'package:focusontime/services/notification_service.dart';
+
 
 
 List<dynamic> loginData = [];
@@ -22,15 +22,24 @@ class _LoginScreenState extends State<LoginScreen> {
   var usernameController = TextEditingController();
   var passwordController = TextEditingController();
 
-  final NotificationHelper notificationHelper = NotificationHelper();
+  
 
   @override
   void initState() {
     super.initState();
-
+    // requestExactAlarmPermission();
+// NotificationService.scheduleNotifications();
     // Schedule a daily notification at 9:00 AM
     // NotificationService().scheduleDailyNotification(9, 0);
   }
+
+//  Future<void> requestExactAlarmPermission() async {
+//     var status = await Permission.scheduleExactAlarm.status;
+//     if (status.isDenied || status.isRestricted || status.isPermanentlyDenied) {
+//       await Permission.scheduleExactAlarm.request();
+//     }
+//   }
+
 
   @override
   Widget build(BuildContext context) {
