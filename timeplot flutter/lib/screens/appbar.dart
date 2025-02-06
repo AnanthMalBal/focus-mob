@@ -239,7 +239,7 @@ class _CommonAppBarState extends State<CommonAppBar> {
   Future<void> handleSubmenuSelection(BuildContext context, String submenuItem,
       List<Map<String, dynamic>> resultMenu) async {
     switch (submenuItem) {
-      case 'Performance':
+      case 'Daily Log':
         print('Navigating to Welcome Screen');
         Navigator.of(context).push(
           MaterialPageRoute(

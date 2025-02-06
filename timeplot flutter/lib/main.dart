@@ -28,10 +28,11 @@ Future<void> main() async {
   // Print the formatted local time
   print("Current Local Time (Asia/Kolkata): $formattedTime");
   final notificationService = NotificationService();
-  notificationService.testImmediateNotification();
-  await notificationService.testScheduledNotification(); // Call here
+ notificationService.testImmediateNotification();
+ await notificationService.testScheduledNotification(); // Call here
   notificationService.scheduleDailyNotifications();
-   
+//  NotificationService().initNotification();
+ 
   // Load environment variables from the appropriate .env file
   await dotenv.load(fileName: ".env");
   runApp(

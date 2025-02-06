@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/services/loginservice.dart';
+import 'package:focusontime/services/notification_service.dart';
 
 
 
@@ -140,14 +141,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           logincall(usernameController.text,
                               passwordController.text, context);
                           //  Show a notification when the button is pressed
-                          // NotificationService.showNotification(
-                          //   'Test Notification',
-                          //   'This is a test notification from the NotificationService class.',
-                          // );
-                          //  await notificationHelper.showImmediateNotification();
-                          //  await notificationHelper.scheduleDailyNotification();
-                          //  await notificationHelper.showImmediateNotification();
-                          // print('Daily notification scheduled.');
+                          
+                          // NotificationService().scheduleNotification(
+                          //   title: "Mark Attendance", 
+                          //   body: " Please Mark Attendance", 
+                          //   hour: 16, 
+                          //   minute: 45,
+                          //   );
+                  //          NotificationHelper.scheduleNotification(
+                  //   "Notification test",
+                  //   "my app Notification",
+                  //   5,
+                  // );
                         },
                         child: Text("Login",
                             style: TextStyle(
