@@ -1,0 +1,52 @@
+{
+  "leave": [
+    {
+      "empId": 15001,
+      "name" :"Soundaravalli",
+      "leave": 5,
+      "totalDays":30,
+      "daysPresent":22,
+      "holiday":3
+    },
+    {
+      "empId": 15002,
+      "name" :"Muthualagan",
+      "leave": 2,
+      "totalDays":30,
+      "daysPresent":27,
+      "holiday":3
+    },
+    {
+      "empId": 15003,
+      "name" :"Tamilselvan",
+      "leave":10,
+      "totalDays":30,
+      "daysPresent":17,
+      "holiday":3
+    }
+    
+  ],
+  "dailyLogEntry": [
+    {
+      "empId": 15001,
+      "name" :"Soundaravalli",
+      "dailyLogEntry": 20,
+      "missedDays":2,
+      "Dates":"2024-01-03, 2024-01-05"
+    },
+    {
+      "empId": 15002,
+      "name" :"Muthualagan",
+      "dailyLogEntry": 25,
+      "missedDays":2,
+      "Dates":"2024-01-08, 2024-01-09"
+    },
+    {
+      "empId": 15003,
+      "name" :"Tamilselvan",
+      "dailyLogEntry": 25,
+      "missedDays":2,
+      "Dates":"2024-01-13, 2024-01-17"
+    }
+  ]
+}

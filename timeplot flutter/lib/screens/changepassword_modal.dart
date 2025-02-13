@@ -161,25 +161,25 @@ bool passToggle = true;
                       width: 500, // Set a fixed width for the text field
                       child: TextField(
                         controller: passwordController,
-                        obscureText: passToggle ? true : false,
+                        obscureText: passToggle ,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       label: Text("Password"),
-                      prefixIcon: Icon(Icons.lock),
-                      suffixIcon: InkWell(
-                        onTap: () {
-                          if (passToggle == true) {
-                            passToggle = false;
-                          } else {
-                            passToggle = true;
-                          }
-                          // setState(() {});
-                        },
-                        child: passToggle
-                            ? Icon(CupertinoIcons.eye_slash_fill)
-                            : Icon(CupertinoIcons.eye_fill),
-                      ),
+                      // prefixIcon: Icon(Icons.lock),
+                      // suffixIcon: InkWell(
+                      //   onTap: () {
+                      //     if (passToggle == true) {
+                      //       passToggle = false;
+                      //     } else {
+                      //       passToggle = true;
+                      //     }
+                      //     // setState(() {});
+                      //   },
+                      //   child: passToggle
+                      //       ? Icon(CupertinoIcons.eye_slash_fill)
+                      //       : Icon(CupertinoIcons.eye_fill),
+                      // ),
                     ),
                     
                       ),

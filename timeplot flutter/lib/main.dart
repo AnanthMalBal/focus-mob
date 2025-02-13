@@ -31,7 +31,9 @@ Future<void> main() async {
  notificationService.testImmediateNotification();
  await notificationService.testScheduledNotification(); // Call here
   notificationService.scheduleDailyNotifications();
-//  NotificationService().initNotification();
+
+//  await NotificationService().initNotifications();
+
  
   // Load environment variables from the appropriate .env file
   await dotenv.load(fileName: ".env");

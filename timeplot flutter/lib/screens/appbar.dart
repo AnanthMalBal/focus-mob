@@ -3,6 +3,7 @@ import 'package:focusontime/modules/lms/screens/applyleave.dart';
 import 'package:focusontime/modules/lms/screens/calender.dart';
 
 import 'package:focusontime/modules/lms/screens/login.dart';
+import 'package:focusontime/modules/lms/screens/reportscreen.dart';
 import 'package:focusontime/modules/lms/screens/welcome.dart';
  import 'package:focusontime/screens/changepassword_modal.dart';
 import 'package:focusontime/screens/colors.dart';
@@ -194,7 +195,7 @@ class _CommonAppBarState extends State<CommonAppBar> {
       case 'Reports':
         print('Navigating to LeaveList Screen');
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (c) => welcomeScreen(
+            builder: (c) => Reportscreen(
                   resultMenu: resultMenu,
                 )));
         break;
