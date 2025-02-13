@@ -2,51 +2,212 @@
   "leave": [
     {
       "empId": 15001,
-      "name" :"Soundaravalli",
+      "name": "Soundaravalli",
       "leave": 5,
-      "totalDays":30,
-      "daysPresent":22,
-      "holiday":3
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "d5b8"
     },
     {
       "empId": 15002,
-      "name" :"Muthualagan",
+      "name": "Muthualagan",
       "leave": 2,
-      "totalDays":30,
-      "daysPresent":27,
-      "holiday":3
+      "totalDays": 30,
+      "daysPresent": 27,
+      "holiday": 3,
+      "id": "f936"
     },
     {
       "empId": 15003,
-      "name" :"Tamilselvan",
-      "leave":10,
-      "totalDays":30,
-      "daysPresent":17,
-      "holiday":3
+      "name": "Tamilselvan",
+      "leave": 10,
+      "totalDays": 30,
+      "daysPresent": 17,
+      "holiday": 3,
+      "id": "5f9f"
+    },
+    {
+      "empId": 15004,
+      "name": "Anu",
+      "leave": 10,
+      "totalDays": 30,
+      "daysPresent": 17,
+      "holiday": 3,
+      "id": "509f"
+    },
+    {
+      "empId": 15005,
+      "name": "Kayathiri",
+      "leave": 10,
+      "totalDays": 30,
+      "daysPresent": 17,
+      "holiday": 3,
+      "id": "7f9f"
+    },
+    {
+      "empId": 15006,
+      "name": "Ananthi",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6f93"
+    },
+    {
+      "empId": 15007,
+      "name": "Radhika",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6f83"
+    },
+    {
+      "empId": 15008,
+      "name": "Hari",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6g43"
+    },
+    {
+      "empId": 15009,
+      "name": "Malini",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "9o2u"
+    },
+    {
+      "empId": 15010,
+      "name": "karthi",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6i93"
+    },
+    {
+      "empId": 15011,
+      "name": "Bala",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6d93"
+    },
+    {
+      "empId": 15012,
+      "name": "Sankar",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "7y93"
+    },
+    {
+      "empId": 15013,
+      "name": "Deva",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6t7h"
+    },
+    {
+      "empId": 15016,
+      "name": "Rishi",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "68u3"
+    },{
+      "empId": 15015,
+      "name": "Shanvi",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6g87"
+    },{
+      "empId": 15016,
+      "name": "Hirushni",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6f54"
+    },{
+      "empId": 15017,
+      "name": "Arun",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6f03"
+    },{
+      "empId": 15018,
+      "name": "Abinov",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6f91"
+    },{
+      "empId": 15019,
+      "name": "Krish",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6b45"
+    },{
+      "empId": 15020,
+      "name": "Varun",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "8b56"
+    },{
+      "empId": 15021,
+      "name": "Durga",
+      "leave": 5,
+      "totalDays": 30,
+      "daysPresent": 22,
+      "holiday": 3,
+      "id": "6f23"
     }
     
   ],
   "dailyLogEntry": [
     {
       "empId": 15001,
-      "name" :"Soundaravalli",
+      "name": "Soundaravalli",
       "dailyLogEntry": 20,
-      "missedDays":2,
-      "Dates":"2024-01-03, 2024-01-05"
+      "missedDays": 2,
+      "Dates": "2024-01-03, 2024-01-05",
+      "id": "6093"
     },
     {
       "empId": 15002,
-      "name" :"Muthualagan",
+      "name": "Muthualagan",
       "dailyLogEntry": 25,
-      "missedDays":2,
-      "Dates":"2024-01-08, 2024-01-09"
+      "missedDays": 2,
+      "Dates": "2024-01-08, 2024-01-09",
+      "id": "8821"
     },
     {
       "empId": 15003,
-      "name" :"Tamilselvan",
+      "name": "Tamilselvan",
       "dailyLogEntry": 25,
-      "missedDays":2,
-      "Dates":"2024-01-13, 2024-01-17"
+      "missedDays": 2,
+      "Dates": "2024-01-13, 2024-01-17",
+      "id": "0d89"
     }
   ]
 }

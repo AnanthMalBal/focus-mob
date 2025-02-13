@@ -174,7 +174,7 @@ late List<Map<String, dynamic>> menuItems;
       
             CommonAppBar(
           menuItems: widget.resultMenu,
-          title: 'Performance',
+          title: 'Daily Log',
        
           showProfile: true,
           // onProfileTap: () {
