@@ -177,7 +177,7 @@ class _ApplyleaveState extends State<Applyleave> {
                                           SizedBox(width: 20),
                                           DropdownMenu<String>(
                                             // initialSelection: newData,
-                                            hintText: "Select Menu",
+                                            hintText: "Select Leave Type",
                                             width: width,
                                             requestFocusOnTap: true,
                                             enableFilter: true,
@@ -221,7 +221,7 @@ class _ApplyleaveState extends State<Applyleave> {
                                             controller: dateinputFrom,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(),
-                                              labelText: "Select Date",
+                                              labelText: "Select From Date",
                                               // "${_dateTime.toLocal()}".split(' ')[0],
                                               suffixIcon: Icon(
                                                 Icons.calendar_view_month,
@@ -252,7 +252,7 @@ class _ApplyleaveState extends State<Applyleave> {
                                             controller: dateinputTo,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(),
-                                              labelText: "Select Date",
+                                              labelText: "Select To Date",
                                               // "${_dateTime.toLocal()}".split(' ')[0],
                                               suffixIcon: Icon(
                                                 Icons.calendar_view_month,
@@ -288,7 +288,7 @@ class _ApplyleaveState extends State<Applyleave> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           10)),
-                                              //  labelText: "00:00",
+                                              labelText: "Reason",
                                             ),
                                           ))
                                         ]),
@@ -389,7 +389,7 @@ class _ApplyleaveState extends State<Applyleave> {
             String description = _itemsBalance[index]['Description'] ??
                 'No description available';
             return Container(
-                height: 23,
+                height: 30,
                 child: ListTile(
                     // leading:
                     // CircleAvatar(
@@ -399,11 +399,24 @@ class _ApplyleaveState extends State<Applyleave> {
                     title: Text(
                       description,
                     ),
-                    trailing: Text(count.toString())));
+                    trailing: CircleAvatar(
+                    radius: 30, // Adjust the size of the circle
+                    backgroundColor:
+                        AppColors.primaryColor, // Background color of the circle
+                    child: Text(
+                      count.toString(), // Text inside the circle
+                      style: TextStyle(
+                        color: Colors.white, // Text color inside the circle
+                        fontWeight: FontWeight.bold, // Optional: Text boldness
+                      ),
+                    ),
+                  ),));
           }),
     );
   }
 
+
+// for fromDate
   DateTime? fromDate;
   DateTime? toDate;
   double? differenceInDays = 0;
@@ -431,7 +444,7 @@ class _ApplyleaveState extends State<Applyleave> {
   }
 
 
-
+// for ToDate
   Future<void> _selectToDate(BuildContext context) async {
     if (fromDate == null || newLeaveType == null || _leaveTypes == null) {
       return; // Ensure "from date" and "leave type" are selected before proceeding
@@ -478,6 +491,7 @@ class _ApplyleaveState extends State<Applyleave> {
     }
   }
 
+// for days calculate
   void _calculateDifference() {
     if (fromDate != null && toDate != null) {
       if (newLeaveType == 'Half_Day') {
@@ -501,24 +515,6 @@ class _ApplyleaveState extends State<Applyleave> {
     }
   }
 
-  // Future getBalanceLeave( context) async {
-  //   print("resultbalance" + empId);
-  //   List<dynamic> resultBalance =
-  //       await leaveservice.getLeaveBalance( context);
-  //   print("resultbalance:" + resultBalance[0].toString());
-  //   List<Map<String, dynamic>> data =
-  //       List<Map<String, dynamic>>.from(resultBalance[0]);
-  //   setState(() {
-  //     _itemsBalance = data;
-
-  //     // int count =  _itemsBalance['Count'];
-  //     // print("count++"+count.toString());
-  //     // mapMonths.addEntries( _itemsBalance.entries);
-  //     // mapMonths.forEach((key, value) {
-  //     //   print("++++" '$key: $value');
-  //     // });
-  //   });
-  // }
 
   Future<void> _getBalanceLeave(BuildContext context) async {
     Map<String, dynamic> leaveBalance =

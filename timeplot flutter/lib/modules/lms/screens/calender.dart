@@ -22,11 +22,13 @@ List<Map<String, dynamic>> dataColor = [];
 
 class CalenderScreen extends StatefulWidget {
   // const CalenderScreen({
-  //   super.key, 
+  //   super.key,
   // });
-  final List<Map<String, dynamic>> resultMenu;  
- 
-  CalenderScreen({required this.resultMenu,});
+  final List<Map<String, dynamic>> resultMenu;
+
+  CalenderScreen({
+    required this.resultMenu,
+  });
 
   @override
   State<CalenderScreen> createState() => _CalenderScreenState();
@@ -43,7 +45,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
   var roles;
   final HolidayService leaveservice = HolidayService();
   Map<DateTime, List<Map<String, dynamic>>> events = {};
-late List<Map<String, dynamic>> menuItems;
+  late List<Map<String, dynamic>> menuItems;
 
   void _onDaySelected(DateTime day, DateTime focusedDay) {
     String formattedDate = DateFormat('yyyy-MM-dd').format(_focusedDay);
@@ -54,7 +56,10 @@ late List<Map<String, dynamic>> menuItems;
       Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FillTimeSheet(date: _focusedDay, resultMenu: widget.resultMenu,),
+            builder: (context) => FillTimeSheet(
+              date: _focusedDay,
+              resultMenu: widget.resultMenu,
+            ),
           ));
     });
   }
@@ -63,27 +68,23 @@ late List<Map<String, dynamic>> menuItems;
     final empData = await shareddata.getpatdata();
     setState(() {
       empId = empData.userId;
-      roles=empData.roles;
+      roles = empData.roles;
       print("id" + empId.toString());
     });
-    getLeaves( _focusedDay.toString());
-    
+    getLeaves(_focusedDay.toString());
   }
 
-  Future getLeaves( String today) async {
-    print("iddate"  + today);
-    List<dynamic> posts = await leaveservice.fetchLeaveColor( today, context);
+  Future getLeaves(String today) async {
+    print("iddate" + today);
+    List<dynamic> posts = await leaveservice.fetchLeaveColor(today, context);
     print("datacolor:" + posts.toString());
 
     setState(() {
       _events = _groupEventsByDate(posts[0]);
       _items = posts[1];
-      
     });
-    print("postcolor:"+_items.toString());
+    print("postcolor:" + _items.toString());
   }
-
- 
 
   Map<DateTime, List<dynamic>> _groupEventsByDate(List<dynamic> events) {
     print("events:" + events.toString());
@@ -119,24 +120,20 @@ late List<Map<String, dynamic>> menuItems;
     return events;
   }
 
-  
-
-
   Future<void> _getBalanceLeave(BuildContext context) async {
-  
-    Map<String, dynamic> leaveBalance = await leaveservice.getLeaveBalance(context);
+    Map<String, dynamic> leaveBalance =
+        await leaveservice.getLeaveBalance(context);
     // Now you have the leave balance data, and you can use it as needed
     print('Leave Balance Count: ${leaveBalance['Count']}');
     print('Leave Balance Description: ${leaveBalance['Description']}');
-  
+
     if (leaveBalance != null) {
-      
       setState(() {
-        
         _itemsBalance = [
           {
-            'Count': leaveBalance['Count'] ?? 0, 
-            'Description': leaveBalance['Description'] ?? 'No description available', 
+            'Count': leaveBalance['Count'] ?? 0,
+            'Description':
+                leaveBalance['Description'] ?? 'No description available',
           },
         ];
       });
@@ -149,33 +146,26 @@ late List<Map<String, dynamic>> menuItems;
       });
     }
   }
-  
 
   @override
   void initState() {
     // user = widget.date;
-   
+
     print("data1");
 
     super.initState();
     _events = {};
     transferdata();
     _getBalanceLeave(context);
- 
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
-   
-    return Scaffold(       
-        appBar:
-      
-            CommonAppBar(
+    return Scaffold(
+        appBar: CommonAppBar(
           menuItems: widget.resultMenu,
           title: 'Daily Log',
-       
+
           showProfile: true,
           // onProfileTap: () {
           //   print('Profile tapped!');
@@ -228,7 +218,7 @@ late List<Map<String, dynamic>> menuItems;
                                   //  color: Colors.grey.withOpacity(0.5)
                                   ),
                               titleTextStyle: TextStyle(
-                                color:AppColors.textColor,
+                                color: AppColors.textColor,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w500,
                               )),
@@ -246,9 +236,8 @@ late List<Map<String, dynamic>> menuItems;
                               color: Colors.blue,
                               shape: BoxShape.circle,
                             ),
-                            
                           ),
-                          eventLoader: _getEventsForDay,                         
+                          eventLoader: _getEventsForDay,
 
                           calendarBuilders: CalendarBuilders(
                               markerBuilder: (context, date, events) {
@@ -286,7 +275,7 @@ late List<Map<String, dynamic>> menuItems;
                             setState(() {
                               _focusedDay = focusedDay;
                             });
-                            getLeaves( focusedDay.toString());
+                            getLeaves(focusedDay.toString());
                             //  getBalanceLeave(empId.toString(),context);
                           },
                         ),
@@ -359,14 +348,28 @@ late List<Map<String, dynamic>> menuItems;
             var item = _items[index];
             print("itemcolor:$item");
             return Container(
-                height: 23,
+                height: 30,
                 child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 6,
-                      backgroundColor: _getColorFromString(item['color']),
+                  leading: CircleAvatar(
+                    radius: 6,
+                    backgroundColor: _getColorFromString(item['color']),
+                  ),
+                  title: Text(_items[index]["title"].toString()),
+                  trailing: CircleAvatar(
+                    radius: 30, // Adjust the size of the circle
+                    backgroundColor:
+                        AppColors.primaryColor, // Background color of the circle
+                    child: Text(
+                      _items[index]["count"]
+                          .toString(), // Text inside the circle
+                      style: TextStyle(
+                        color: Colors.white, // Text color inside the circle
+                        fontWeight: FontWeight.bold, // Optional: Text boldness
+                      ),
                     ),
-                    title: Text(_items[index]["title"].toString()),
-                    trailing: Text(_items[index]["count"].toString())));
+                  ),
+                  // Text(_items[index]["count"].toString())
+                ));
           }),
     );
   }
@@ -374,18 +377,31 @@ late List<Map<String, dynamic>> menuItems;
   Widget leaveBalance() {
     return Expanded(
       child: ListView.builder(
-          scrollDirection: Axis.vertical,
+          // scrollDirection: Axis.vertical,
           itemCount: _itemsBalance.length,
           itemBuilder: (BuildContext context, index) {
             int count = _itemsBalance[index]['Count'] ?? 0;
-            String description = _itemsBalance[index]['Description'] ?? 'No description available';
+            String description = _itemsBalance[index]['Description'] ??
+                'No description available';
             return Container(
-                height: 23,
+                height: 30,
                 child: ListTile(
-                    leading: Text(description),
+                  title: Text(description),
                     // Text('${mapMonths.keys}'),
                     // title: Text("LWP"),
-                    trailing: Text(count.toString())
+                    trailing: CircleAvatar(
+                    radius: 30, // Adjust the size of the circle
+                    backgroundColor:
+                        AppColors.primaryColor, // Background color of the circle
+                    child: Text(
+                      count.toString(), // Text inside the circle
+                      style: TextStyle(
+                        color: Colors.white, // Text color inside the circle
+                        fontWeight: FontWeight.bold, // Optional: Text boldness
+                      ),
+                    ),
+                  ),
+                    // Text(count.toString())
                     // Text("${mapMonths.values}"),
                     //  minLeadingWidth : 5,
                     ));
@@ -393,34 +409,22 @@ late List<Map<String, dynamic>> menuItems;
     );
   }
 
-//  Map<DateTime, List<Map<String, dynamic>>> events = {};
-  // void _mapApiDataToEvents() {
-  //   for (var event in dataColor) {
-  //     DateTime date = DateTime.parse(event['cDate']!);
-  //     Color color = _getColorFromString(event['color']);
 
-  //     if (events[date] == null) {
-  //       events[date] = [];
-  //     }
-  //     events[date]!.add(
-  //         {"date": event['cDate'], "title": event['title'], "color": color});
-  //   }
-  // }
-
+// Getting color from api
   Color _getColorFromString(String colorString) {
-  switch (colorString) {
-    case "Orange":
-      return Colors.orange;
-    case "Green":
-      return Colors.green;
-    case "Red":
-      return Colors.red;
-    case "White":
-      return Colors.white;
-    case "Grey":
-      return Colors.grey;
-    default:
-      return Colors.blue; // Default color
+    switch (colorString) {
+      case "Orange":
+        return Colors.orange;
+      case "Green":
+        return Colors.green;
+      case "Red":
+        return Colors.red;
+      case "White":
+        return Colors.white;
+      case "Grey":
+        return Colors.grey;
+      default:
+        return Colors.blue; // Default color
+    }
   }
-}
 }

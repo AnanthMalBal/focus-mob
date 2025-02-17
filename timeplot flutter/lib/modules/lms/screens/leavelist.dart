@@ -81,7 +81,7 @@ class _LeavelistState extends State<Leavelist> {
     return Scaffold(
         appBar: CommonAppBar(
           menuItems: widget.resultMenu,
-          title: 'LeaveList',
+          title: 'Leave Report',
 
           showProfile: true,
           // onProfileTap: () {
@@ -94,20 +94,53 @@ class _LeavelistState extends State<Leavelist> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
+              // Container(
+              //   padding: new EdgeInsets.all(10.0),
+              //   width: 500.0,
+              //   // height:20.0,
+              //   decoration: BoxDecoration(
+              //     color: AppColors.borderColor.withOpacity(0.1),                  
+              //   ),                
+              //   child: 
+              //   Text("Leave List :",
+              //       style: TextStyle(
+              //         color: AppColors.textColor,
+              //         fontSize: 20,
+              //         fontWeight: FontWeight.w500,
+              //       )),
+              // ),
               Container(
-                padding: new EdgeInsets.all(10.0),
-                width: 500.0,
-                // height:20.0,
-                decoration: BoxDecoration(
-                  color: AppColors.borderColor.withOpacity(0.1),                  
-                ),                
-                child: Text("Leave List :",
-                    style: TextStyle(
-                      color: AppColors.textColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    )),
-              ),
+  padding: EdgeInsets.all(10.0),
+  width: 500.0,
+  decoration: BoxDecoration(
+    color: AppColors.borderColor.withOpacity(0.1),
+  ),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,  // Distribute space between the elements
+    children: [
+      Text(
+        "Leave Records",
+        style: TextStyle(
+          color: AppColors.textColor,
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      LegendIndicator(
+        color: Colors.blue,  // Example color
+        text: "Pending",  // Example text
+      ),
+       LegendIndicator(
+        color: Colors.green,  // Example color
+        text: "Approved",  // Example text
+      ),
+      LegendIndicator(
+        color: Color.fromARGB(255, 241, 46, 32),  // Example color
+        text: "Rejected",  // Example text
+      ),
+    ],
+  ),
+),
               SizedBox(
                   height: 700,
                   child: ListView.builder(
@@ -166,7 +199,7 @@ class _LeavelistState extends State<Leavelist> {
                             break;
                           case 'Rejected':
                             borderSide = BorderSide(
-                                color: Color.fromARGB(255, 247, 174, 169),
+                                color: Color.fromARGB(255, 241, 46, 32),
                                 width: 2.0);
                             break;
                           default:
@@ -286,5 +319,32 @@ class _LeavelistState extends State<Leavelist> {
     print("cancel" + leaveId);
     await applyleaveservice.cancelLeaveList(leaveId, context);
     getListLeave(page, perPage, sort, firstDate, lastDate, context);
+  }
+}
+
+
+// for color description
+class LegendIndicator extends StatelessWidget {
+  final Color color;
+  final String text;
+
+  LegendIndicator({required this.color, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        SizedBox(width: 5),
+        Text(text, style: TextStyle(fontSize: 14)),
+      ],
+    );
   }
 }

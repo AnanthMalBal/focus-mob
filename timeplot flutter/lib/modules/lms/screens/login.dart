@@ -7,8 +7,6 @@ import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/services/loginservice.dart';
 import 'package:focusontime/services/notification_service.dart';
 
-
-
 List<dynamic> loginData = [];
 
 class LoginScreen extends StatefulWidget {
@@ -23,24 +21,10 @@ class _LoginScreenState extends State<LoginScreen> {
   var usernameController = TextEditingController();
   var passwordController = TextEditingController();
 
-  
-
   @override
   void initState() {
-    super.initState();
-    // requestExactAlarmPermission();
-// NotificationService.scheduleNotifications();
-    // Schedule a daily notification at 9:00 AM
-    // NotificationService().scheduleDailyNotification(9, 0);
+    super.initState();    
   }
-
-//  Future<void> requestExactAlarmPermission() async {
-//     var status = await Permission.scheduleExactAlarm.status;
-//     if (status.isDenied || status.isRestricted || status.isPermanentlyDenied) {
-//       await Permission.scheduleExactAlarm.request();
-//     }
-//   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -52,15 +36,15 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             children: [
               Padding(padding: EdgeInsets.all(10)),
-              Text(
-                "Login",
-                style: TextStyle(
-                  color: AppColors.textColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
+              // Text(
+              //   "Login",
+              //   style: TextStyle(
+              //     color: AppColors.textColor,
+              //     fontSize: 20,
+              //     fontWeight: FontWeight.bold,
+              //   ),
+              // ),
+              // SizedBox(height: 10),
               Padding(
                 padding: EdgeInsets.all(10),
                 child: Image.asset(
@@ -79,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // maxLength: 10,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    label: Text("Enter userid"),
+                    label: Text("User Name"),
                     prefixIcon: Icon(Icons.person),
                   ),
                   validator: (val) {
@@ -97,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextFormField(
                     controller: passwordController,
                     obscureText: passToggle ? true : false,
-                    maxLength: 10,
+                    // maxLength: 10,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       label: Text("Password"),
@@ -141,7 +125,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           logincall(usernameController.text,
                               passwordController.text, context);
                           //  Show a notification when the button is pressed
-                 
                         },
                         child: Text("Login",
                             style: TextStyle(

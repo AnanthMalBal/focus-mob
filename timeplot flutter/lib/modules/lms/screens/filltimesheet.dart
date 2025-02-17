@@ -6,7 +6,6 @@ import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:focusontime/services/timesheetservice.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 final shareddata = SharedPref();
 
 enum SampleItem { itemOne, itemTwo, itemThree }
@@ -140,9 +139,9 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   }
 
   Future<void> getMarkedAttendance(String date) async {
-    print("MarkedAttendance:"+date);
+    print("MarkedAttendance:" + date);
     final resultTimeMarked =
-        await timesheetservice.fetchMarkedAttendance(date,context);
+        await timesheetservice.fetchMarkedAttendance(date, context);
     print(" resultTimeMarked:" + resultTimeMarked.toString());
     setState(() {
       _itemTimeMarked = resultTimeMarked;
@@ -221,9 +220,9 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     // double? workingHoursDouble =
     //     double.tryParse(_itemTimeMarked!['workingHours']);
     double? workingHoursDouble;
-if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
-  workingHoursDouble = double.tryParse(_itemTimeMarked!['workingHours']);
-}
+    if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
+      workingHoursDouble = double.tryParse(_itemTimeMarked!['workingHours']);
+    }
     double workingHoursInMinutes = (workingHoursDouble ?? 0) * 60;
     double width = 200;
     bool isAddButtonDisabled =
@@ -254,7 +253,7 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                   //  borderRadius: BorderRadius.circular(10)
                 ),
                 child: Text(
-                    "TimeSheet on Dated:" +
+                    "TimeSheet on Date " + // Added a space after the colon
                         widget.date.toString().split(" ")[0],
                     style: TextStyle(
                       color: AppColors.textColor,
@@ -296,40 +295,19 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                       SizedBox(
                                         width: 20,
                                       ),
-                                      Text("Date: ",
-                                          style: TextStyle(
-                                            color: AppColors.borderColor,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                          )),
-                                      Text(tsDate.toString().split(" ")[0],
-                                          style: TextStyle(
-                                            color: AppColors.textColor,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                          )),
+                                      // Text("Date: ",
+                                      //     style: TextStyle(
+                                      //       color: AppColors.borderColor,
+                                      //       fontSize: 15,
+                                      //       fontWeight: FontWeight.w500,
+                                      //     )),
+                                      // Text(tsDate.toString().split(" ")[0],
+                                      //     style: TextStyle(
+                                      //       color: AppColors.textColor,
+                                      //       fontSize: 15,
+                                      //       fontWeight: FontWeight.w500,
+                                      //     )),
                                     ]),
-                                // SizedBox(
-                                //   height: 15,
-                                // ),
-                                // Row(
-                                //   mainAxisAlignment: MainAxisAlignment.start,
-                                //   children: [
-                                //     Text("Total Working Hours : ",
-                                //         style: TextStyle(
-                                //           color: AppColors.borderColor,
-                                //           fontSize: 15,
-                                //         )),
-                                //     Text('$workingHours',
-                                //         // '$workingHours',
-                                //         // '${item['WorkingHours']}'
-                                //         style: TextStyle(
-                                //           color: AppColors.textColor,
-                                //           fontSize: 15,
-                                //           fontWeight: FontWeight.w500,
-                                //         ))
-                                //   ],
-                                // )
                               ]),
                         ),
                       ])),
@@ -351,7 +329,7 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                         AppColors.borderColor.withOpacity(0.1),
                                     //  borderRadius: BorderRadius.circular(10)
                                   ),
-                                  child: Text("Fill TimeSheet",
+                                  child: Text("TimeSheet",
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
@@ -413,8 +391,8 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
-                                              0.3,
-                                          child: Text("SelectProject: ",
+                                              0.2,
+                                          child: Text("Project",
                                               style: TextStyle(
                                                 color: AppColors.borderColor,
                                                 fontSize: 15,
@@ -428,11 +406,11 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                             width: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                0.5,
+                                                0.6,
                                             child: DropdownMenu<String>(
                                               // initialSelection: newData,
-                                              hintText: "Select Project",
-                                              width: width,
+                                              hintText: "Select",
+                                              width: MediaQuery.of(context).size.width * 0.6,
                                               requestFocusOnTap: true,
                                               enableFilter: true,
                                               // label: const Text('SelectProjectId'),
@@ -467,8 +445,8 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                       SizedBox(
                                         width:
                                             MediaQuery.of(context).size.width *
-                                                0.3,
-                                        child: Text("SelectProcess: ",
+                                                0.2,
+                                        child: Text("Process",
                                             style: TextStyle(
                                               color: AppColors.borderColor,
                                               fontSize: 15,
@@ -480,12 +458,12 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
-                                              0.5,
+                                              0.6,
                                           // height:40,
                                           child: DropdownMenu<String>(
                                             // initialSelection: list.first,
-                                            hintText: "Select Process",
-                                            width: width,
+                                            hintText: "Select",
+                                            width: MediaQuery.of(context).size.width * 0.6,
                                             requestFocusOnTap: true,
                                             enableFilter: true,
                                             onSelected: (String? value) {
@@ -524,56 +502,7 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  // Row(
-                                  //   mainAxisAlignment: MainAxisAlignment.start,
-                                  //   children: [
-                                  //     SizedBox(
-                                  //       width:
-                                  //           MediaQuery.of(context).size.width *
-                                  //               0.29,
-                                  //       child: Text("TimesheetId : ",
-                                  //           style: TextStyle(
-                                  //             color: AppColors.borderColor,
-                                  //             fontSize: 15,
-                                  //             fontWeight: FontWeight.w500,
-                                  //           )),
-                                  //     ),
-                                  //     SizedBox(width: 10),
-                                  //     SizedBox(
-                                  //         width: MediaQuery.of(context)
-                                  //                 .size
-                                  //                 .width *
-                                  //             0.5,
-                                  //         // height:40,
-                                  //         child: DropdownMenu<String>(
-                                  //           // initialSelection: list.first,
-                                  //           hintText: "Select TimesheetId",
-                                  //           width: width,
-                                  //           requestFocusOnTap: true,
-                                  //           enableFilter: true,
-                                  //           onSelected: (String? value) {
-                                  //             setState(() {
-                                  //               newTimesheetData = value!;
-                                  //               print("newTimesheetData" +
-                                  //                   newTimesheetData);
-                                  //             });
-                                  //           },
-                                  //           dropdownMenuEntries: _itemTimesheet != null && _itemTimesheet!.isNotEmpty
-                                  //               ? _itemTimesheet!
-                                  //               .map<DropdownMenuEntry<String>>(
-                                  //                   (value) {
-                                  //             return DropdownMenuEntry<String>(
-                                  //                 value: value['timesheetId']
-                                  //                     .toString(),
-                                  //                 label: value['timesheetId']
-                                  //                     .toString());
-                                  //           }).toList() : [],
-                                  //         ))
-                                  //   ],
-                                  // ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
+                                 
                                   Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
@@ -582,18 +511,19 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
-                                              0.29,
-                                          child: Text("Time : ",
+                                              0.2,
+                                          child: Text("Time",
                                               style: TextStyle(
                                                 color: AppColors.borderColor,
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w500,
                                               )),
                                         ),
-                                        SizedBox(width: 10),
-                                        Expanded(
+                                        SizedBox(width: 5),
+                                        // Expanded(
                                           //   flex: 1,
-                                          child: GestureDetector(
+                                          // child: 
+                                          GestureDetector(
                                             onTap: () async {
                                               TimeOfDay? pickedTime =
                                                   await showTimePicker(
@@ -633,13 +563,13 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                               width: MediaQuery.of(context)
                                                       .size
                                                       .width *
-                                                  0.5,
-                                              //  height: 40,
+                                                  0.6,
+                                                height: 60,
                                               child: TextField(
                                                 controller:
                                                     actualTimeController,
                                                 decoration: InputDecoration(
-                                                    // labelText: "Working Time",
+                                                     labelText: "Select",
                                                     border:
                                                         OutlineInputBorder(),
                                                     contentPadding:
@@ -650,28 +580,63 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                               ),
                                             )),
                                           ),
+                                        // ),
+                                      ]),
+                                      SizedBox(
+                                    height: 3,
+                                  ),
+                                       Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.2,
+                                          child: Text("Description",
+                                              style: TextStyle(
+                                                color: AppColors.borderColor,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              )),
                                         ),
+                                        SizedBox(width: 5),
+                                        SizedBox(
+                                          width: MediaQuery.of(context).size.width * 0.6,
+                                              child: TextField(
+                                            controller: descriptionController,
+                                            maxLines: 2,
+                                            //  expands: false,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                             labelText: "Task Description",
+                                            ),
+                                          ))
                                       ]),
                                 ])),
 
                         // )
                       ])),
-              Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: new EdgeInsets.all(5.0),
-                          child: TextFormField(
-                            controller: descriptionController,
-                            decoration: const InputDecoration(
-                              border: UnderlineInputBorder(),
-                              labelText: 'Work Description',
-                            ),
-                          ),
-                        ),
-                      ])),
+              // Padding(
+              //     padding: EdgeInsets.all(5.0),
+              //     child: Column(
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           Container(
+              //             padding: new EdgeInsets.all(5.0),
+              //             child: TextFormField(
+              //               controller: descriptionController,
+              //               decoration: const InputDecoration(
+              //                 border: UnderlineInputBorder(),
+              //                 labelText: 'Work Description',
+              //               ),
+              //             ),
+              //           ),
+              //         ])),
               Padding(
                   padding: EdgeInsets.all(5.0),
                   child: Column(
@@ -746,7 +711,7 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                                   fontWeight: FontWeight.bold,
                                                 )),
                                             Text(
-                                                "${totalTime.toStringAsFixed(2)} min",
+                                                "${totalTime.toStringAsFixed(2)} mins",
                                                 style: TextStyle(
                                                   color: AppColors.textColor,
                                                   fontSize: 18,
@@ -771,7 +736,7 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                             //  borderRadius: BorderRadius.circular(10)
                           ),
                           child: Text(
-                            "Projects  entry:",
+                            "Projects  Entry:",
                             style: TextStyle(
                               color: AppColors.textColor,
                               fontSize: 18,
@@ -798,7 +763,7 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                     // final log = _itemDailyLog[index];
                                     // autoId = _itemDailyLog[index]['autoId'];
                                     return ListTile(
-                                      title: Text('Project: $projectId'),
+                                      title: Text(' $projectId'),
                                       // subtitle:
                                       //     Text('Process: $processId'),
                                       // \nTime: ${log['actualTime']} minutes
@@ -811,7 +776,7 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
                                                   height:
                                                       12.0), // Adjust height to control space
                                               Text(
-                                                '$actualTime min',
+                                                '$actualTime mins',
                                                 style: TextStyle(
                                                   color: AppColors.textColor,
                                                   fontSize: 15,
@@ -890,7 +855,7 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
       String timesheetId, String time, String description, String date) async {
     await timesheetservice.userDailyLog(newProjectData, newProcessData,
         timesheetId, time, description, date, context);
-    await getUsersDailyLog();   
+    await getUsersDailyLog();
     setState(() {
       // Safely parse workingHours to a double
       double? workingHoursDouble =
@@ -920,8 +885,6 @@ if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
     await timesheetservice.updateTimesheet(timesheetId, totalBMinutesInt,
         totalNBNPMinutesInt, totalNBPMinutesInt, context);
   }
-
-
 
   deleteLogByAutoId(String autoId) async {
     print("deletedailylog:" + autoId.toString());

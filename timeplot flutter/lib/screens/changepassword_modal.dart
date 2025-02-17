@@ -7,9 +7,7 @@ import 'package:focusontime/services/passwordservice.dart';
 final PasswordService passwordservice = PasswordService();
 void ForgetPasswordModal(BuildContext context) {
   TextEditingController emailController = TextEditingController();
-  TextEditingController currentPasswordController = TextEditingController();
-  TextEditingController newPasswordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // Define a GlobalKey for the Form
 
   // First Modal - Email Input
   showModalBottomSheet(
@@ -30,29 +28,53 @@ void ForgetPasswordModal(BuildContext context) {
                 right: 16,
                 top: 16,
               ),
-              child: SingleChildScrollView( // Wrap the Column in a scrollable widget
+              child: SingleChildScrollView(
+                // Wrap the Column in a scrollable widget
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       "Enter Email",
-                      style: TextStyle(
-                        fontSize: 18, 
-                        fontWeight: FontWeight.bold
-                      ),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 16),
-                    Container(
-                      width: 500, // Set a fixed width for the text field
-                      child: TextField(
+                    // Container(
+                    //   width: 500, // Set a fixed width for the text field
+                    //   child: TextField(
+                    //     controller: emailController,
+                    //     // textAlign: TextAlign.center,
+                    //     decoration: InputDecoration(
+                    //       labelText: "Email",
+                    //       border: OutlineInputBorder(),
+                    //       prefixIcon: Icon(Icons.email),
+                    //     ),
+                    //   ),
+                    // ),
+                    Form(
+                      key: _formKey, // Attach the key to the Form
+                      child: TextFormField(
                         controller: emailController,
-                        textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           labelText: "Email",
                           border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.email),
                         ),
+                        keyboardType: TextInputType
+                            .emailAddress, // Helps with email input
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter your email"; // ✅ Required field validation
+                          }
+                          if (!RegExp(
+                                  r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+                              .hasMatch(value)) {
+                            return "Please enter a valid email"; // ✅ Email format validation
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     SizedBox(height: 20),
@@ -60,15 +82,20 @@ void ForgetPasswordModal(BuildContext context) {
                       width: 150, // Button width
                       child: ElevatedButton(
                         onPressed: () {
-                          if (emailController.text.isNotEmpty) {
-                            sendEmailForVerification(
-                                emailController.text, context);
-                          } else{
-                           showdialog(context,"Please Enter valid Email");
+                          // if (emailController.text.isNotEmpty) {
+                          //   sendEmailForVerification(
+                          //       emailController.text, context);
+                          // } else {
+                          //   showdialog(context, "Please Enter valid Email");
+                          // }
+                          if (_formKey.currentState!.validate()) {
+                            print("Valid Email: ${emailController.text}");
                           }
+                          sendEmailForVerification(
+                              emailController.text, context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor, 
+                          backgroundColor: AppColors.primaryColor,
                           padding: EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -95,23 +122,130 @@ void ForgetPasswordModal(BuildContext context) {
   );
 }
 
- sendEmailForVerification(email, dynamic context)async {
+sendEmailForVerification(email, dynamic context) async {
   print("email:$email");
-   await passwordservice.sendEamil(email,context);
-   // Close the first modal
-    //  Navigator.pop(context);
+  await passwordservice.sendEamil(email, context);
+  // Close the first modal
+  //  Navigator.pop(context);
+}
 
-    
- }
+// void ChangePasswordModal(BuildContext context) {
+//   TextEditingController otpController = TextEditingController();
+//   TextEditingController passwordController = TextEditingController();
+//   bool passToggle = true;
+//   showModalBottomSheet(
+//     context: context,
+//     shape: RoundedRectangleBorder(
+//       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+//     ),
+//     isScrollControlled: true,
+//     builder: (context) {
+//       return StatefulBuilder(
+//         builder: (context, setModalState) {
+//           return SizedBox(
+//             height: 500, // Fixed height for the modal
+//             child: Padding(
+//               padding: EdgeInsets.only(
+//                 bottom: MediaQuery.of(context).viewInsets.bottom,
+//                 left: 16,
+//                 right: 16,
+//                 top: 16,
+//               ),
+//               child: SingleChildScrollView(
+//                 // Wrap Column in SingleChildScrollView
+//                 child: Column(
+//                   mainAxisSize: MainAxisSize.min,
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   crossAxisAlignment: CrossAxisAlignment.center,
+//                   children: [
+//                     Text(
+//                       "Enter OTP and Password",
+//                       style:
+//                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//                     ),
+//                     SizedBox(height: 16),
+//                     Container(
+//                       width: 500, // Set a fixed width for the text field
+//                       child: TextField(
+//                         controller: otpController,
+//                         // textAlign: TextAlign.center,
+//                         decoration: InputDecoration(
+//                           labelText: "OTP",
+//                           border: OutlineInputBorder(),
+                          
+//                         ),
+//                       ),
+//                     ),
+//                     SizedBox(height: 16),
+//                     Container(
+//                       width: 500, // Set a fixed width for the text field
+//                       child: TextField(
+//                         controller: passwordController,
+//                         obscureText: passToggle,
+//                         // textAlign: TextAlign.center,
+//                         decoration: InputDecoration(
+//                           border: OutlineInputBorder(),
+//                           label: Text("Password"),
+//                           prefixIcon: Icon(Icons.lock),
+//                           suffixIcon: InkWell(
+//                             onTap: () {
+//                               setModalState(() { // ✅ Correct way to update UI
+//                                 passToggle = !passToggle;
+//                               });
+//                               // setState(() {});
+//                             },
+//                             child: passToggle
+//                                 ? Icon(CupertinoIcons.eye_slash_fill)
+//                                 : Icon(CupertinoIcons.eye_fill),
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                     SizedBox(height: 20),
+//                     SizedBox(
+//                       width: 250, // Button width
+//                       child: ElevatedButton(
+//                         onPressed: () {
+//                           // Handle password change logic here
+//                           String otp = otpController.text;
+//                           String password = passwordController.text;
+//                           changePassword(otp, password, context);
+//                         },
+//                         style: ElevatedButton.styleFrom(
+//                           backgroundColor: AppColors.primaryColor,
+//                           padding: EdgeInsets.symmetric(vertical: 12),
+//                           shape: RoundedRectangleBorder(
+//                             borderRadius: BorderRadius.circular(8),
+//                           ),
+//                         ),
+//                         child: Text(
+//                           "Change Password",
+//                           style: TextStyle(
+//                             color: Colors.white,
+//                             fontSize: 20,
+//                             fontWeight: FontWeight.bold,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           );
+//         },
+//       );
+//     },
+//   );
+// }
 
-
-
- void ChangePasswordModal(BuildContext context) {
-  TextEditingController otpController = TextEditingController(); 
+void ChangePasswordModal(BuildContext context) {
+  final _formKey = GlobalKey<FormState>(); // ✅ Form key for validation
+  TextEditingController otpController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  
-bool passToggle = true;
-  showModalBottomSheet(   
+  bool passToggle = true; // Password visibility toggle
+
+  showModalBottomSheet(
     context: context,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -119,7 +253,7 @@ bool passToggle = true;
     isScrollControlled: true,
     builder: (context) {
       return StatefulBuilder(
-        builder: (context, setModalState) {
+        builder: (context, setModalState) { // ✅ Using setModalState for updates
           return SizedBox(
             height: 500, // Fixed height for the modal
             child: Padding(
@@ -129,91 +263,115 @@ bool passToggle = true;
                 right: 16,
                 top: 16,
               ),
-              child: SingleChildScrollView( // Wrap Column in SingleChildScrollView
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Enter OTP and Password",
-                      style: TextStyle(
-                        fontSize: 18, 
-                        fontWeight: FontWeight.bold
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey, // ✅ Attach form key
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Enter OTP and Password",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    SizedBox(height: 16),
-                    Container(
-                      width: 500, // Set a fixed width for the text field
-                      child: TextField(
-                        controller: otpController,
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          labelText: "OTP",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                    
+                      SizedBox(height: 16),
 
-                    SizedBox(height: 16),
-                    Container(
-                      width: 500, // Set a fixed width for the text field
-                      child: TextField(
-                        controller: passwordController,
-                        obscureText: passToggle ,
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      label: Text("Password"),
-                      // prefixIcon: Icon(Icons.lock),
-                      // suffixIcon: InkWell(
-                      //   onTap: () {
-                      //     if (passToggle == true) {
-                      //       passToggle = false;
-                      //     } else {
-                      //       passToggle = true;
-                      //     }
-                      //     // setState(() {});
-                      //   },
-                      //   child: passToggle
-                      //       ? Icon(CupertinoIcons.eye_slash_fill)
-                      //       : Icon(CupertinoIcons.eye_fill),
-                      // ),
-                    ),
-                    
-                      ),
-                    ),
-                    
-                   
-                    SizedBox(height: 20),
-                    SizedBox(
-                      width: 250, // Button width
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Handle password change logic here
-                          String otp = otpController.text; 
-      String password = passwordController.text;
-                          changePassword(otp,password,context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor, 
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      // ✅ OTP Field with Validation
+                      Container(
+                        width: 500,
+                        child: TextFormField(
+                          controller: otpController,
+                          // keyboardType: TextInputType.number,
+                          maxLength: 10,
+                          decoration: InputDecoration(
+                            labelText: "OTP",
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.verified),
+                            counterText: "", // Hides character counter
                           ),
-                        ),
-                        child: Text(
-                          "Change Password",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Please enter OTP"; // ✅ Required field validation
+                            }
+                            if (!RegExp(r'^(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
+                              return "Enter a valid 4-6 digit OTP"; // ✅ OTP format validation
+                            }
+                            return null;
+                          },
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 16),
+
+                      // ✅ Password Field with Validation & Visibility Toggle
+                      Container(
+                        width: 500,
+                        child: TextFormField(
+                          controller: passwordController,
+                          obscureText: passToggle,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: "Password",
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                setModalState(() { // ✅ Update UI on tap
+                                  passToggle = !passToggle;
+                                });
+                              },
+                              child: Icon(
+                                passToggle ? CupertinoIcons.eye_slash_fill : CupertinoIcons.eye_fill,
+                              ),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Please enter a password"; // ✅ Required field validation
+                            }
+                            // if (value.length < 10) {
+                            //   return "Password must be at least 6 characters"; // ✅ Password length validation
+                            // }
+                            if (!RegExp(r'^(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
+                              return "Include at least 1 uppercase & 1 number"; // ✅ Strong password validation
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 20),
+
+                      // ✅ Submit Button with Validation Check
+                      SizedBox(
+                        width: 250,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              // ✅ If all fields are valid, proceed
+                              String otp = otpController.text;
+                              String password = passwordController.text;
+                              changePassword(otp, password, context);                             
+                            }
+
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            "Change Password",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -224,9 +382,6 @@ bool passToggle = true;
   );
 }
 
-
-
-                    
 //                     // OTP Input Boxes
 //                     Row(
 //                       mainAxisAlignment: MainAxisAlignment.center,
@@ -263,13 +418,10 @@ bool passToggle = true;
 //                         );
 //                       }),
 //                     ),
-//                    
+//
 
-
-changePassword(otp,password, context) async{
-
-  
+changePassword(otp, password, context) async {
   print("otp:$otp,password:$password");
-  await passwordservice.updatePassword(otp,password,context);
+  await passwordservice.updatePassword(otp, password, context);
   // Navigator.pop(context);
 }
