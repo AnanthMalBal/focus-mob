@@ -494,7 +494,7 @@ class _buildDrawerState extends State<buildDrawer> {
                       backgroundImage: AssetImage(
                           "images/image.jpeg"), // Replace with your image path
                     ),
-                    SizedBox(width: 16), // Space between icon and text
+                    SizedBox(width: 10), // Space between icon and text
                     Text(
                       //  name ?? "Loading...",
                       name != null && roles != null

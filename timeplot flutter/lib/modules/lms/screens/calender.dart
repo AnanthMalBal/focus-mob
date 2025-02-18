@@ -47,6 +47,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
   Map<DateTime, List<Map<String, dynamic>>> events = {};
   late List<Map<String, dynamic>> menuItems;
 
+// for Onselectday
   void _onDaySelected(DateTime day, DateTime focusedDay) {
     String formattedDate = DateFormat('yyyy-MM-dd').format(_focusedDay);
     print('Selected Date: $formattedDate');
@@ -74,6 +75,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
     getLeaves(_focusedDay.toString());
   }
 
+// method to getLeave color from api
   Future getLeaves(String today) async {
     print("iddate" + today);
     List<dynamic> posts = await leaveservice.fetchLeaveColor(today, context);
@@ -86,6 +88,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
     print("postcolor:" + _items.toString());
   }
 
+// color to calender event
   Map<DateTime, List<dynamic>> _groupEventsByDate(List<dynamic> events) {
     print("events:" + events.toString());
     //  print("events"+events[0]['sdate']);
@@ -119,6 +122,8 @@ class _CalenderScreenState extends State<CalenderScreen> {
     print('Events for $day: $events');
     return events;
   }
+
+// method to getleavebalance from api
 
   Future<void> _getBalanceLeave(BuildContext context) async {
     Map<String, dynamic> leaveBalance =
@@ -167,35 +172,16 @@ class _CalenderScreenState extends State<CalenderScreen> {
           title: 'Daily Log',
 
           showProfile: true,
-          // onProfileTap: () {
-          //   print('Profile tapped!');
-          // },
+          
         ),
         body:
             //  SingleChildScrollView(
             SafeArea(
           child: Column(
-            //  mainAxisAlignment:MainAxisAlignment.start,
+           
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Container(
-              //   padding: new EdgeInsets.all(15.0),
-
-              //   //  width: MediaQuery.of(context).size.width,
-              //   //       height: MediaQuery.of(context).size.height/1 ,
-              //   width: 500.0,
-              //   // height:20.0,
-              //   decoration: BoxDecoration(
-              //     color: AppColors.borderColor.withOpacity(0.1),
-              //     //  borderRadius: BorderRadius.circular(10)
-              //   ),
-              //   child:
-              //       Text("Signed Out:" + _focusedDay.toString().split(" ")[0],
-              //           style: TextStyle(
-              //             fontSize: 20,
-              //             fontWeight: FontWeight.w500,
-              //           )),
-              // ),
+             
               Padding(
                 padding: EdgeInsets.all(10.0),
                 child: Column(
@@ -336,8 +322,10 @@ class _CalenderScreenState extends State<CalenderScreen> {
     // );
   }
 
+// for this month report
   Widget getList() {
     Padding(padding: EdgeInsets.all(15.0));
+    
     return Expanded(
       // child:Text("Hi")
 
@@ -374,6 +362,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
     );
   }
 
+// for leave balance
   Widget leaveBalance() {
     return Expanded(
       child: ListView.builder(

@@ -37,7 +37,8 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   var newProjectData;
   var newTimesheetData;
   List<Map<String, dynamic>> _itemProject = [];
-  var _itemProcess = [];
+  // var _itemProcess = [];
+  List<Map<String, dynamic>> _itemProcess = [];
   List<Map<String, dynamic>>? _itemTimesheet;
   Map<String, dynamic> _itemTimeMarked = {};
   List<Map<String, dynamic>> _itemDailyLog = [];
@@ -45,6 +46,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   var actualTimeController = TextEditingController();
   var descriptionController = TextEditingController();
   var billTypeController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   List<double> filledTimes = [];
   double totalTime = 0.0;
   double totalTime1 = 0;
@@ -67,7 +69,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   int totalNBPMinutesInt = 0;
   int autoId = 0;
   var roles;
-  String divisionId = "DEV";
+  String divisionId = "Dev";
 
   @override
   void initState() {
@@ -77,7 +79,6 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     super.initState();
     transferdata();
     getproject(divisionId);
-
     getTimesheet(date);
     getMarkedAttendance(date);
     //  getUsersDailyLog();
@@ -90,6 +91,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     super.dispose();
   }
 
+// for getproject
   Future<void> getproject(String divisionId) async {
     print("projectid:" + divisionId);
     final resultProject =
@@ -99,8 +101,8 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
       String projectId = project['projectId'];
       print("Calling getprocess with projectId: $projectId");
 
-      // Call the getprocess function with the projectId
-      getprocess(projectId);
+     // Call the getprocess function with the projectId
+      // await getprocess(projectId);
     }
     setState(() {
       _itemProject = resultProject;
@@ -108,17 +110,19 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     print("itemproject" + _itemProject.toString());
   }
 
+// for getprocess
   Future<void> getprocess(String projectId) async {
-    print("processid:" + projectId);
+    print("String projectId:" + projectId);
     final resultProcess =
         await timesheetservice.getProcessId(projectId, context);
-    print("data:" + resultProcess.toString());
+    print("dataprocess:" + resultProcess.toString());
     setState(() {
       _itemProcess = resultProcess;
     });
     print("itemProcess" + _itemProcess.toString());
   }
 
+// for getTimesheet
   Future<void> getTimesheet(String date) async {
     print("Timesheet");
     final resultTimesheet =
@@ -138,6 +142,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     }
   }
 
+// for getMarkedAttendance
   Future<void> getMarkedAttendance(String date) async {
     print("MarkedAttendance:" + date);
     final resultTimeMarked =
@@ -149,6 +154,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     print("_itemTimeMarked: $_itemTimeMarked");
   }
 
+// for getUsersDailyLog
   Future<void> getUsersDailyLog() async {
     print("DailyLog");
 
@@ -214,11 +220,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // if (_itemTimeMarked == null || _itemTimeMarked!.isEmpty) {
-    //   return Center(child: CircularProgressIndicator()); // Show loading state
-    // }
-    // double? workingHoursDouble =
-    //     double.tryParse(_itemTimeMarked!['workingHours']);
+    // to display workinghours
     double? workingHoursDouble;
     if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
       workingHoursDouble = double.tryParse(_itemTimeMarked!['workingHours']);
@@ -230,626 +232,550 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     bool isSubmitButtonEnabled = totalTime >= workingHoursInMinutes;
 
     return Scaffold(
-        appBar: CommonAppBar(
-          menuItems: widget.resultMenu,
-          title: 'MyAttendance',
-
-          showProfile: true,
-          // onProfileTap: () {
-          //   print('Profile tapped!');
-          // },
-        ),
-        // drawer: buildDrawer(context),
-        body: SingleChildScrollView(
-            child: SafeArea(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-              Container(
-                padding: new EdgeInsets.all(10.0),
-                width: 500.0,
-                decoration: BoxDecoration(
-                  color: AppColors.borderColor.withOpacity(0.1),
-                  //  borderRadius: BorderRadius.circular(10)
-                ),
-                child: Text(
-                    "TimeSheet on Date " + // Added a space after the colon
-                        widget.date.toString().split(" ")[0],
-                    style: TextStyle(
-                      color: AppColors.textColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    )),
+      appBar: CommonAppBar(
+        menuItems: widget.resultMenu,
+        title: 'MyAttendance',
+        showProfile: true,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Form(
+            key: _formKey, // Assign Form Key
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _buildHeader(),
+              SizedBox(height: 10),
+              _buildProjectDropdown(),
+              SizedBox(height: 10),
+              _buildProcessDropdown(),
+              SizedBox(height: 10),
+              _buildTimePicker(),
+              SizedBox(height: 10),
+              _buildDescriptionField(),
+              SizedBox(height: 10),
+              _buildAddButton(),
+              SizedBox(height: 10),
+              _buildFilledTimeSheet(totalTime),
+              SizedBox(height: 10),
+              _buildProjectEntries(
+                _itemDailyLog,
+                deleteLogByAutoId, // Define your delete function as needed
               ),
-              Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: new EdgeInsets.all(10.0),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text("Total Working Hours : ",
-                                          style: TextStyle(
-                                            color: AppColors.borderColor,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                          )),
-                                      Text(
-                                          _itemTimeMarked!['workingHours'] ??
-                                              'N/A', // Safe access,
-                                          // '$workingHours',
-                                          // '${item['WorkingHours']}'
-                                          style: TextStyle(
-                                            color: AppColors.textColor,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                          )),
-
-                                      // ],)
-                                      SizedBox(
-                                        width: 20,
-                                      ),
-                                      // Text("Date: ",
-                                      //     style: TextStyle(
-                                      //       color: AppColors.borderColor,
-                                      //       fontSize: 15,
-                                      //       fontWeight: FontWeight.w500,
-                                      //     )),
-                                      // Text(tsDate.toString().split(" ")[0],
-                                      //     style: TextStyle(
-                                      //       color: AppColors.textColor,
-                                      //       fontSize: 15,
-                                      //       fontWeight: FontWeight.w500,
-                                      //     )),
-                                    ]),
-                              ]),
-                        ),
-                      ])),
-              Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                child: Container(
-                                  padding: new EdgeInsets.all(5.0),
-                                  width: 500.0,
-                                  // height:20.0,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        AppColors.borderColor.withOpacity(0.1),
-                                    //  borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  child: Text("TimeSheet",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.textColor,
-                                      )),
-                                ),
-                              ),
-                              SizedBox(width: 5),
-                              SizedBox(
-                                  width: 80,
-                                  //  height:50,
-                                  child: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.borderColor
-                                          .withOpacity(0.1),
-                                      // border: Border.all(color:AppColors.borderColor.withOpacity(0.1)),
-                                      // borderRadius: BorderRadius.circular(5.0),
-                                    ),
-                                    child: Text(
-                                      billTypeController.text.isNotEmpty
-                                          ? billTypeController.text
-                                          : "No Bill",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: AppColors
-                                              .textColor), // Custom styling
-                                    ),
-                                  )
-                                  // TextField(
-                                  //   controller: billTypeController,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: "Billable",
-                                  //     border: OutlineInputBorder(),
-                                  //     contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
-                                  //   ),
-                                  //    style: TextStyle(fontSize: 14),
-                                  // ),
-                                  ),
-                            ])
-                      ])),
-              Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                            padding: new EdgeInsets.all(5.0),
-                            child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                //  crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.2,
-                                          child: Text("Project",
-                                              style: TextStyle(
-                                                color: AppColors.borderColor,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              )),
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.6,
-                                            child: DropdownMenu<String>(
-                                              // initialSelection: newData,
-                                              hintText: "Select",
-                                              width: MediaQuery.of(context).size.width * 0.6,
-                                              requestFocusOnTap: true,
-                                              enableFilter: true,
-                                              // label: const Text('SelectProjectId'),
-                                              onSelected: (String? value) {
-                                                setState(() {
-                                                  newProjectData = value!;
-                                                  print("projectdata" +
-                                                      newProjectData);
-                                                });
-                                              },
-                                              dropdownMenuEntries: _itemProject
-                                                  .map<
-                                                      DropdownMenuEntry<
-                                                          String>>((value) {
-                                                return DropdownMenuEntry<
-                                                    String>(
-                                                  value: value['projectId']
-                                                      .toString(),
-                                                  label: value['projectName']
-                                                      .toString(),
-                                                );
-                                              }).toList(),
-                                              // menuHeight: 200,
-                                            )),
-                                      ]),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.2,
-                                        child: Text("Process",
-                                            style: TextStyle(
-                                              color: AppColors.borderColor,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
-                                            )),
-                                      ),
-                                      SizedBox(width: 5),
-                                      SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.6,
-                                          // height:40,
-                                          child: DropdownMenu<String>(
-                                            // initialSelection: list.first,
-                                            hintText: "Select",
-                                            width: MediaQuery.of(context).size.width * 0.6,
-                                            requestFocusOnTap: true,
-                                            enableFilter: true,
-                                            onSelected: (String? value) {
-                                              setState(() {
-                                                newProcessData = value!;
-                                                print("ProcessData" +
-                                                    newProcessData!);
-                                                final selectedProcess =
-                                                    _itemProcess.firstWhere(
-                                                  (process) =>
-                                                      process["processId"] ==
-                                                      value,
-                                                  orElse: () => {
-                                                    "billType": ""
-                                                  }, // Default if not found
-                                                );
-                                                // Update the billTypeController based on the selected process
-                                                billTypeController.text =
-                                                    selectedProcess[
-                                                            "billType"] ??
-                                                        "";
-                                              });
-                                            },
-                                            dropdownMenuEntries: _itemProcess
-                                                .map<DropdownMenuEntry<String>>(
-                                                    (value) {
-                                              return DropdownMenuEntry<String>(
-                                                  value: value['processId']
-                                                      .toString(),
-                                                  label: value['processName']
-                                                      .toString());
-                                            }).toList(),
-                                          )),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                 
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.2,
-                                          child: Text("Time",
-                                              style: TextStyle(
-                                                color: AppColors.borderColor,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              )),
-                                        ),
-                                        SizedBox(width: 5),
-                                        // Expanded(
-                                          //   flex: 1,
-                                          // child: 
-                                          GestureDetector(
-                                            onTap: () async {
-                                              TimeOfDay? pickedTime =
-                                                  await showTimePicker(
-                                                context: context,
-                                                initialTime: TimeOfDay
-                                                    .now(), // Default to the current time
-                                                builder: (BuildContext context,
-                                                    Widget? child) {
-                                                  return MediaQuery(
-                                                    data: MediaQuery.of(context)
-                                                        .copyWith(
-                                                      alwaysUse24HourFormat:
-                                                          true, // 24-hour format
-                                                    ),
-                                                    child: child!,
-                                                  );
-                                                },
-                                              );
-
-                                              if (pickedTime != null) {
-                                                // Convert the picked time into minutes
-                                                int totalMinutes =
-                                                    pickedTime.hour * 60 +
-                                                        pickedTime.minute;
-                                                actualTimeController.text =
-                                                    totalMinutes
-                                                        .toString(); // Store minutes as string
-                                                actualTimeInMinutes =
-                                                    actualTimeController.text;
-                                                print("actualTimeController" +
-                                                    actualTimeController.text +
-                                                    actualTimeInMinutes);
-                                              }
-                                            },
-                                            child: AbsorbPointer(
-                                                child: SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.6,
-                                                height: 60,
-                                              child: TextField(
-                                                controller:
-                                                    actualTimeController,
-                                                decoration: InputDecoration(
-                                                     labelText: "Select",
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    contentPadding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 4.0,
-                                                            horizontal: 4.0)),
-                                                style: TextStyle(fontSize: 14),
-                                              ),
-                                            )),
-                                          ),
-                                        // ),
-                                      ]),
-                                      SizedBox(
-                                    height: 3,
-                                  ),
-                                       Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.2,
-                                          child: Text("Description",
-                                              style: TextStyle(
-                                                color: AppColors.borderColor,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              )),
-                                        ),
-                                        SizedBox(width: 5),
-                                        SizedBox(
-                                          width: MediaQuery.of(context).size.width * 0.6,
-                                              child: TextField(
-                                            controller: descriptionController,
-                                            maxLines: 2,
-                                            //  expands: false,
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
-                                             labelText: "Task Description",
-                                            ),
-                                          ))
-                                      ]),
-                                ])),
-
-                        // )
-                      ])),
-              // Padding(
-              //     padding: EdgeInsets.all(5.0),
-              //     child: Column(
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: [
-              //           Container(
-              //             padding: new EdgeInsets.all(5.0),
-              //             child: TextFormField(
-              //               controller: descriptionController,
-              //               decoration: const InputDecoration(
-              //                 border: UnderlineInputBorder(),
-              //                 labelText: 'Work Description',
-              //               ),
-              //             ),
-              //           ),
-              //         ])),
-              Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                            padding: new EdgeInsets.all(5.0),
-                            decoration: BoxDecoration(
-                              color: AppColors.backgroundColor,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryColor,
-                                    padding: const EdgeInsets.all(10),
-                                  ),
-                                  onPressed: isAddButtonDisabled
-                                      ? null
-                                      : () {
-                                          addDailgLog(
-                                              newProjectData,
-                                              newProcessData!,
-                                              timesheetId,
-                                              actualTimeInMinutes,
-                                              descriptionController.text,
-                                              tsDate
-                                              // billTypeController.text,
-                                              );
-                                        },
-                                  child: Text("ADD",
-                                      style: TextStyle(
-                                        color: AppColors.backgroundColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      )),
-                                ))),
-                      ])),
-              Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                            padding: new EdgeInsets.all(5.0),
-                            child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                //  crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            //
-                                          ],
-                                        ),
-                                        //     )),
-                                        Divider(),
-                                        // Display total time
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text("FilledTimeSheet: ",
-                                                style: TextStyle(
-                                                  color: AppColors.textColor,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                )),
-                                            Text(
-                                                "${totalTime.toStringAsFixed(2)} mins",
-                                                style: TextStyle(
-                                                  color: AppColors.textColor,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                )),
-                                          ],
-                                        ),
-                                      ])
-                                ])),
-                      ])),
-              Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: new EdgeInsets.all(5.0),
-                          width: 500.0,
-                          // height:20.0,
-                          decoration: BoxDecoration(
-                            color: AppColors.borderColor.withOpacity(0.1),
-                            //  borderRadius: BorderRadius.circular(10)
-                          ),
-                          child: Text(
-                            "Projects  Entry:",
-                            style: TextStyle(
-                              color: AppColors.textColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: 100, // Set height for the ListView
-                          child: _itemDailyLog.isNotEmpty
-                              ? ListView.builder(
-                                  itemCount: _itemDailyLog.length,
-                                  itemBuilder: (context, index) {
-                                    final log = _itemDailyLog[index];
-                                    final autoId =
-                                        log['autoId'] ?? 'Unknown ID';
-                                    final processId =
-                                        log['processId'] ?? 'Unknown Process';
-                                    final projectId =
-                                        log['processName'] ?? 'Unknown Project';
-                                    final actualTime = log['actualTime'] ?? 0;
-                                    final billType =
-                                        log['billType'] ?? 'Unknown';
-                                    // final log = _itemDailyLog[index];
-                                    // autoId = _itemDailyLog[index]['autoId'];
-                                    return ListTile(
-                                      title: Text(' $projectId'),
-                                      // subtitle:
-                                      //     Text('Process: $processId'),
-                                      // \nTime: ${log['actualTime']} minutes
-                                      trailing: Wrap(
-                                        spacing: 8,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              SizedBox(
-                                                  height:
-                                                      12.0), // Adjust height to control space
-                                              Text(
-                                                '$actualTime mins',
-                                                style: TextStyle(
-                                                  color: AppColors.textColor,
-                                                  fontSize: 15,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          // Tooltip(
-                                          // message: "Totalminutes-" + '${log['actualTime']}',
-                                          // preferBelow: false,
-                                          // child: IconButton(
-                                          //   icon: const Icon(Icons.lock_clock_rounded),
-                                          //   color: Colors.green,
-                                          //   onPressed: () {},
-                                          // ),
-                                          // Text(
-                                          //     '${log['billType']}',
-                                          //     style: TextStyle(
-                                          //       color: AppColors.textColor,
-                                          //       fontSize: 15,
-                                          //     ),
-                                          //   ),
-                                          // ),
-
-                                          Tooltip(
-                                            message: 'cancel',
-                                            preferBelow: false,
-                                            child: IconButton(
-                                                icon: Icon(Icons.delete,
-                                                    color: Colors.red),
-                                                onPressed: () {
-                                                  deleteLogByAutoId(autoId);
-                                                  // Navigator.of(context).pop();
-                                                }),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                )
-                              : Text('No logs available'),
-                        ),
-                      ])),
-              Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                            padding: new EdgeInsets.all(5.0),
-                            child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryColor,
-                                    padding: const EdgeInsets.all(10),
-                                  ),
-                                  onPressed: isSubmitButtonEnabled
-                                      ? () {
-                                          updateUserTimesheet();
-                                        }
-                                      : null,
-                                  child: Text("SUBMIT",
-                                      style: TextStyle(
-                                        color: AppColors.backgroundColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      )),
-                                ))),
-                      ])),
-            ]))));
+              SizedBox(height: 10),
+              _buildSubmitButton(
+                isSubmitButtonEnabled,
+                updateUserTimesheet, // Function to update timesheet
+              )
+            ]),
+          ),
+        ),
+      ),
+    );
   }
 
+  // UI Components
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Date Header
+        Container(
+          padding: EdgeInsets.all(10.0),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.1),
+          ),
+          child: Text(
+            "TimeSheet on Date ${widget.date.toString().split(" ")[0]}",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+          ),
+        ),
+        SizedBox(height: 10),
+
+        // Total Working Hours Section
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Total Working Hours : ",
+                      style: TextStyle(
+                        color: AppColors.borderColor,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      _itemTimeMarked?['workingHours'] ?? 'N/A',
+                      style: TextStyle(
+                        color: AppColors.textColor,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // TimeSheet Title + Bill Type
+        Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  // Timesheet Title
+                  Flexible(
+                    child: Container(
+                      padding: EdgeInsets.all(5.0),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.borderColor.withOpacity(0.1),
+                      ),
+                      child: Text(
+                        "TimeSheet",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 5),
+
+                  // Bill Type Box
+                  SizedBox(
+                    width: 100,
+                    child: Container(
+                      padding: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        color: AppColors.borderColor.withOpacity(0.1),
+                      ),
+                      child: Text(
+                        billTypeController.text.isNotEmpty
+                            ? billTypeController.text
+                            : "No Bill",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+// for project
+  Widget _buildProjectDropdown() {
+    return Row(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.2,
+          child: Text("Project",
+              style: TextStyle(
+                color: AppColors.borderColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              )),
+        ),
+        SizedBox(width: 5),
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            hint: Text("Select"),
+            decoration: InputDecoration(border: OutlineInputBorder()),
+            value: newProjectData,
+            onChanged: (String? value) {
+              setState(() {
+                newProjectData = value!;
+                print("Project selected: $newProjectData");
+                 getprocess(newProjectData!);
+              });
+            },
+            items: _itemProject.map((value) {
+              return DropdownMenuItem<String>(
+                value: value['projectId'].toString(),
+                child: Text(value['projectName'].toString()),
+              );
+            }).toList(),
+            validator: (value) =>
+                value == null ? 'Please select a project' : null,
+          ),
+        ),
+      ],
+    );
+  }
+
+//for process
+  Widget _buildProcessDropdown() {
+    return Row(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.2,
+          child: Text("Process",
+              style: TextStyle(
+                color: AppColors.borderColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              )),
+        ),
+        SizedBox(width: 5),
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            hint: Text("Select"),
+            decoration: InputDecoration(border: OutlineInputBorder()),
+            value: newProcessData,
+            onChanged: (String? value) {
+              setState(() {
+                newProcessData = value!;
+                print("Process selected: $newProcessData");
+
+                final selectedProcess = _itemProcess.firstWhere(
+                  (process) => process["processId"] == value,
+                  orElse: () => {"billType": ""}, // Default if not found
+                );
+
+                // Update the billTypeController based on the selected process
+                billTypeController.text = selectedProcess["billType"] ?? "";
+              });
+            },
+            items: _itemProcess.map((value) {
+              return DropdownMenuItem<String>(
+                value: value['processId'].toString(),
+                child: Text(value['processName'].toString()),
+              );
+            }).toList(),
+            validator: (value) =>
+                value == null ? 'Please select a process' : null,
+          ),
+        ),
+      ],
+    );
+  }
+
+// for timepicker
+  Widget _buildTimePicker() {
+    return Row(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.2,
+          child: Text(
+            "Time",
+            style: TextStyle(
+              color: AppColors.borderColor,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        SizedBox(width: 5),
+        Expanded(
+          child: GestureDetector(
+            onTap: () async {
+              TimeOfDay? pickedTime = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.now(), // Default to the current time
+                builder: (BuildContext context, Widget? child) {
+                  return MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      alwaysUse24HourFormat: true, // Use 24-hour format
+                    ),
+                    child: child!,
+                  );
+                },
+              );
+
+              if (pickedTime != null) {
+                // Convert the picked time into total minutes
+                int totalMinutes = pickedTime.hour * 60 + pickedTime.minute;
+                setState(() {
+                  actualTimeController.text = totalMinutes.toString();
+                  actualTimeInMinutes = actualTimeController.text;
+                });
+                print("Selected Time: ${actualTimeController.text} minutes");
+              }
+            },
+            child: AbsorbPointer(
+              child: TextFormField(
+                controller: actualTimeController,
+                decoration: InputDecoration(
+                  labelText: "Select",
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                ),
+                style: TextStyle(fontSize: 14),
+                validator: (value) =>
+                    value!.isEmpty ? 'Please select a time' : null,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+// for description
+  Widget _buildDescriptionField() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.2,
+          child: Text(
+            "Description",
+            style: TextStyle(
+              color: AppColors.borderColor,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        SizedBox(width: 5),
+        Expanded(
+          child: TextFormField(
+            controller: descriptionController,
+            maxLines: 2,
+            decoration: InputDecoration(
+              labelText: "Task Description",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            validator: (value) =>
+                value!.isEmpty ? 'Please enter a description' : null,
+          ),
+        ),
+      ],
+    );
+  }
+
+// for ADD Button
+  Widget _buildAddButton() {
+    return Padding(
+      padding: EdgeInsets.all(5.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(5.0),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundColor,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  padding: const EdgeInsets.all(10),
+                ),
+                onPressed: isAddButtonDisabled
+                    ? null
+                    : () {
+                        // Validate the form before calling the add function
+                        if (_formKey.currentState!.validate()) {
+                          addDailgLog(
+                            newProjectData,
+                            newProcessData!,
+                            timesheetId,
+                            actualTimeInMinutes,
+                            descriptionController.text,
+                            tsDate,
+                          );
+                        }
+                      },
+                child: Text(
+                  "ADD",
+                  style: TextStyle(
+                    color: AppColors.backgroundColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+//  for filledTimesheet
+
+  Widget _buildFilledTimeSheet(double totalTime) {
+    return Padding(
+      padding: EdgeInsets.all(5.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(5.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Divider(), // Divider for separation
+                  ],
+                ),
+                // Display total time
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Filled TimeSheet: ",
+                      style: TextStyle(
+                        color: AppColors.textColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "${totalTime.toStringAsFixed(2)} mins", // Formatting to 2 decimal places
+                      style: TextStyle(
+                        color: AppColors.textColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProjectEntries(List<Map<String, dynamic>> itemDailyLog,
+      Function(String) deleteLogByAutoId) {
+    return Padding(
+      padding: EdgeInsets.all(5.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(5.0),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.borderColor.withOpacity(0.1),
+            ),
+            child: Text(
+              "Projects Entry:",
+              style: TextStyle(
+                color: AppColors.textColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          Container(
+            height: 100, // Set height for the ListView
+            child: itemDailyLog.isNotEmpty
+                ? ListView.builder(
+                    itemCount: itemDailyLog.length,
+                    itemBuilder: (context, index) {
+                      final log = itemDailyLog[index];
+                      final autoId = log['autoId'] ?? 'Unknown ID';
+                      final projectId = log['processName'] ?? 'Unknown Project';
+                      final actualTime = log['actualTime'] ?? 0;
+
+                      return ListTile(
+                        title: Text(projectId),
+                        trailing: Wrap(
+                          spacing: 8,
+                          children: [
+                            Column(
+                              children: [
+                                SizedBox(height: 12.0),
+                                Text(
+                                  '$actualTime mins',
+                                  style: TextStyle(
+                                    color: AppColors.textColor,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Tooltip(
+                              message: 'Delete log',
+                              preferBelow: false,
+                              child: IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  deleteLogByAutoId(
+                                      autoId); // Call delete function
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                : Center(child: Text('No logs available')),
+          ),
+        ],
+      ),
+    );
+  }
+
+// for submit button
+  Widget _buildSubmitButton(bool isSubmitButtonEnabled, VoidCallback onSubmit) {
+    return Padding(
+      padding: EdgeInsets.all(5.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(5.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  padding: const EdgeInsets.all(10),
+                ),
+                onPressed: isSubmitButtonEnabled ? onSubmit : null,
+                child: Text(
+                  "SUBMIT",
+                  style: TextStyle(
+                    color: AppColors.backgroundColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+// method to add dailylog
   List<String> projectEntries = [];
   void addDailgLog(String newProjectData, String newProcessData,
       String timesheetId, String time, String description, String date) async {
@@ -880,12 +806,14 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     descriptionController.clear();
   }
 
+// method to updateUserTimesheet()
   Future updateUserTimesheet() async {
     print("timesheet");
     await timesheetservice.updateTimesheet(timesheetId, totalBMinutesInt,
         totalNBNPMinutesInt, totalNBPMinutesInt, context);
   }
 
+// method to deleteLogByAutoId
   deleteLogByAutoId(String autoId) async {
     print("deletedailylog:" + autoId.toString());
     await timesheetservice.deleteTimesheet(autoId, context);

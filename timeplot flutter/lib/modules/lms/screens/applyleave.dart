@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:intl/intl.dart';
 
-
 final shareddata = SharedPref();
 
 enum SampleItem { itemOne, itemTwo, itemThree }
@@ -19,7 +18,7 @@ List<Map<String, dynamic>> _itemsBalance = [];
 
 class Applyleave extends StatefulWidget {
   // const Applyleave({super.key});
-  final List<Map<String, dynamic>> resultMenu; 
+  final List<Map<String, dynamic>> resultMenu;
 
   Applyleave({
     required this.resultMenu,
@@ -40,11 +39,13 @@ class _ApplyleaveState extends State<Applyleave> {
   TextEditingController dateinputFrom = TextEditingController();
   TextEditingController dateinputTo = TextEditingController();
   TextEditingController reasoncontroller = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   List<dynamic> _leaveTypes = [];
   final ApplyLeaveService applyleaveservice = ApplyLeaveService();
   final HolidayService leaveservice = HolidayService();
   var empId;
   var roles;
+  String? selectedLeaveType;
 
   void transferdata() async {
     final empData = await shareddata.getpatdata();
@@ -62,8 +63,6 @@ class _ApplyleaveState extends State<Applyleave> {
     _getBalanceLeave(context);
     transferdata();
   }
-
-  
 
   Future<void> _fetchLeaveTypes() async {
     print("Fetching Leave Types in ApplyLeaveService...");
@@ -96,6 +95,8 @@ class _ApplyleaveState extends State<Applyleave> {
         ),
         body: SingleChildScrollView(
             child: SafeArea(
+                child: Form(
+          key: _formKey,
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -117,6 +118,7 @@ class _ApplyleaveState extends State<Applyleave> {
                 //         fontWeight: FontWeight.w500,
                 //       )),
                 // ),
+                // Header
                 Container(
                   padding: EdgeInsets.all(10.0),
                   width: 500.0,
@@ -141,17 +143,19 @@ class _ApplyleaveState extends State<Applyleave> {
                           color: AppColors.textColor,
                         ),
                         onPressed: () {
-                         
-                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Leavelist(resultMenu: widget.resultMenu,),
-                        ));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Leavelist(
+                                  resultMenu: widget.resultMenu,
+                                ),
+                              ));
                         },
                       ),
                     ],
                   ),
                 ),
+                // LeaveTypeDropdown
                 Padding(
                     padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
                     child: Column(
@@ -168,48 +172,7 @@ class _ApplyleaveState extends State<Applyleave> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          Text("Leave Type : ",
-                                              style: TextStyle(
-                                                color: AppColors.borderColor,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              )),
-                                          SizedBox(width: 20),
-                                          DropdownMenu<String>(
-                                            // initialSelection: newData,
-                                            hintText: "Select Leave Type",
-                                            width: width,
-                                            requestFocusOnTap: true,
-                                            enableFilter: true,
-                                            // label: const Text('SelectProjectId'),
-                                            onSelected: (String? value) {
-                                              // This is called when the user selects an item.
-                                              setState(() {
-                                                newLeaveType = value!;
-                                                print("newLeaveType" +
-                                                    newLeaveType);
-                                              });
-                                            },
-                                            dropdownMenuEntries: _leaveTypes
-                                                .map<DropdownMenuEntry<String>>(
-                                                    (value) {
-                                              return DropdownMenuEntry<String>(
-                                                value: value['leaveTypeId']
-                                                    .toString(),
-                                                label: value['leaveTypeName']
-                                                    .toString(),
-                                              );
-                                            }).toList(),
-                                          )
-                                        ]),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text("Leave From : ",
+                                          Text("Leave Type ",
                                               style: TextStyle(
                                                 color: AppColors.borderColor,
                                                 fontSize: 15,
@@ -217,11 +180,56 @@ class _ApplyleaveState extends State<Applyleave> {
                                               )),
                                           SizedBox(width: 20),
                                           Expanded(
-                                              child: TextField(
+                                            child:
+                                                DropdownButtonFormField<String>(
+                                              hint: Text("Select "),
+                                              value: newLeaveType,
+                                              decoration: InputDecoration(
+                                                  border: OutlineInputBorder()),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  newLeaveType = value!;
+                                                });
+                                              },
+                                              items: _leaveTypes.map<
+                                                      DropdownMenuItem<String>>(
+                                                  (value) {
+                                                return DropdownMenuItem<String>(
+                                                  value: value['leaveTypeId'],
+                                                  child: Text(
+                                                      value['leaveTypeName'] ??
+                                                          ''),
+                                                );
+                                              }).toList(),
+                                              validator: (value) => value ==
+                                                      null
+                                                  ? 'Please select a leave type'
+                                                  : null, // Validation
+                                            ),
+                                          ),
+                                        ]),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+
+                                    // FromDatePicker
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text("Leave From ",
+                                              style: TextStyle(
+                                                color: AppColors.borderColor,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              )),
+                                          SizedBox(width: 20),
+                                          Expanded(
+                                              child: TextFormField(
                                             controller: dateinputFrom,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(),
-                                              labelText: "Select From Date",
+                                              labelText: "From Date",
                                               // "${_dateTime.toLocal()}".split(' ')[0],
                                               suffixIcon: Icon(
                                                 Icons.calendar_view_month,
@@ -231,16 +239,21 @@ class _ApplyleaveState extends State<Applyleave> {
                                             onTap: () {
                                               _selectFromDate(context);
                                             },
+                                            validator: (value) => value!.isEmpty
+                                                ? 'Please select to date'
+                                                : null, // Validation
                                           ))
                                         ]),
                                     SizedBox(
                                       height: 10,
                                     ),
+
+                                    // ToDate DatePicker
                                     Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          Text("Leave To : ",
+                                          Text("Leave To ",
                                               style: TextStyle(
                                                 color: AppColors.borderColor,
                                                 fontSize: 15,
@@ -248,11 +261,11 @@ class _ApplyleaveState extends State<Applyleave> {
                                               )),
                                           SizedBox(width: 40),
                                           Expanded(
-                                              child: TextField(
+                                              child: TextFormField(
                                             controller: dateinputTo,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(),
-                                              labelText: "Select To Date",
+                                              labelText: "To Date",
                                               // "${_dateTime.toLocal()}".split(' ')[0],
                                               suffixIcon: Icon(
                                                 Icons.calendar_view_month,
@@ -262,46 +275,58 @@ class _ApplyleaveState extends State<Applyleave> {
                                             onTap: () {
                                               _selectToDate(context);
                                             },
+                                            validator: (value) => value!.isEmpty
+                                                ? 'Please select to date'
+                                                : null, // Validation
                                           ))
                                         ]),
                                     SizedBox(
                                       height: 10,
                                     ),
+
+                                    // for Reason Textarea
                                     Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text("Reason : ",
-                                              style: TextStyle(
-                                                color: AppColors.borderColor,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              )),
-                                          SizedBox(width: 50),
-                                          Expanded(
-                                              child: TextField(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Reason ",
+                                          style: TextStyle(
+                                            color: AppColors.borderColor,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        SizedBox(width: 50),
+                                        Expanded(
+                                          child: TextFormField(
                                             controller: reasoncontroller,
                                             maxLines: 2,
-                                            //  expands: false,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10)),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
                                               labelText: "Reason",
                                             ),
-                                          ))
-                                        ]),
+                                            validator: (value) => value!.isEmpty
+                                                ? 'Please enter a reason'
+                                                : null, // Validation
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     SizedBox(
                                       height: 10,
                                     ),
+
+                                    // for totalleaveDays
                                     Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                              "Total Days of Leave :" +
-                                                  differenceInDays.toString(),
+                                              "Total Days of Leave: " + differenceInDays.toString(),
                                               style: TextStyle(
                                                 color: AppColors.borderColor,
                                                 fontSize: 15,
@@ -310,6 +335,8 @@ class _ApplyleaveState extends State<Applyleave> {
                                         ]),
                                   ]))
                         ])),
+
+                // for Balance Leave
                 Padding(
                     padding: EdgeInsets.only(top: 10.0, left: 5, right: 0),
                     child: Column(
@@ -334,6 +361,8 @@ class _ApplyleaveState extends State<Applyleave> {
                           ),
                         ])),
                 getLeaveList(),
+
+                // for Requestbutton
                 Padding(
                     padding: EdgeInsets.only(top: 5.0, left: 5, right: 5),
                     child: Column(
@@ -353,15 +382,22 @@ class _ApplyleaveState extends State<Applyleave> {
                                       padding: const EdgeInsets.all(10),
                                     ),
                                     onPressed: () {
-                                      requestLeave(
-                                          // empId,
-                                          // double.parse(
-                                          //     differenceInDays.toString()),
-                                          newLeaveType,
-                                          dateinputFrom.text,
-                                          dateinputTo.text,
-                                          reasoncontroller.text,
-                                          context);
+                                      if (_formKey.currentState!.validate()) {
+                                        requestLeave(
+                                            // empId,
+                                            // double.parse(
+                                            //     differenceInDays.toString()),
+                                            newLeaveType,
+                                            dateinputFrom.text,
+                                            dateinputTo.text,
+                                            reasoncontroller.text,
+                                            context);
+                                        // Clear the dropdown by resetting the selected value
+                                        setState(() {
+                                          newLeaveType =
+                                              null; // or set it to an initial value, like 'Select'
+                                        });
+                                      }
                                     },
                                     child: Text("Request",
                                         style: TextStyle(
@@ -372,8 +408,10 @@ class _ApplyleaveState extends State<Applyleave> {
                                   )))
                         ])),
               ]),
-        )));
+        ))));
   }
+
+// for BalanceLeave
 
   Widget getLeaveList() {
     Padding(padding: EdgeInsets.all(5.0));
@@ -391,18 +429,18 @@ class _ApplyleaveState extends State<Applyleave> {
             return Container(
                 height: 30,
                 child: ListTile(
-                    // leading:
-                    // CircleAvatar(
-                    //   radius: 6,
-                    //   backgroundColor: Colors.blue,
-                    // ),
-                    title: Text(
-                      description,
-                    ),
-                    trailing: CircleAvatar(
+                  // leading:
+                  // CircleAvatar(
+                  //   radius: 6,
+                  //   backgroundColor: Colors.blue,
+                  // ),
+                  title: Text(
+                    description,
+                  ),
+                  trailing: CircleAvatar(
                     radius: 30, // Adjust the size of the circle
-                    backgroundColor:
-                        AppColors.primaryColor, // Background color of the circle
+                    backgroundColor: AppColors
+                        .primaryColor, // Background color of the circle
                     child: Text(
                       count.toString(), // Text inside the circle
                       style: TextStyle(
@@ -410,11 +448,11 @@ class _ApplyleaveState extends State<Applyleave> {
                         fontWeight: FontWeight.bold, // Optional: Text boldness
                       ),
                     ),
-                  ),));
+                  ),
+                ));
           }),
     );
   }
-
 
 // for fromDate
   DateTime? fromDate;
@@ -443,7 +481,6 @@ class _ApplyleaveState extends State<Applyleave> {
     }
   }
 
-
 // for ToDate
   Future<void> _selectToDate(BuildContext context) async {
     if (fromDate == null || newLeaveType == null || _leaveTypes == null) {
@@ -453,8 +490,8 @@ class _ApplyleaveState extends State<Applyleave> {
     DateTime maxDate;
 
     // Get the max days from the API response based on selected leave type
-    final leaveType = _leaveTypes
-        .firstWhere((leave) => leave['leaveTypeId'] == newLeaveType);
+    final leaveType =
+        _leaveTypes.firstWhere((leave) => leave['leaveTypeId'] == newLeaveType);
     final maxDays = leaveType['maxDays'];
 
     // Ensure that maxDays is not null and is a valid number
@@ -515,7 +552,7 @@ class _ApplyleaveState extends State<Applyleave> {
     }
   }
 
-
+// method to getBalanceLeave  from api
   Future<void> _getBalanceLeave(BuildContext context) async {
     Map<String, dynamic> leaveBalance =
         await leaveservice.getLeaveBalance(context);
@@ -546,6 +583,7 @@ class _ApplyleaveState extends State<Applyleave> {
     }
   }
 
+// method to request leave to api
   requestLeave(String symbol, String fromDate, String toDate, String reason,
       context) async {
     await applyleaveservice.applyLeave(
