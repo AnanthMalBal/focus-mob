@@ -1,9 +1,12 @@
 
 
 import 'package:flutter/material.dart';
+
 import 'package:focusontime/modules/lms/screens/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:focusontime/services/notification_service.dart';
+
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart';
@@ -38,9 +41,14 @@ Future<void> main() async {
   // Load environment variables from the appropriate .env file
   await dotenv.load(fileName: ".env");
   runApp(
-
-
-  const MyApp());
+// MultiProvider(
+//       providers: [
+//         ChangeNotifierProvider(create: (_) => LoadingProvider()),
+//       ],
+//       child: MyApp(),
+// )
+   const MyApp()
+  );
   
 }
 
@@ -54,7 +62,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       
-      home: LoginScreen(),
+       home: LoginScreen(),
+      // home: Stack(
+      //   children: [
+      //     LoginScreen(),
+      //     GlobalLoader(), // This keeps the loader available in the whole app
+      //   ],
+      // ),
+      
       // routes: {
       //   '/': (context) =>  welcomeScreen(),
       //   '/dashboard': (context) => const welcomeScreen(),

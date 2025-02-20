@@ -3,6 +3,7 @@ import 'package:focusontime/model/event.dart';
 import 'package:focusontime/modules/lms/screens/filltimesheet.dart';
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
+import 'package:focusontime/screens/logo_loader.dart';
 import 'package:focusontime/services/getholidaysservice.dart';
 import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,6 +39,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
   SampleItem? selectedMenu;
 
   var _events = {};
+  bool _isLoading = true;
   DateTime _focusedDay = DateTime.now();
   List<Event>? date;
   Map<String, dynamic> mapMonths = {};
@@ -162,6 +164,27 @@ class _CalenderScreenState extends State<CalenderScreen> {
     _events = {};
     transferdata();
     _getBalanceLeave(context);
+     _loadData();
+    
+  }
+
+
+  Future<void> _loadData() async {
+    await Future.delayed(Duration(seconds: 2)); // Simulate API call
+    if (mounted) {
+      setState(() {
+        _isLoading = false; // Data loaded
+      });
+    }
+  }
+
+  Future<void> _refreshData() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+    await _loadData();
   }
 
   @override
@@ -176,147 +199,154 @@ class _CalenderScreenState extends State<CalenderScreen> {
         ),
         body:
             //  SingleChildScrollView(
-            SafeArea(
-          child: Column(
-           
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-             
-              Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        // Text("HI"),
-
-                        child: TableCalendar(
-                          locale: "en_US",
-                          rowHeight: 43,
-                          //  centerTitle: true,
-                          // backgroundColor:Colors.grey,
-
-                          headerStyle: HeaderStyle(
-                              formatButtonVisible: false,
-                              titleCentered: true,
-                              decoration: BoxDecoration(
-
-                                  //  color: Colors.grey.withOpacity(0.5)
-                                  ),
-                              titleTextStyle: TextStyle(
-                                color: AppColors.textColor,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                              )),
-                          availableGestures: AvailableGestures.all,
-                          selectedDayPredicate: (day) =>
-                              isSameDay(day, _focusedDay),
-
-                          firstDay: DateTime.utc(2020, 07, 01),
-                          lastDay: DateTime.utc(2050, 09, 30),
-                          focusedDay: _focusedDay,
-                          calendarStyle: CalendarStyle(
-                            outsideTextStyle: TextStyle(
-                                color: Color.fromARGB(255, 161, 160, 160)),
-                            todayDecoration: const BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
+            RefreshIndicator(
+              onRefresh: _refreshData,
+              child: SafeArea(
+                        child:  _isLoading
+              ? LogoLoader(
+                size: 100.0, 
+              ) :
+                        Column(
+                         
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+               
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          // Text("HI"),
+              
+                          child: TableCalendar(
+                            locale: "en_US",
+                            rowHeight: 43,
+                            //  centerTitle: true,
+                            // backgroundColor:Colors.grey,
+              
+                            headerStyle: HeaderStyle(
+                                formatButtonVisible: false,
+                                titleCentered: true,
+                                decoration: BoxDecoration(
+              
+                                    //  color: Colors.grey.withOpacity(0.5)
+                                    ),
+                                titleTextStyle: TextStyle(
+                                  color: AppColors.textColor,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                )),
+                            availableGestures: AvailableGestures.all,
+                            selectedDayPredicate: (day) =>
+                                isSameDay(day, _focusedDay),
+              
+                            firstDay: DateTime.utc(2020, 07, 01),
+                            lastDay: DateTime.utc(2050, 09, 30),
+                            focusedDay: _focusedDay,
+                            calendarStyle: CalendarStyle(
+                              outsideTextStyle: TextStyle(
+                                  color: Color.fromARGB(255, 161, 160, 160)),
+                              todayDecoration: const BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                              ),
                             ),
+                            eventLoader: _getEventsForDay,
+              
+                            calendarBuilders: CalendarBuilders(
+                                markerBuilder: (context, date, events) {
+                              if (events.isNotEmpty) {
+                                return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: events.length,
+                                    itemBuilder: (context, index) {
+                                      final _event =
+                                          events[index] as Map<String, dynamic>?;
+                                      print("++++" + _event.toString());
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: _event != null
+                                                ? _event['color']
+                                                : Colors.transparent
+                                            //  Colors.primaries[ Random().nextInt(Colors.primaries.length)],
+                                            ),
+                                        width: 10,
+                                        height: 10,
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 1.5),
+                                      );
+                                    });
+                              }
+                              return null;
+                            }),
+              
+                            onDaySelected: _onDaySelected,
+              
+                            onPageChanged: (focusedDay) {
+                              print("print" + focusedDay.month.toString());
+                              print("print1" + focusedDay.toString());
+                              setState(() {
+                                _focusedDay = focusedDay;
+                              });
+                              getLeaves(focusedDay.toString());
+                              //  getBalanceLeave(empId.toString(),context);
+                            },
                           ),
-                          eventLoader: _getEventsForDay,
-
-                          calendarBuilders: CalendarBuilders(
-                              markerBuilder: (context, date, events) {
-                            if (events.isNotEmpty) {
-                              return ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: events.length,
-                                  itemBuilder: (context, index) {
-                                    final _event =
-                                        events[index] as Map<String, dynamic>?;
-                                    print("++++" + _event.toString());
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: _event != null
-                                              ? _event['color']
-                                              : Colors.transparent
-                                          //  Colors.primaries[ Random().nextInt(Colors.primaries.length)],
-                                          ),
-                                      width: 10,
-                                      height: 10,
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 1.5),
-                                    );
-                                  });
-                            }
-                            return null;
-                          }),
-
-                          onDaySelected: _onDaySelected,
-
-                          onPageChanged: (focusedDay) {
-                            print("print" + focusedDay.month.toString());
-                            print("print1" + focusedDay.toString());
-                            setState(() {
-                              _focusedDay = focusedDay;
-                            });
-                            getLeaves(focusedDay.toString());
-                            //  getBalanceLeave(empId.toString(),context);
-                          },
+                        )
+                      ]),
+                ),
+                Padding(
+                    padding: EdgeInsets.only(top: 5.0, left: 5, right: 5),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding:
+                                new EdgeInsets.only(top: 5.0, left: 5, right: 5),
+                            width: 500.0,
+                            // height:20.0,
+                            decoration: BoxDecoration(
+                              color: AppColors.borderColor.withOpacity(0.1),
+                              //  borderRadius: BorderRadius.circular(10)
+                            ),
+                            child: Text("This Month",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textColor,
+                                )),
+                          )
+                        ])),
+                getList(),
+                Padding(
+                    padding: EdgeInsets.only(top: 5.0, left: 5, right: 5),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding:
+                                new EdgeInsets.only(top: 5.0, left: 5, right: 5),
+                            width: 500.0,
+                            // height:20.0,
+                            decoration: BoxDecoration(
+                              color: AppColors.borderColor.withOpacity(0.1),
+                              //  borderRadius: BorderRadius.circular(10)
+                            ),
+                            child: Text("Your Remain Leave",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textColor,
+                                )),
+                          )
+                        ])),
+                leaveBalance()
+              ],
                         ),
-                      )
-                    ]),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(top: 5.0, left: 5, right: 5),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding:
-                              new EdgeInsets.only(top: 5.0, left: 5, right: 5),
-                          width: 500.0,
-                          // height:20.0,
-                          decoration: BoxDecoration(
-                            color: AppColors.borderColor.withOpacity(0.1),
-                            //  borderRadius: BorderRadius.circular(10)
-                          ),
-                          child: Text("This Month",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColor,
-                              )),
-                        )
-                      ])),
-              getList(),
-              Padding(
-                  padding: EdgeInsets.only(top: 5.0, left: 5, right: 5),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding:
-                              new EdgeInsets.only(top: 5.0, left: 5, right: 5),
-                          width: 500.0,
-                          // height:20.0,
-                          decoration: BoxDecoration(
-                            color: AppColors.borderColor.withOpacity(0.1),
-                            //  borderRadius: BorderRadius.circular(10)
-                          ),
-                          child: Text("Your Remain Leave",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColor,
-                              )),
-                        )
-                      ])),
-              leaveBalance()
-            ],
-          ),
-        )
+                      ),
+            )
         // )
         );
     // );
@@ -329,7 +359,17 @@ class _CalenderScreenState extends State<CalenderScreen> {
     return Expanded(
       // child:Text("Hi")
 
-      child: ListView.builder(
+      child:  _items.isEmpty
+        ? Center(
+            child:LogoLoader(
+                size: 50.0, 
+              ) 
+            //  Text(
+            //   "No data available",
+            //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            // ),
+          )
+      :ListView.builder(
           scrollDirection: Axis.vertical,
           itemCount: _items.length,
           itemBuilder: (BuildContext context, index) {
@@ -365,7 +405,14 @@ class _CalenderScreenState extends State<CalenderScreen> {
 // for leave balance
   Widget leaveBalance() {
     return Expanded(
-      child: ListView.builder(
+      child: _itemsBalance.isEmpty
+        ? Center(
+            child: Text(
+              "No data available",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          )
+      :ListView.builder(
           // scrollDirection: Axis.vertical,
           itemCount: _itemsBalance.length,
           itemBuilder: (BuildContext context, index) {

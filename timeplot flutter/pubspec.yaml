@@ -48,8 +48,7 @@ dependencies:
   url_launcher: ^6.3.1  
   qr_flutter: ^4.1.0
   pdf: ^3.11.1  
-  open_file: ^3.2.1
-  
+  open_file: ^3.2.1  
   image_picker: ^1.1.2   
   image: ^4.3.0  
   intl: 
@@ -59,6 +58,7 @@ dependencies:
   permission_handler: ^10.0.0
   android_intent_plus: ^3.0.5  
   fl_chart: 0.66.2
+  shimmer: ^3.0.0
   
 
 dev_dependencies:

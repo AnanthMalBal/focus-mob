@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:focusontime/screens/CommonShimmer.dart';
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
+import 'package:focusontime/screens/logo_loader.dart';
 import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:focusontime/services/timesheetservice.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -70,6 +72,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   int autoId = 0;
   var roles;
   String divisionId = "Dev";
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -81,7 +84,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     getproject(divisionId);
     getTimesheet(date);
     getMarkedAttendance(date);
-    //  getUsersDailyLog();
+    _loadData();
   }
 
   @override
@@ -101,7 +104,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
       String projectId = project['projectId'];
       print("Calling getprocess with projectId: $projectId");
 
-     // Call the getprocess function with the projectId
+      // Call the getprocess function with the projectId
       // await getprocess(projectId);
     }
     setState(() {
@@ -218,6 +221,24 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     });
   }
 
+  Future<void> _loadData() async {
+    await Future.delayed(Duration(seconds: 2)); // Simulate API call
+    if (mounted) {
+      setState(() {
+        _isLoading = false; // Data loaded
+      });
+    }
+  }
+
+  Future<void> _refreshData() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+    await _loadData();
+  }
+
   @override
   Widget build(BuildContext context) {
     // to display workinghours
@@ -232,46 +253,63 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     bool isSubmitButtonEnabled = totalTime >= workingHoursInMinutes;
 
     return Scaffold(
-      appBar: CommonAppBar(
-        menuItems: widget.resultMenu,
-        title: 'MyAttendance',
-        showProfile: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Form(
-            key: _formKey, // Assign Form Key
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _buildHeader(),
-              SizedBox(height: 10),
-              _buildProjectDropdown(),
-              SizedBox(height: 10),
-              _buildProcessDropdown(),
-              SizedBox(height: 10),
-              _buildTimePicker(),
-              SizedBox(height: 10),
-              _buildDescriptionField(),
-              SizedBox(height: 10),
-              _buildAddButton(),
-              SizedBox(height: 10),
-              _buildFilledTimeSheet(totalTime),
-              SizedBox(height: 10),
-              _buildProjectEntries(
-                _itemDailyLog,
-                deleteLogByAutoId, // Define your delete function as needed
-              ),
-              SizedBox(height: 10),
-              _buildSubmitButton(
-                isSubmitButtonEnabled,
-                updateUserTimesheet, // Function to update timesheet
-              )
-            ]),
-          ),
+        appBar: CommonAppBar(
+          menuItems: widget.resultMenu,
+          title: 'MyAttendance',
+          showProfile: true,
         ),
+        body: RefreshIndicator(
+          onRefresh: _refreshData,
+          child: _isLoading
+           ? Center( // ✅ Ensures the loader is centered on the entire screen
+            child: LogoLoader(
+        size: 100.0, // Customize size
+       
+       
       ),
-    );
+           )
+           :SingleChildScrollView(
+            // ✅ Allows scrolling & prevents overflow
+            physics: AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Form(
+                key: _formKey, // Assign Form Key
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                     
+                         _buildHeader(),
+                      SizedBox(height: 10),
+                       
+                      _buildProjectDropdown(),
+                      SizedBox(height: 10),
+                      _buildProcessDropdown(),
+                      SizedBox(height: 10),
+                      _buildTimePicker(),
+                      SizedBox(height: 10),
+                      _buildDescriptionField(),
+                      SizedBox(height: 10),
+                      _buildAddButton(),
+                      SizedBox(height: 10),
+                      _buildFilledTimeSheet(totalTime),
+                      SizedBox(height: 10),
+                      _buildProjectEntries(
+                        _itemDailyLog,
+                        deleteLogByAutoId, // Define your delete function as needed
+                      ),
+                      SizedBox(height: 10),
+                      _buildSubmitButton(
+                        isSubmitButtonEnabled,
+                        updateUserTimesheet, // Function to update timesheet
+                      )
+                    ]),
+                    
+                ),
+              ),
+            ),
+          ),
+        );
   }
 
   // UI Components
@@ -400,14 +438,32 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
         SizedBox(width: 5),
         Expanded(
           child: DropdownButtonFormField<String>(
-            hint: Text("Select"),
-            decoration: InputDecoration(border: OutlineInputBorder()),
-            value: newProjectData,
+            hint: Text(_itemProject.isEmpty ? "No data available" :"Select"),
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey), // Normal border
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: Colors.grey, width: 2), // Blue when focused
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide:
+                    BorderSide(color: Colors.red, width: 2), // Red on error
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: Colors.red, width: 2), // Red when focused on error
+              ),
+            ),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            value: newProjectData, // ✅ Corrected placement
             onChanged: (String? value) {
               setState(() {
                 newProjectData = value!;
                 print("Project selected: $newProjectData");
-                 getprocess(newProjectData!);
+                getprocess(newProjectData!);
               });
             },
             items: _itemProject.map((value) {
@@ -424,7 +480,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     );
   }
 
-//for process
+
   Widget _buildProcessDropdown() {
     return Row(
       children: [
@@ -440,16 +496,38 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
         SizedBox(width: 5),
         Expanded(
           child: DropdownButtonFormField<String>(
-            hint: Text("Select"),
-            decoration: InputDecoration(border: OutlineInputBorder()),
-            value: newProcessData,
-            onChanged: (String? value) {
+            hint: Text(_itemProcess.isEmpty ? "Select":"Select"),
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey), // Normal border
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: Colors.grey, width: 2), // Blue when focused
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide:
+                    BorderSide(color: Colors.red, width: 2), // Red on error
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: Colors.red, width: 2), // Red when focused on error
+              ),
+            ),
+            autovalidateMode:
+                AutovalidateMode.onUserInteraction, // ✅ Moved here
+            value: _itemProcess.isEmpty ? null :newProcessData,
+            onChanged: _itemProcess.isEmpty
+              ? null // ❌ Disable dropdown if API fails
+              :
+            (String? value) {
               setState(() {
                 newProcessData = value!;
                 print("Process selected: $newProcessData");
 
                 final selectedProcess = _itemProcess.firstWhere(
-                  (process) => process["processId"] == value,
+                  (process) => process["processId"].toString() == value,
                   orElse: () => {"billType": ""}, // Default if not found
                 );
 
@@ -457,7 +535,10 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                 billTypeController.text = selectedProcess["billType"] ?? "";
               });
             },
-            items: _itemProcess.map((value) {
+            items: _itemProcess.isEmpty
+              ? [] // ❌ Empty dropdown if no data
+              :
+            _itemProcess.map((value) {
               return DropdownMenuItem<String>(
                 value: value['processId'].toString(),
                 child: Text(value['processName'].toString()),
@@ -472,6 +553,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   }
 
 // for timepicker
+
   Widget _buildTimePicker() {
     return Row(
       children: [
@@ -516,9 +598,26 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
             child: AbsorbPointer(
               child: TextFormField(
                 controller: actualTimeController,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
                   labelText: "Select",
                   border: OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey), // Normal border
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Colors.grey, width: 2), // Blue when focused
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Colors.red, width: 2), // Red on error
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 2), // Red when focused on error
+                  ),
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                 ),
@@ -554,10 +653,23 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
           child: TextFormField(
             controller: descriptionController,
             maxLines: 2,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
               labelText: "Task Description",
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.grey)),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: Colors.grey, width: 2), // Blue when focused
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide:
+                    BorderSide(color: Colors.red, width: 2), // Red on error
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: Colors.red, width: 2), // Red when focused on error
               ),
             ),
             validator: (value) =>
@@ -593,6 +705,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                     : () {
                         // Validate the form before calling the add function
                         if (_formKey.currentState!.validate()) {
+                          
                           addDailgLog(
                             newProjectData,
                             newProcessData!,
@@ -601,6 +714,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                             descriptionController.text,
                             tsDate,
                           );
+                         
                         }
                       },
                 child: Text(
@@ -801,9 +915,16 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
       }
       // Enable Submit button if totalTime equals working hours
       isSubmitButtonEnabled = (totalTime >= workingHoursInMinutes);
+
+      // ✅ Clear input fields
+      actualTimeController.clear();
+      descriptionController.clear();
+
+      // ✅ Reset form validation to remove error messages
+      if (_formKey.currentState != null) {
+        _formKey.currentState!.reset();
+      }
     });
-    actualTimeController.clear();
-    descriptionController.clear();
   }
 
 // method to updateUserTimesheet()

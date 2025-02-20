@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:focusontime/screens/CommonShimmer.dart';
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/services/applyleaveservice.dart';
@@ -35,6 +36,7 @@ class _LeavelistState extends State<Leavelist> {
   String sort = "modifiedDate desc";
   String firstDate = "";
   String lastDate = "";
+  bool _isLoading = true;
 
   void transferdata() async {
     final empData = await shareddata.getpatdata();
@@ -74,6 +76,26 @@ class _LeavelistState extends State<Leavelist> {
     transferdata();
     _itemsLeave.clear();
     main();
+     _loadData();
+  }
+
+
+Future<void> _loadData() async {
+    await Future.delayed(Duration(seconds: 2)); // Simulate API call
+    if (mounted) {
+      setState(() {
+        _isLoading = false; // Data loaded
+      });
+    }
+  }
+
+  Future<void> _refreshData() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+    await _loadData();
   }
 
   @override
@@ -88,195 +110,205 @@ class _LeavelistState extends State<Leavelist> {
           //   print('Profile tapped!');
           // },
         ),
-        body: SingleChildScrollView(
-            child: SafeArea(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-              // Container(
-              //   padding: new EdgeInsets.all(10.0),
-              //   width: 500.0,
-              //   // height:20.0,
-              //   decoration: BoxDecoration(
-              //     color: AppColors.borderColor.withOpacity(0.1),                  
-              //   ),                
-              //   child: 
-              //   Text("Leave List :",
-              //       style: TextStyle(
-              //         color: AppColors.textColor,
-              //         fontSize: 20,
-              //         fontWeight: FontWeight.w500,
-              //       )),
-              // ),
-              Container(
-  padding: EdgeInsets.all(10.0),
-  width: 500.0,
-  decoration: BoxDecoration(
-    color: AppColors.borderColor.withOpacity(0.1),
-  ),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,  // Distribute space between the elements
-    children: [
-      Text(
-        "Leave Records",
-        style: TextStyle(
-          color: AppColors.textColor,
-          fontSize: 20,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      LegendIndicator(
-        color: Colors.blue,  // Example color
-        text: "Pending",  // Example text
-      ),
-       LegendIndicator(
-        color: Colors.green,  // Example color
-        text: "Approved",  // Example text
-      ),
-      LegendIndicator(
-        color: Color.fromARGB(255, 241, 46, 32),  // Example color
-        text: "Rejected",  // Example text
-      ),
-    ],
-  ),
-),
-              SizedBox(
-                  height: 700,
-                  child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: _itemsLeave.length,
-                      itemBuilder: (BuildContext context, index) {
-                        // var days = _itemsLeave[index]['noOfDays'];
-                        // double noOfDaysAsDouble =
-                        //     (days is int) ? days.toDouble() : days;
-                        // String noOfDaysStr =
-                        //     noOfDaysAsDouble.toStringAsFixed(1);
-                        // String status = _itemsLeave[index]['status'];
-                        var daysStr = _itemsLeave[index]
-                            ['noOfDays']; // "1 day(s)" or "3 day(s)"
-
-                        // Use regex to extract the number part of the string (e.g., "1", "3")
-                        RegExp regExp = RegExp(
-                            r'(\d+(\.\d+)?)'); // Regex to capture a number (integer or decimal)
-                        var match = regExp.firstMatch(daysStr);
-
-                        // Convert the captured number to a double
-                        double noOfDaysAsDouble = 0.0;
-                        if (match != null) {
-                          noOfDaysAsDouble =
-                              double.tryParse(match.group(0) ?? '0') ?? 0.0;
-                        }
-
-                        String noOfDaysStrFormatted =
-                            noOfDaysAsDouble.toStringAsFixed(1);
-                        String status = _itemsLeave[index]['status'];
-                        // // Color cardColor;
-                        BorderSide borderSide;
-
-                        // switch (status) {
-                        //   case 'Pending':
-                        //     cardColor = const Color.fromARGB(255, 163, 208, 245);
-                        //     break;
-                        //   case 'Approved':
-                        //     cardColor = const Color.fromARGB(255, 172, 232, 174);
-                        //     break;
-                        //   case 'Rejected':
-                        //     cardColor = const Color.fromARGB(255, 240, 146, 139);
-                        //     break;
-                        //   default:
-                        //     cardColor = Color.fromARGB(255, 250, 247, 247);
-                        // }
-
-                        switch (status) {
-                          case 'Pending':
-                            borderSide =
-                                BorderSide(color: Colors.blue, width: 2.0);
-                            break;
-                          case 'Approved':
-                            borderSide =
-                                BorderSide(color: Colors.green, width: 2.0);
-                            break;
-                          case 'Rejected':
-                            borderSide = BorderSide(
-                                color: Color.fromARGB(255, 241, 46, 32),
-                                width: 2.0);
-                            break;
-                          default:
-                            borderSide =
-                                BorderSide(color: Colors.grey, width: 2.0);
-                        }
-                        return Card(
-                            // color: cardColor,
-                            shape: RoundedRectangleBorder(
-                              side: borderSide,
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            margin: EdgeInsets.all(3.0),
-                            child: ListTile(
-                              title: Text(_itemsLeave[index]['symbol']),
-                              leading: Text(index.toString()),
-                              subtitle: Text("From-" +
-                                  '${formatDate(_itemsLeave[index]['fromDate'])}' +
-                                  "      To-" +
-                                  '  ${formatDate(_itemsLeave[index]['toDate'])}'),
-                              trailing: Wrap(
-                                spacing: 8,
-                                children: [
-                                  Tooltip(
-                                    message: "noOfDays-" + noOfDaysStrFormatted,
-                                    preferBelow: false,
-                                    child: IconButton(
-                                      icon: const Icon(Icons.calendar_month),
-                                      color: Colors.green,
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                  Tooltip(
-                                    message: "reason-" +
-                                        _itemsLeave[index]['reason'],
-                                    preferBelow: false,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.event,
-                                        color:
-                                            Color.fromARGB(255, 19, 152, 219),
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                  Tooltip(
-                                    message: 'cancel',
-                                    preferBelow: false,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.cancel,
-                                        color: status == "Pending"
-                                            ? Colors.red
-                                            : Colors.grey,
-                                      ),
-                                      onPressed: status == "Pending"
-                                          ? () {
-                                              print(
-                                                  'Cancel leave requested for ' +
-                                                      _itemsLeave[index]
-                                                          ['reason']);
-                                              String leaveId =
-                                                  _itemsLeave[index]['leaveId'];
-                                              print("leaveId" + leaveId);
-                                              leaveCancel(
-                                                  _itemsLeave[index]['leaveId'],
-                                                  context);
-                                              // Navigator.of(context).pop();
-                                            }
-                                          : null,
-                                    ),
-                                  ),
-                                ],
+        body: RefreshIndicator(
+onRefresh: _refreshData,
+          child: SingleChildScrollView(
+             physics: AlwaysScrollableScrollPhysics(),
+              child: SafeArea(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                // Container(
+                //   padding: new EdgeInsets.all(10.0),
+                //   width: 500.0,
+                //   // height:20.0,
+                //   decoration: BoxDecoration(
+                //     color: AppColors.borderColor.withOpacity(0.1),                  
+                //   ),                
+                //   child: 
+                //   Text("Leave List :",
+                //       style: TextStyle(
+                //         color: AppColors.textColor,
+                //         fontSize: 20,
+                //         fontWeight: FontWeight.w500,
+                //       )),
+                // ),
+                _isLoading ? CommonShimmer(itemCount: _itemsLeave.length, )
+                :
+                Container(
+            padding: EdgeInsets.all(10.0),
+            width: 500.0,
+            decoration: BoxDecoration(
+              color: AppColors.borderColor.withOpacity(0.1),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,  // Distribute space between the elements
+              children: [
+                Text(
+          "Leave Records",
+          style: TextStyle(
+            color: AppColors.textColor,
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+          ),
+                ),
+                LegendIndicator(
+          color: Colors.blue,  // Example color
+          text: "Pending",  // Example text
+                ),
+                 LegendIndicator(
+          color: Colors.green,  // Example color
+          text: "Approved",  // Example text
+                ),
+                LegendIndicator(
+          color: Color.fromARGB(255, 241, 46, 32),  // Example color
+          text: "Rejected",  // Example text
+                ),
+              ],
+            ),
+          ),
+           _isLoading
+           ? CommonShimmer(itemCount:_itemsLeave.length ):
+                SizedBox(
+                    height: 700,
+                    child: ListView.builder(
+                        // scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: _itemsLeave.length,
+                        itemBuilder: (BuildContext context, index) {
+                          // var days = _itemsLeave[index]['noOfDays'];
+                          // double noOfDaysAsDouble =
+                          //     (days is int) ? days.toDouble() : days;
+                          // String noOfDaysStr =
+                          //     noOfDaysAsDouble.toStringAsFixed(1);
+                          // String status = _itemsLeave[index]['status'];
+                          var daysStr = _itemsLeave[index]
+                              ['noOfDays']; // "1 day(s)" or "3 day(s)"
+          
+                          // Use regex to extract the number part of the string (e.g., "1", "3")
+                          RegExp regExp = RegExp(
+                              r'(\d+(\.\d+)?)'); // Regex to capture a number (integer or decimal)
+                          var match = regExp.firstMatch(daysStr);
+          
+                          // Convert the captured number to a double
+                          double noOfDaysAsDouble = 0.0;
+                          if (match != null) {
+                            noOfDaysAsDouble =
+                                double.tryParse(match.group(0) ?? '0') ?? 0.0;
+                          }
+          
+                          String noOfDaysStrFormatted =
+                              noOfDaysAsDouble.toStringAsFixed(1);
+                          String status = _itemsLeave[index]['status'];
+                          // // Color cardColor;
+                          BorderSide borderSide;
+          
+                          // switch (status) {
+                          //   case 'Pending':
+                          //     cardColor = const Color.fromARGB(255, 163, 208, 245);
+                          //     break;
+                          //   case 'Approved':
+                          //     cardColor = const Color.fromARGB(255, 172, 232, 174);
+                          //     break;
+                          //   case 'Rejected':
+                          //     cardColor = const Color.fromARGB(255, 240, 146, 139);
+                          //     break;
+                          //   default:
+                          //     cardColor = Color.fromARGB(255, 250, 247, 247);
+                          // }
+          
+                          switch (status) {
+                            case 'Pending':
+                              borderSide =
+                                  BorderSide(color: Colors.blue, width: 2.0);
+                              break;
+                            case 'Approved':
+                              borderSide =
+                                  BorderSide(color: Colors.green, width: 2.0);
+                              break;
+                            case 'Rejected':
+                              borderSide = BorderSide(
+                                  color: Color.fromARGB(255, 241, 46, 32),
+                                  width: 2.0);
+                              break;
+                            default:
+                              borderSide =
+                                  BorderSide(color: Colors.grey, width: 2.0);
+                          }
+                          return Card(
+                              // color: cardColor,
+                              shape: RoundedRectangleBorder(
+                                side: borderSide,
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
-                            ));
-                      }))
-            ]))));
+                              margin: EdgeInsets.all(3.0),
+                              child: ListTile(
+                                title: Text(_itemsLeave[index]['symbol']),
+                                leading: Text(index.toString()),
+                                subtitle: Text("From-" +
+                                    '${formatDate(_itemsLeave[index]['fromDate'])}' +
+                                    "      To-" +
+                                    '  ${formatDate(_itemsLeave[index]['toDate'])}'),
+                                trailing: Wrap(
+                                  spacing: 8,
+                                  children: [
+                                    Tooltip(
+                                      message: "noOfDays-" + noOfDaysStrFormatted,
+                                      preferBelow: false,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.calendar_month),
+                                        color: Colors.green,
+                                        onPressed: () {},
+                                      ),
+                                    ),
+                                    Tooltip(
+                                      message: "reason-" +
+                                          _itemsLeave[index]['reason'],
+                                      preferBelow: false,
+                                      child: IconButton(
+                                        icon: Icon(
+                                          Icons.event,
+                                          color:
+                                              Color.fromARGB(255, 19, 152, 219),
+                                        ),
+                                        onPressed: () {},
+                                      ),
+                                    ),
+                                    Tooltip(
+                                      message: 'cancel',
+                                      preferBelow: false,
+                                      child: IconButton(
+                                        icon: Icon(
+                                          Icons.cancel,
+                                          color: status == "Pending"
+                                              ? Colors.red
+                                              : Colors.grey,
+                                        ),
+                                        onPressed: status == "Pending"
+                                            ? () {
+                                                print(
+                                                    'Cancel leave requested for ' +
+                                                        _itemsLeave[index]
+                                                            ['reason']);
+                                                String leaveId =
+                                                    _itemsLeave[index]['leaveId'];
+                                                print("leaveId" + leaveId);
+                                                leaveCancel(
+                                                    _itemsLeave[index]['leaveId'],
+                                                    context);
+                                                // Navigator.of(context).pop();
+                                              }
+                                            : null,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ));
+                        }))
+              ]))),
+        ));
   }
 
   Future getListLeave(int page, int perPage, String sort, String firstDate,

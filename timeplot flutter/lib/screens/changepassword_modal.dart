@@ -41,18 +41,7 @@ void ForgetPasswordModal(BuildContext context) {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 16),
-                    // Container(
-                    //   width: 500, // Set a fixed width for the text field
-                    //   child: TextField(
-                    //     controller: emailController,
-                    //     // textAlign: TextAlign.center,
-                    //     decoration: InputDecoration(
-                    //       labelText: "Email",
-                    //       border: OutlineInputBorder(),
-                    //       prefixIcon: Icon(Icons.email),
-                    //     ),
-                    //   ),
-                    // ),
+                  
                     Form(
                       key: _formKey, // Attach the key to the Form
                       child: TextFormField(
@@ -75,6 +64,11 @@ void ForgetPasswordModal(BuildContext context) {
                           }
                           return null;
                         },
+                        onChanged: (value) {
+          setModalState(() {
+            _formKey.currentState!.validate(); // Revalidate dynamically
+          });
+        },
                       ),
                     ),
                     SizedBox(height: 20),
@@ -129,115 +123,7 @@ sendEmailForVerification(email, dynamic context) async {
   //  Navigator.pop(context);
 }
 
-// void ChangePasswordModal(BuildContext context) {
-//   TextEditingController otpController = TextEditingController();
-//   TextEditingController passwordController = TextEditingController();
-//   bool passToggle = true;
-//   showModalBottomSheet(
-//     context: context,
-//     shape: RoundedRectangleBorder(
-//       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-//     ),
-//     isScrollControlled: true,
-//     builder: (context) {
-//       return StatefulBuilder(
-//         builder: (context, setModalState) {
-//           return SizedBox(
-//             height: 500, // Fixed height for the modal
-//             child: Padding(
-//               padding: EdgeInsets.only(
-//                 bottom: MediaQuery.of(context).viewInsets.bottom,
-//                 left: 16,
-//                 right: 16,
-//                 top: 16,
-//               ),
-//               child: SingleChildScrollView(
-//                 // Wrap Column in SingleChildScrollView
-//                 child: Column(
-//                   mainAxisSize: MainAxisSize.min,
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   crossAxisAlignment: CrossAxisAlignment.center,
-//                   children: [
-//                     Text(
-//                       "Enter OTP and Password",
-//                       style:
-//                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                     ),
-//                     SizedBox(height: 16),
-//                     Container(
-//                       width: 500, // Set a fixed width for the text field
-//                       child: TextField(
-//                         controller: otpController,
-//                         // textAlign: TextAlign.center,
-//                         decoration: InputDecoration(
-//                           labelText: "OTP",
-//                           border: OutlineInputBorder(),
-                          
-//                         ),
-//                       ),
-//                     ),
-//                     SizedBox(height: 16),
-//                     Container(
-//                       width: 500, // Set a fixed width for the text field
-//                       child: TextField(
-//                         controller: passwordController,
-//                         obscureText: passToggle,
-//                         // textAlign: TextAlign.center,
-//                         decoration: InputDecoration(
-//                           border: OutlineInputBorder(),
-//                           label: Text("Password"),
-//                           prefixIcon: Icon(Icons.lock),
-//                           suffixIcon: InkWell(
-//                             onTap: () {
-//                               setModalState(() { // ✅ Correct way to update UI
-//                                 passToggle = !passToggle;
-//                               });
-//                               // setState(() {});
-//                             },
-//                             child: passToggle
-//                                 ? Icon(CupertinoIcons.eye_slash_fill)
-//                                 : Icon(CupertinoIcons.eye_fill),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                     SizedBox(height: 20),
-//                     SizedBox(
-//                       width: 250, // Button width
-//                       child: ElevatedButton(
-//                         onPressed: () {
-//                           // Handle password change logic here
-//                           String otp = otpController.text;
-//                           String password = passwordController.text;
-//                           changePassword(otp, password, context);
-//                         },
-//                         style: ElevatedButton.styleFrom(
-//                           backgroundColor: AppColors.primaryColor,
-//                           padding: EdgeInsets.symmetric(vertical: 12),
-//                           shape: RoundedRectangleBorder(
-//                             borderRadius: BorderRadius.circular(8),
-//                           ),
-//                         ),
-//                         child: Text(
-//                           "Change Password",
-//                           style: TextStyle(
-//                             color: Colors.white,
-//                             fontSize: 20,
-//                             fontWeight: FontWeight.bold,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           );
-//         },
-//       );
-//     },
-//   );
-// }
+
 
 void ChangePasswordModal(BuildContext context) {
   final _formKey = GlobalKey<FormState>(); // ✅ Form key for validation
@@ -299,6 +185,11 @@ void ChangePasswordModal(BuildContext context) {
                             }
                             return null;
                           },
+                          onChanged: (value) {
+          setModalState(() {
+            _formKey.currentState!.validate(); // Revalidate dynamically
+          });
+        },
                         ),
                       ),
                       SizedBox(height: 16),
@@ -336,6 +227,11 @@ void ChangePasswordModal(BuildContext context) {
                             }
                             return null;
                           },
+                            onChanged: (value) {
+          setModalState(() {
+            _formKey.currentState!.validate(); // Revalidate dynamically
+          });
+                            }
                         ),
                       ),
                       SizedBox(height: 20),

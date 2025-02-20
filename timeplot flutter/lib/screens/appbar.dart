@@ -3,7 +3,9 @@ import 'package:focusontime/modules/lms/screens/applyleave.dart';
 import 'package:focusontime/modules/lms/screens/calender.dart';
 
 import 'package:focusontime/modules/lms/screens/login.dart';
+import 'package:focusontime/modules/lms/screens/myreport.dart';
 import 'package:focusontime/modules/lms/screens/reportscreen.dart';
+import 'package:focusontime/modules/lms/screens/teamreport.dart';
 import 'package:focusontime/modules/lms/screens/welcome.dart';
 import 'package:focusontime/screens/changepassword_modal.dart';
 import 'package:focusontime/screens/colors.dart';
@@ -286,46 +288,15 @@ Future<void> handlePopupMenuSelection(BuildContext context, String menuItem,
         ), // Pass resultMenu here
       ));
       break;
-    case 'Reports':
-      print('Navigating to LeaveList Screen');
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (c) => Reportscreen(
-                resultMenu: resultMenu,
-              )));
-      break;
-
-    // case 'LeaveList':
+    // case 'Reports':
     //   print('Navigating to LeaveList Screen');
     //   Navigator.of(context).push(MaterialPageRoute(
-    //       builder: (c) => Leavelist(resultMenu: resultMenu)));
+    //       builder: (c) => Reportscreen(
+    //             resultMenu: resultMenu,
+    //           )));
     //   break;
-    // case 'Ticket':
-    //   print('Navigating to TicketScreen');
-    //   Navigator.of(context).push(MaterialPageRoute(
-    //       builder: (c) => TicketScreen(resultMenu: resultMenu)));
-    //   break;
-    // case 'QRCodeGenerator':
-    //   print('Navigating to QRCodeGenerator Screen');
-    //   Navigator.of(context)
-    //       .push(MaterialPageRoute(builder: (c) => Qrcodegenerator()));
-    //   break;
-    // case 'QRCodeScan':
-    //   print('Navigating to QRCodeScan Screen');
-    //   Navigator.of(context)
-    //       .push(MaterialPageRoute(builder: (c) => Qrcodescan()));
-    //   break;
-    // case 'Performance':
-    //   print('Navigating to QRCodeScan Screen');
-    //   Navigator.of(context).push(MaterialPageRoute(
-    //       builder: (c) => CalenderScreen(resultMenu: resultMenu)));
-    //   break;
-    // case 'Logout':
-    //   prefs = await SharedPreferences.getInstance();
-    //   await prefs?.clear();
-    //   Navigator.of(context).pushAndRemoveUntil(
-    //       MaterialPageRoute(builder: (c) => LoginScreen()), (route) => false);
-    //   print('Logging out');
-    //   break;
+
+  
     default:
       print('Invalid selection');
   }
@@ -333,6 +304,7 @@ Future<void> handlePopupMenuSelection(BuildContext context, String menuItem,
 
 Future<void> handleSubmenuSelection(BuildContext context, String submenuItem,
     List<Map<String, dynamic>> resultMenu) async {
+    
   switch (submenuItem) {
     case 'Daily Log':
       print('Navigating to Welcome Screen');
@@ -359,10 +331,26 @@ Future<void> handleSubmenuSelection(BuildContext context, String submenuItem,
                 resultMenu: resultMenu,
               )));
       break;
+    case 'My Attendance Report':
+      print('Navigating to ApplyLeave Screen');
+      
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (c) => MyReport(
+                resultMenu: resultMenu,
+              )));
+      break;
+    case 'Team Attendance Report':
+      print('Navigating to ApplyLeave Screen');
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (c) => TeamReport(
+                resultMenu: resultMenu,
+              )));
+      break;
     default:
       print('Invalid submenu selection');
   }
 }
+    
 
 // for Icon
 IconData getIconFromCssClass(String cssClassIcon) {
@@ -377,6 +365,8 @@ IconData getIconFromCssClass(String cssClassIcon) {
       return Icons.edit; // Map to pencil (edit) icon
     case "icon-bar-chart":
       return Icons.bar_chart; // Map to bar chart icon
+    case "icon-pie-chart":
+      return Icons.pie_chart; // Map to bar chart icon
     // Add other cases as per the icons in your JSON data
     default:
       return Icons.help; // Default icon if no match is found
