@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:focusontime/modules/lms/screens/calender.dart';
 import 'package:focusontime/modules/ticketing/screens/ticket.dart';
-import 'package:focusontime/screens/CommonShimmer.dart';
+
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/screens/logo_loader.dart';
@@ -11,7 +11,6 @@ import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:focusontime/services/timesheetservice.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shimmer/shimmer.dart';
 
 final shareddata = SharedPref();
 final sharedPref = SharedPref();
@@ -117,31 +116,29 @@ class _welcomeScreenState extends State<welcomeScreen> {
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: _isLoading
-        ? Center( // ✅ Ensures the loader is centered on the entire screen
-            child: LogoLoader(
-        size: 100.0, // Customize size
-       
-       
-      ),
-          )
-          :
-        ListView(
-          physics: AlwaysScrollableScrollPhysics(), // ✅ Ensures scrolling
-          padding: EdgeInsets.all(16),
-          children: [
-            SafeArea(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  SizedBox(
-                    height: 20,
-                  ),
-                  
-                      // buildShimmer(ShimmerType.fullScreen, 1)
-                       _buildMainContent(screenWidth),
-                ]))
-          ],
-        ),
+            ? Center(
+                // ✅ Ensures the loader is centered on the entire screen
+                child: LogoLoader(
+                  size: 80.0, // Customize size
+                ),
+              )
+            : ListView(
+                physics: AlwaysScrollableScrollPhysics(), // ✅ Ensures scrolling
+                padding: EdgeInsets.all(16),
+                children: [
+                  SafeArea(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                        SizedBox(
+                          height: 20,
+                        ),
+
+                        // buildShimmer(ShimmerType.fullScreen, 1)
+                        _buildMainContent(screenWidth),
+                      ]))
+                ],
+              ),
       ),
     );
   }

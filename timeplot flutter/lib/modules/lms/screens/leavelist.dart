@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:focusontime/screens/CommonShimmer.dart';
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/services/applyleaveservice.dart';
@@ -7,6 +6,7 @@ import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 
 final shareddata = SharedPref();
 
@@ -119,23 +119,9 @@ onRefresh: _refreshData,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                // Container(
-                //   padding: new EdgeInsets.all(10.0),
-                //   width: 500.0,
-                //   // height:20.0,
-                //   decoration: BoxDecoration(
-                //     color: AppColors.borderColor.withOpacity(0.1),                  
-                //   ),                
-                //   child: 
-                //   Text("Leave List :",
-                //       style: TextStyle(
-                //         color: AppColors.textColor,
-                //         fontSize: 20,
-                //         fontWeight: FontWeight.w500,
-                //       )),
-                // ),
-                _isLoading ? CommonShimmer(itemCount: _itemsLeave.length, )
-                :
+                         _isLoading
+           ?  _buildShimmerHeader():         
+             
                 Container(
             padding: EdgeInsets.all(10.0),
             width: 500.0,
@@ -168,8 +154,8 @@ onRefresh: _refreshData,
               ],
             ),
           ),
-           _isLoading
-           ? CommonShimmer(itemCount:_itemsLeave.length ):
+          _isLoading
+           ? _buildShimmerEffect():
                 SizedBox(
                     height: 700,
                     child: ListView.builder(
@@ -379,4 +365,99 @@ class LegendIndicator extends StatelessWidget {
       ],
     );
   }
+}
+
+// for shimmer header
+Widget _buildShimmerHeader() {
+  return Container(
+    padding: EdgeInsets.all(10.0),
+    width: double.infinity,  // Ensure it takes full screen width
+    decoration: BoxDecoration(
+      color: AppColors.borderColor.withOpacity(0.1),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Wrap Title in Expanded
+        Expanded(
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 20,
+              width: double.infinity, // Ensures flexible width
+              color: Colors.white,
+            ),
+          ),
+        ),
+
+        // Wrap Legend Indicators in Expanded/Flexible
+        Row(
+          mainAxisSize: MainAxisSize.min,  // Prevents taking extra space
+          children: List.generate(3, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 80, // Adjust width
+                  height: 20,
+                  color: Colors.white,
+                ),
+              ),
+            );
+          }),
+        ),
+      ],
+    ),
+  );
+}
+
+// for shimmer listview
+
+Widget _buildShimmerEffect() {
+  return ListView.builder(
+    shrinkWrap: true,
+    physics: NeverScrollableScrollPhysics(),
+    itemCount: _itemsLeave.isNotEmpty ? _itemsLeave.length : 5, // Dynamic itemCount
+    itemBuilder: (context, index) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: Colors.grey.withOpacity(0.5), width: 2.0),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          margin: EdgeInsets.all(3.0),
+          child: ListTile(
+            leading: _buildShimmerContainer(width: 40, height: 40, radius: 20),
+            title: _buildShimmerContainer(width: double.infinity, height: 12),
+            subtitle: _buildShimmerContainer(width: 150, height: 10, margin: EdgeInsets.only(top: 5)),
+            trailing: Wrap(
+              spacing: 8,
+              children: List.generate(3, (index) => _buildShimmerContainer(width: 30, height: 30, radius: 5)),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+// Reusable Shimmer Container Method
+Widget _buildShimmerContainer({double width = 50, double height = 10, double radius = 5, EdgeInsets? margin}) {
+  return Shimmer.fromColors(
+    baseColor: Colors.grey[300]!,
+    highlightColor: Colors.grey[100]!,
+    child: Container(
+      width: width,
+      height: height,
+      margin: margin,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    ),
+  );
 }

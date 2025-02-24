@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:focusontime/modules/lms/screens/applyleave.dart';
 import 'package:focusontime/modules/lms/screens/calender.dart';
-
 import 'package:focusontime/modules/lms/screens/login.dart';
 import 'package:focusontime/modules/lms/screens/myreport.dart';
-import 'package:focusontime/modules/lms/screens/reportscreen.dart';
 import 'package:focusontime/modules/lms/screens/teamreport.dart';
 import 'package:focusontime/modules/lms/screens/welcome.dart';
 import 'package:focusontime/screens/changepassword_modal.dart';
@@ -42,131 +40,66 @@ class _CommonAppBarState extends State<CommonAppBar> {
 
   @override
   Widget build(BuildContext context) {
-//     return AppBar(
-//       // centerTitle: true,
-//       title: Row(
-//         mainAxisSize: MainAxisSize.min, // To make the row size fit content
-//         mainAxisAlignment: MainAxisAlignment.start, 
-//         children: [
-//            Align(
-//       alignment: Alignment.centerLeft,
-//           // Image.asset(
-//           //   'images/focus_topnav.jpg',
-//           //   fit: BoxFit.fitHeight,
-//           //     height: 50,
-//           //   //  width: 100,
-//           // ),
-//           child: SizedBox(
-//   height: 50,
-//   child: Image.asset(
-//     'images/focus_topnav.jpg',
-//     fit: BoxFit.scaleDown, // Ensures the image scales down instead of stretching
-//   ),
-// ),
-//            ),
-//           SizedBox(width: 10),
-//           Expanded(
-//             child: Text(
-//               widget.title,
-//               style: TextStyle(
-//                 color: Colors.black,
-//                 fontWeight: FontWeight.w500,
-//               ),
-//             ),
-//           )
-//         ],
-//       ),
-//       backgroundColor:
-//           AppColors.backgroundColor, // Customize the background color
-//       elevation: 0, // Set to 0 if you don't want the default shadow
-//       bottom: PreferredSize(
-//         preferredSize: Size.fromHeight(1.0),
-//         child: Container(
-//           color: Colors.grey, // Border color
-//           height: 1.0,
-//         ),
-//       ),
-//       actions: [
-//         if (widget.showProfile)
-//           GestureDetector(
-//             onTap: () {
-//               Scaffold.of(context).openDrawer();
-//             },
-//             child: CircleAvatar(
-//               radius: 20,
-//               backgroundImage: AssetImage("images/image.jpeg"),
-//             ),
-//           ),
-//         PopupMenuButton<String>(
-//           onSelected: (String value) {
-//             // Handle menu item selection
-//             handlePopupMenuSelection(context, value, widget.menuItems);
-//           },
-//           itemBuilder: (BuildContext context) {
-//             return _buildMenuItems(context);
-//           },
-//         ),
-//       ],
-//     );
-return AppBar(
-  centerTitle: true,
-  title: Row(
-    // mainAxisSize: MainAxisSize.min,
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: [
-      SizedBox(
-        height: 50,
-        child: Image.asset(
-          'images/focus_topnav.jpg',
-          fit: BoxFit.scaleDown,
-        ),
-      ),
-      SizedBox(width: 10), // Reduced spacing
-      Flexible( // Prevents unnecessary expansion
-        child: Text(
-          widget.title,
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
+    return AppBar(
+      centerTitle: true,
+      title: Row(
+        // mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 50,
+            child: Image.asset(
+              'images/focus_topnav.jpg',
+              fit: BoxFit.scaleDown,
+            ),
           ),
-          overflow: TextOverflow.ellipsis, // Avoids text overflow
+          SizedBox(width: 10), // Reduced spacing
+          Flexible(
+            // Prevents unnecessary expansion
+            child: Text(
+              widget.title,
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis, // Avoids text overflow
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: AppColors.backgroundColor,
+      elevation: 0,
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(1.0),
+        child: Container(
+          color: Colors.grey,
+          height: 1.0,
         ),
       ),
-    ],
-  ),
-  backgroundColor: AppColors.backgroundColor,
-  elevation: 0,
-  bottom: PreferredSize(
-    preferredSize: Size.fromHeight(1.0),
-    child: Container(
-      color: Colors.grey,
-      height: 1.0,
-    ),
-  ),
-  actions: [
-    // if (widget.showProfile)
-    //   Padding(
-    //     padding: EdgeInsets.only(right: 3), // Reduced padding for tighter layout
-    //     child: GestureDetector(
-    //       onTap: () {
-    //         Scaffold.of(context).openDrawer();
-    //       },
-    //       child: CircleAvatar(
-    //         radius: 20,
-    //         backgroundImage: AssetImage("images/image.jpeg"),
-    //       ),
-    //     ),
-    //   ),
-    PopupMenuButton<String>(
-      onSelected: (String value) {
-        handlePopupMenuSelection(context, value, widget.menuItems);
-      },
-      itemBuilder: (BuildContext context) {
-        return _buildMenuItems(context);
-      },
-    ),
-  ],
-);
+      actions: [
+        // if (widget.showProfile)
+        //   Padding(
+        //     padding: EdgeInsets.only(right: 3), // Reduced padding for tighter layout
+        //     child: GestureDetector(
+        //       onTap: () {
+        //         Scaffold.of(context).openDrawer();
+        //       },
+        //       child: CircleAvatar(
+        //         radius: 20,
+        //         backgroundImage: AssetImage("images/image.jpeg"),
+        //       ),
+        //     ),
+        //   ),
+        PopupMenuButton<String>(
+          onSelected: (String value) {
+            handlePopupMenuSelection(context, value, widget.menuItems);
+          },
+          itemBuilder: (BuildContext context) {
+            return _buildMenuItems(context);
+          },
+        ),
+      ],
+    );
   }
 
   // Building the menu items with expanded submenu support
@@ -296,7 +229,6 @@ Future<void> handlePopupMenuSelection(BuildContext context, String menuItem,
     //           )));
     //   break;
 
-  
     default:
       print('Invalid selection');
   }
@@ -304,7 +236,6 @@ Future<void> handlePopupMenuSelection(BuildContext context, String menuItem,
 
 Future<void> handleSubmenuSelection(BuildContext context, String submenuItem,
     List<Map<String, dynamic>> resultMenu) async {
-    
   switch (submenuItem) {
     case 'Daily Log':
       print('Navigating to Welcome Screen');
@@ -333,7 +264,7 @@ Future<void> handleSubmenuSelection(BuildContext context, String submenuItem,
       break;
     case 'My Attendance Report':
       print('Navigating to ApplyLeave Screen');
-      
+
       Navigator.of(context).push(MaterialPageRoute(
           builder: (c) => MyReport(
                 resultMenu: resultMenu,
@@ -350,7 +281,6 @@ Future<void> handleSubmenuSelection(BuildContext context, String submenuItem,
       print('Invalid submenu selection');
   }
 }
-    
 
 // for Icon
 IconData getIconFromCssClass(String cssClassIcon) {
@@ -372,20 +302,6 @@ IconData getIconFromCssClass(String cssClassIcon) {
       return Icons.help; // Default icon if no match is found
   }
 }
-// snackbar
-// void showSnackbar(BuildContext context, String message, {bool isSuccess = true}) {
-//   final Color backgroundColor = isSuccess ? Colors.green : Colors.red;
-
-//   final snackbar = SnackBar(
-//     content: Text(message),
-//     backgroundColor: backgroundColor,
-//     duration: const Duration(seconds: 3),
-//   );
-
-//   ScaffoldMessenger.of(context).showSnackBar(snackbar);
-// }
-
-// for SnackBar
 
 void showSnackbar(
   BuildContext context,
@@ -498,33 +414,7 @@ class _buildDrawerState extends State<buildDrawer> {
                   ],
                 ),
                 SizedBox(height: 20),
-                // Row(
-                //   crossAxisAlignment: CrossAxisAlignment
-                //       .center, // Vertically center items in the row
-                //   children: [
-                //     InkWell(
-                //       onTap: () {
-                //         // Action when the lock icon is tapped
-                //        ForgetPasswordModal(context);
-                //         print('Lock Icon Tapped!');
 
-                //       },
-                //       child: Icon(
-                //         Icons.lock, // Lock icon
-                //         color: Colors.white,
-                //         size: 20, // Adjust size as needed
-                //       ),
-                //     ),
-                //     SizedBox(width: 10), // Space between icon and text
-                //     Text(
-                //       'ChangePassword', // Text next to the icon
-                //       style: TextStyle(
-                //         color: Colors.white,
-                //         fontSize: 18,
-                //       ),
-                //     ),
-                //   ],
-                // ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -556,17 +446,7 @@ class _buildDrawerState extends State<buildDrawer> {
               ],
             ),
           ),
-          // ListTile(
-          // title: Text('Name:${name ?? "Loading..."}  '),
-          // Uncomment and implement if needed
-          // onTap: () {
-          //   Navigator.pop(context);
-          //   Navigator.pushReplacement(
-          //     context,
-          //     MaterialPageRoute(builder: (context) => welcomeScreen()),
-          //   );
-          // },
-          // ),
+
           ListTile(
             title: Text('Employee Id: $empId'),
             onTap: () {},
@@ -584,27 +464,6 @@ class _buildDrawerState extends State<buildDrawer> {
             onTap: () {},
           ),
 
-          // ListTile(
-          //   title: Text('Email: ananthee89@gmail.com'),
-          //   onTap: () {},
-          // ),
-          // ListTile(
-          //   title: Text('Reporting To: Tamilselvan'),
-          //   onTap: () {},
-          // ),
-
-          //     ListTile(
-          //       title: Text('Logout'),
-          //       onTap: () async {
-
-          // prefs = await SharedPreferences.getInstance();
-          //         await prefs?.clear();
-          //         Navigator.of(context).pushAndRemoveUntil(
-          //             MaterialPageRoute(builder: (c) => LoginScreen()),
-          //             (route) => false);
-          //         print('Logging out');
-          //       },
-          //     ),
           ListTile(
             title: Align(
               alignment: Alignment.centerLeft, // Align as needed

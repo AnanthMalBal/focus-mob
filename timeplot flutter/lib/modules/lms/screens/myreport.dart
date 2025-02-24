@@ -6,6 +6,7 @@ import 'package:focusontime/services/reportservice.dart';
 import 'package:focusontime/services/sharedpreferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 final shareddata = SharedPref();
 SharedPreferences? prefs;
 
@@ -97,14 +98,16 @@ class _MyReportState extends State<MyReport> {
         child: _isLoading
              ? Center( // ✅ Ensures the loader is centered on the entire screen
               child: LogoLoader(
-          size: 100.0, // Customize size
+          size: 80.0, // Customize size
                  
                  
                 ),
              ) 
             : SingleChildScrollView(
                physics: AlwaysScrollableScrollPhysics(),
-               child: employeesById == null
+               child: _isLoading
+          ? LogoLoader(size: 80.0) 
+              : employeesById == null
                   ? Center(child: Center(
                  child: LogoLoader(
           size: 100.0, // Customize size
@@ -122,7 +125,7 @@ class _MyReportState extends State<MyReport> {
               crossAxisAlignment: CrossAxisAlignment.center, // ✅ Centers content horizontally
                     children: [
                       // Employee Pie Chart
-                      Text(
+                       Text(
                         "Employee Report: ${employeesById?['empId'] ?? 'Unknown'}",
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),

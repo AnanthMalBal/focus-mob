@@ -4,10 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
-import 'package:focusontime/screens/logo_loader.dart';
-
 import 'package:focusontime/services/loginservice.dart';
-import 'package:focusontime/services/notification_service.dart';
 
 
 List<dynamic> loginData = [];
@@ -23,25 +20,20 @@ class _LoginScreenState extends State<LoginScreen> {
   bool passToggle = true;
   var usernameController = TextEditingController();
   var passwordController = TextEditingController();
-   final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
-    super.initState();    
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      body: Stack(
-        children: 
-        [
-          SingleChildScrollView(
-          child: SafeArea(
-             child: Form(
-              key: _formKey,
-              
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Form(
+            key: _formKey,
             child: Column(
               children: [
                 Padding(padding: EdgeInsets.all(10)),
@@ -63,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(height: 10),
-        // Username Field
+                // Username Field
                 Padding(
                   padding: EdgeInsets.all(8),
                   child: TextFormField(
@@ -73,33 +65,38 @@ class _LoginScreenState extends State<LoginScreen> {
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey), // Normal border
+                        borderSide:
+                            BorderSide(color: Colors.grey), // Normal border
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey, width: 2), // Blue when focused
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red, width: 2), // Red on error
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red, width: 2), // Red when focused on error
-                        ),
+                        borderSide: BorderSide(
+                            color: Colors.grey, width: 2), // Blue when focused
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Colors.red, width: 2), // Red on error
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Colors.red,
+                            width: 2), // Red when focused on error
+                      ),
                       label: Text("User Name"),
                       prefixIcon: Icon(Icons.person),
                     ),
                     validator: (val) {
-                      if (val!.isEmpty 
-                      // ||
+                      if (val!.isEmpty
+                          // ||
                           // !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=/^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                              // .hasMatch(val)
-                              ) {
+                          // .hasMatch(val)
+                          ) {
                         return "Please enter your Name";
                       }
                       return null;
                     },
                   ),
                 ),
-                 // Password Field
+                // Password Field
                 Padding(
                     padding: EdgeInsets.all(8),
                     child: TextFormField(
@@ -109,11 +106,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
-                         enabledBorder: OutlineInputBorder(
+                        enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color:Colors.grey, width: 2),
+                          borderSide: BorderSide(color: Colors.grey, width: 2),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.red, width: 2),
@@ -159,22 +156,77 @@ class _LoginScreenState extends State<LoginScreen> {
                             backgroundColor: AppColors.primaryColor,
                             padding: const EdgeInsets.all(10),
                           ),
-                          onPressed: 
-                          () async {
-                            if (_formKey.currentState!.validate()){
-                              setState(() {
-                  _isLoading = true; // ✅ Set loader only when the button is pressed
-                });
-                            logincall(usernameController.text,
-                                passwordController.text, context);
-                            }
-                          },
-                          child: Text("Login",
-                              style: TextStyle(
-                                color: AppColors.backgroundColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              )),
+                          //           onPressed:
+                          //           () async {
+                          //             if (_formKey.currentState!.validate()){
+                          //               setState(() {
+                          //   _isLoading = true; // ✅ Set loader only when the button is pressed
+                          // });
+                          //             logincall(usernameController.text,
+                          //                 passwordController.text, context);
+                          //             }
+                          //           },
+                          onPressed: _isLoading
+                              ? null // ✅ Disable button while loading
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      _isLoading =
+                                          true; // ✅ Show loader inside button
+                                    });
+                                    // Simulate API call
+                                   String apiResponse = await logincall(
+                                      usernameController.text,
+                                      passwordController.text,
+                                      context,
+                                    );
+                                    // ✅ Parse response to check success/failure
+          bool isSuccess = apiResponse.contains("successfully");
+
+          if (!isSuccess) {
+            // If login fails, keep "Logging in..." for 2 more seconds
+            await Future.delayed(Duration(seconds: 2));
+          }
+
+                                    setState(() {
+                                      _isLoading =
+                                          false; // ✅ Hide loader after login completes
+                                    });
+                                  }
+                                },
+                          child: _isLoading
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 3,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        width:
+                                            10), // Space between loader and text
+                                    Text(
+                                      "Logging in...",
+                                      style: TextStyle(
+                                        color: AppColors.primaryColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Text("Login",
+                                  style: TextStyle(
+                                    color: AppColors.backgroundColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  )),
                         ))),
                 // SizedBox(height: 10),
                 // Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -188,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 //   ),
                 //   TextButton(
                 //       onPressed: () {
-        
+
                 //         // Navigator.push(
                 //         //     context,
                 //         //     MaterialPageRoute(
@@ -207,45 +259,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
           ),
-        ),),
-            // ✅ Full-Screen Loader (Keeps running if API is down)
-      if (_isLoading)
-        Positioned.fill(
-          child: Container(
-            color: Colors.black.withOpacity(0.5), // Semi-transparent background
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  LogoLoader(size: 100.0), // ✅ Loader
-                  // SizedBox(height: 20),
-                  // Text(
-                  //   "Connecting to server...",
-                  //   style: TextStyle(color: Colors.white, fontSize: 16),
-                  // ),
-                  // SizedBox(height: 20),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     setState(() {
-                  //       _isLoading = false; // ❌ Stop loader manually if needed
-                  //     });
-                  //   },
-                  //   child: Text("Cancel"),
-                  // ),
-                ],
-              ),
-            ),
-          ),
         ),
-      
-    ]  ),
+      ),
     );
   }
 
 // method for loginapi
-bool _isLoading = false; // Declare loading state
-  void logincall(String username, String password, BuildContext context) async {
-  
+  bool _isLoading = false; // Declare loading state
+ Future<String> logincall(String username, String password, BuildContext context) async {
     String result = await LoginService().login(username, password, context);
 
 // Decode the JSON response
@@ -268,8 +289,6 @@ bool _isLoading = false; // Declare loading state
 
     // Show Snackbar using SnackbarHelper
     showSnackbar(context, result, isSuccess: isSuccess);
-    setState(() {
-      _isLoading = false; // Hide loader after API response
-    });
+    return message;
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:focusontime/screens/CommonShimmer.dart';
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/screens/logo_loader.dart';
@@ -132,6 +131,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
         await timesheetservice.fetchTimesheet(date, context);
     // widget.date.toString().split(" ")[0]
     print("receiveddata:" + resultTimesheet.toString());
+    // ignore: unnecessary_null_comparison
     if (resultTimesheet != null && resultTimesheet.isNotEmpty) {
       setState(() {
         _itemTimesheet = resultTimesheet;
@@ -166,6 +166,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     // widget.date.toString().split(" ")[0]
     print("data:" + resultDailyLog.toString());
 
+    // ignore: unnecessary_null_comparison, unnecessary_type_check
     if (resultDailyLog != null && resultDailyLog is List) {
       setState(() {
         _itemDailyLog = List<Map<String, dynamic>>.from(resultDailyLog);
@@ -175,6 +176,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     }
 
 // Ensure _itemDailyLog is a list and iterate through it
+    // ignore: unnecessary_null_comparison, unnecessary_type_check
     if (_itemDailyLog != null && _itemDailyLog is List) {
       // Initialize variables for B and NBP minutes
       double totalBMinutes = 0.0;
@@ -243,73 +245,70 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   Widget build(BuildContext context) {
     // to display workinghours
     double? workingHoursDouble;
-    if (_itemTimeMarked != null && _itemTimeMarked!['workingHours'] is String) {
-      workingHoursDouble = double.tryParse(_itemTimeMarked!['workingHours']);
+    // ignore: unnecessary_null_comparison
+    if (_itemTimeMarked != null && _itemTimeMarked['workingHours'] is String) {
+      workingHoursDouble = double.tryParse(_itemTimeMarked['workingHours']);
     }
     double workingHoursInMinutes = (workingHoursDouble ?? 0) * 60;
-    double width = 200;
-    bool isAddButtonDisabled =
-        workingHoursInMinutes > 0 && totalTime >= workingHoursInMinutes;
+    // double width = 200;
+    // bool isAddButtonDisabled =
+    //     workingHoursInMinutes > 0 && totalTime >= workingHoursInMinutes;
     bool isSubmitButtonEnabled = totalTime >= workingHoursInMinutes;
 
     return Scaffold(
-        appBar: CommonAppBar(
-          menuItems: widget.resultMenu,
-          title: 'MyAttendance',
-          showProfile: true,
-        ),
-        body: RefreshIndicator(
-          onRefresh: _refreshData,
-          child: _isLoading
-           ? Center( // ✅ Ensures the loader is centered on the entire screen
-            child: LogoLoader(
-        size: 100.0, // Customize size
-       
-       
+      appBar: CommonAppBar(
+        menuItems: widget.resultMenu,
+        title: 'MyAttendance',
+        showProfile: true,
       ),
-           )
-           :SingleChildScrollView(
-            // ✅ Allows scrolling & prevents overflow
-            physics: AlwaysScrollableScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Form(
-                key: _formKey, // Assign Form Key
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                     
-                         _buildHeader(),
-                      SizedBox(height: 10),
-                       
-                      _buildProjectDropdown(),
-                      SizedBox(height: 10),
-                      _buildProcessDropdown(),
-                      SizedBox(height: 10),
-                      _buildTimePicker(),
-                      SizedBox(height: 10),
-                      _buildDescriptionField(),
-                      SizedBox(height: 10),
-                      _buildAddButton(),
-                      SizedBox(height: 10),
-                      _buildFilledTimeSheet(totalTime),
-                      SizedBox(height: 10),
-                      _buildProjectEntries(
-                        _itemDailyLog,
-                        deleteLogByAutoId, // Define your delete function as needed
-                      ),
-                      SizedBox(height: 10),
-                      _buildSubmitButton(
-                        isSubmitButtonEnabled,
-                        updateUserTimesheet, // Function to update timesheet
-                      )
-                    ]),
-                    
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: _isLoading
+            ? Center(
+                // ✅ Ensures the loader is centered on the entire screen
+                child: LogoLoader(
+                  size: 80.0, // Customize size
+                ),
+              )
+            : SingleChildScrollView(
+                // ✅ Allows scrolling & prevents overflow
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Form(
+                    key: _formKey, // Assign Form Key
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeader(),
+                          SizedBox(height: 10),
+                          _buildProjectDropdown(),
+                          SizedBox(height: 10),
+                          _buildProcessDropdown(),
+                          SizedBox(height: 10),
+                          _buildTimePicker(),
+                          SizedBox(height: 10),
+                          _buildDescriptionField(),
+                          SizedBox(height: 10),
+                          _buildAddButton(),
+                          SizedBox(height: 10),
+                          _buildFilledTimeSheet(totalTime),
+                          SizedBox(height: 10),
+                          _buildProjectEntries(
+                            _itemDailyLog,
+                            deleteLogByAutoId, // Define your delete function as needed
+                          ),
+                          SizedBox(height: 10),
+                          _buildSubmitButton(
+                            isSubmitButtonEnabled,
+                            updateUserTimesheet, // Function to update timesheet
+                          )
+                        ]),
+                  ),
                 ),
               ),
-            ),
-          ),
-        );
+      ),
+    );
   }
 
   // UI Components
@@ -351,7 +350,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                       ),
                     ),
                     Text(
-                      _itemTimeMarked?['workingHours'] ?? 'N/A',
+                      _itemTimeMarked['workingHours'] ?? 'N/A',
                       style: TextStyle(
                         color: AppColors.textColor,
                         fontSize: 15,
@@ -438,7 +437,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
         SizedBox(width: 5),
         Expanded(
           child: DropdownButtonFormField<String>(
-            hint: Text(_itemProject.isEmpty ? "No data available" :"Select"),
+            hint: Text(_itemProject.isEmpty ? "No data available" : "Select"),
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               enabledBorder: OutlineInputBorder(
@@ -480,7 +479,6 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     );
   }
 
-
   Widget _buildProcessDropdown() {
     return Row(
       children: [
@@ -496,7 +494,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
         SizedBox(width: 5),
         Expanded(
           child: DropdownButtonFormField<String>(
-            hint: Text(_itemProcess.isEmpty ? "Select":"Select"),
+            hint: Text(_itemProcess.isEmpty ? "Select" : "Select"),
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               enabledBorder: OutlineInputBorder(
@@ -517,33 +515,32 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
             ),
             autovalidateMode:
                 AutovalidateMode.onUserInteraction, // ✅ Moved here
-            value: _itemProcess.isEmpty ? null :newProcessData,
+            value: _itemProcess.isEmpty ? null : newProcessData,
             onChanged: _itemProcess.isEmpty
-              ? null // ❌ Disable dropdown if API fails
-              :
-            (String? value) {
-              setState(() {
-                newProcessData = value!;
-                print("Process selected: $newProcessData");
+                ? null // ❌ Disable dropdown if API fails
+                : (String? value) {
+                    setState(() {
+                      newProcessData = value!;
+                      print("Process selected: $newProcessData");
 
-                final selectedProcess = _itemProcess.firstWhere(
-                  (process) => process["processId"].toString() == value,
-                  orElse: () => {"billType": ""}, // Default if not found
-                );
+                      final selectedProcess = _itemProcess.firstWhere(
+                        (process) => process["processId"].toString() == value,
+                        orElse: () => {"billType": ""}, // Default if not found
+                      );
 
-                // Update the billTypeController based on the selected process
-                billTypeController.text = selectedProcess["billType"] ?? "";
-              });
-            },
+                      // Update the billTypeController based on the selected process
+                      billTypeController.text =
+                          selectedProcess["billType"] ?? "";
+                    });
+                  },
             items: _itemProcess.isEmpty
-              ? [] // ❌ Empty dropdown if no data
-              :
-            _itemProcess.map((value) {
-              return DropdownMenuItem<String>(
-                value: value['processId'].toString(),
-                child: Text(value['processName'].toString()),
-              );
-            }).toList(),
+                ? [] // ❌ Empty dropdown if no data
+                : _itemProcess.map((value) {
+                    return DropdownMenuItem<String>(
+                      value: value['processId'].toString(),
+                      child: Text(value['processName'].toString()),
+                    );
+                  }).toList(),
             validator: (value) =>
                 value == null ? 'Please select a process' : null,
           ),
@@ -681,6 +678,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   }
 
 // for ADD Button
+  bool _isAdding = false;
   Widget _buildAddButton() {
     return Padding(
       padding: EdgeInsets.all(5.0),
@@ -700,31 +698,68 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                   backgroundColor: AppColors.primaryColor,
                   padding: const EdgeInsets.all(10),
                 ),
-                onPressed: isAddButtonDisabled
+                onPressed: isAddButtonDisabled || _isAdding
                     ? null
-                    : () {
-                        // Validate the form before calling the add function
+                    : () async {
                         if (_formKey.currentState!.validate()) {
-                          
-                          addDailgLog(
-                            newProjectData,
-                            newProcessData!,
-                            timesheetId,
-                            actualTimeInMinutes,
-                            descriptionController.text,
-                            tsDate,
-                          );
-                         
+                          setState(() {
+                            _isAdding = true; // ✅ Start loader
+                          });
+                          // await Future.delayed(Duration(seconds: 2));
+                          try {
+                            bool isSuccess = await addDailgLog(
+                              newProjectData,
+                              newProcessData!,
+                              timesheetId,
+                              actualTimeInMinutes,
+                              descriptionController.text,
+                              tsDate,
+                            );
+                            if (!isSuccess) {
+                              // If API fails, keep "Adding..." visible for 2 more seconds
+                              await Future.delayed(Duration(seconds: 2));
+                            }
+                          } catch (e) {
+                            print("Error in addDailgLog: $e");
+                          }
+
+                          setState(() {
+                            _isAdding = false; // ✅ Stop loader
+                          });
                         }
                       },
-                child: Text(
-                  "ADD",
-                  style: TextStyle(
-                    color: AppColors.backgroundColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                child: _isAdding
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          ),
+                          SizedBox(width: 10), // Space between loader and text
+                          Text(
+                            "Adding...",
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        "ADD",
+                        style: TextStyle(
+                          color: AppColors.backgroundColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -732,6 +767,66 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
       ),
     );
   }
+  // Widget _buildAddButton() {
+  //   return Padding(
+  //     padding: EdgeInsets.all(5.0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Container(
+  //           padding: EdgeInsets.all(5.0),
+  //           decoration: BoxDecoration(
+  //             color: AppColors.backgroundColor,
+  //             borderRadius: BorderRadius.circular(15),
+  //           ),
+  //           child: SizedBox(
+  //             width: double.infinity,
+  //             child: ElevatedButton(
+  //               style: ElevatedButton.styleFrom(
+  //                 backgroundColor: AppColors.primaryColor,
+  //                 padding: const EdgeInsets.all(10),
+  //               ),
+  //               onPressed: isAddButtonDisabled || _isLoading
+  //                   ? null
+  //                   : () async {
+  //                       // Validate the form before calling the add function
+  //                       if (_formKey.currentState!.validate()) {
+  //                         setState(() {
+  //                             _isLoading = true; // Start loader
+  //                           });
+
+  //                         addDailgLog(
+  //                           newProjectData,
+  //                           newProcessData!,
+  //                           timesheetId,
+  //                           actualTimeInMinutes,
+  //                           descriptionController.text,
+  //                           tsDate,
+  //                         );
+  //                        setState(() {
+  //                             _isLoading = false; // Stop loader
+  //                           });
+
+  //                       }
+  //                     },
+
+  //               child: Text(
+  //                 "ADD",
+  //                 style: TextStyle(
+  //                   color: AppColors.backgroundColor,
+  //                   fontSize: 16,
+  //                   fontWeight: FontWeight.w500,
+  //                 ),
+  //               ),
+
+  //             ),
+
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
 //  for filledTimesheet
 
@@ -857,7 +952,41 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   }
 
 // for submit button
-  Widget _buildSubmitButton(bool isSubmitButtonEnabled, VoidCallback onSubmit) {
+
+  // Widget _buildSubmitButton(bool isSubmitButtonEnabled, VoidCallback onSubmit) {
+  //   return Padding(
+  //     padding: EdgeInsets.all(5.0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Container(
+  //           padding: EdgeInsets.all(5.0),
+  //           child: SizedBox(
+  //             width: double.infinity,
+  //             child: ElevatedButton(
+  //               style: ElevatedButton.styleFrom(
+  //                 backgroundColor: AppColors.primaryColor,
+  //                 padding: const EdgeInsets.all(10),
+  //               ),
+  //               onPressed: isSubmitButtonEnabled ? onSubmit : null,
+  //               child: Text(
+  //                 "SUBMIT",
+  //                 style: TextStyle(
+  //                   color: AppColors.backgroundColor,
+  //                   fontSize: 16,
+  //                   fontWeight: FontWeight.w500,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  bool _isSubmitting = false;
+  Widget _buildSubmitButton(bool isSubmitButtonEnabled, Future<bool> Function() onSubmit) {
     return Padding(
       padding: EdgeInsets.all(5.0),
       child: Column(
@@ -872,15 +1001,61 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                   backgroundColor: AppColors.primaryColor,
                   padding: const EdgeInsets.all(10),
                 ),
-                onPressed: isSubmitButtonEnabled ? onSubmit : null,
-                child: Text(
-                  "SUBMIT",
-                  style: TextStyle(
-                    color: AppColors.backgroundColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                onPressed: isSubmitButtonEnabled && !_isSubmitting
+                    ? () async {
+                        setState(() {
+                          _isSubmitting = true; // ✅ Start loader inside button
+                        });
+
+                         bool isSuccess = false;
+
+                        try {
+                         isSuccess= await onSubmit(); // Call the submit function
+                        } catch (e) {
+                          print("Error in onSubmit: $e");
+                        }
+                        if (!isSuccess) {
+                        // ❌ If API fails, keep "Submitting..." for 2 more seconds
+                        await Future.delayed(Duration(seconds: 2));
+                      }
+
+                        setState(() {
+                          _isSubmitting = false; // ✅ Stop loader inside button
+                        });
+                      }
+                    : null, // Disable button while submitting
+                child: _isSubmitting
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          ),
+                          SizedBox(width: 10), // Space between loader and text
+                          Text(
+                            "Submitting...",
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        "SUBMIT",
+                        style: TextStyle(
+                          color: AppColors.backgroundColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -891,7 +1066,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
 
 // method to add dailylog
   List<String> projectEntries = [];
-  void addDailgLog(String newProjectData, String newProcessData,
+  Future<bool> addDailgLog(String newProjectData, String newProcessData,
       String timesheetId, String time, String description, String date) async {
     await timesheetservice.userDailyLog(newProjectData, newProcessData,
         timesheetId, time, description, date, context);
@@ -899,7 +1074,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
     setState(() {
       // Safely parse workingHours to a double
       double? workingHoursDouble =
-          double.tryParse(_itemTimeMarked?['workingHours'] ?? '0');
+          double.tryParse(_itemTimeMarked['workingHours'] ?? '0');
       double workingHoursInMinutes = (workingHoursDouble ?? 0) * 60;
 
       print("Total Time: $totalTime");
@@ -925,13 +1100,15 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
         _formKey.currentState!.reset();
       }
     });
+    return true;
   }
 
 // method to updateUserTimesheet()
-  Future updateUserTimesheet() async {
+  Future <bool> updateUserTimesheet() async {
     print("timesheet");
     await timesheetservice.updateTimesheet(timesheetId, totalBMinutesInt,
         totalNBNPMinutesInt, totalNBPMinutesInt, context);
+        return true;
   }
 
 // method to deleteLogByAutoId

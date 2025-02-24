@@ -134,6 +134,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
     print('Leave Balance Count: ${leaveBalance['Count']}');
     print('Leave Balance Description: ${leaveBalance['Description']}');
 
+    // ignore: unnecessary_null_comparison
     if (leaveBalance != null) {
       setState(() {
         _itemsBalance = [
@@ -204,7 +205,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
               child: SafeArea(
                         child:  _isLoading
               ? LogoLoader(
-                size: 100.0, 
+                size: 80.0, 
               ) :
                         Column(
                          

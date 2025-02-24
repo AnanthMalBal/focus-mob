@@ -47,7 +47,7 @@ class _TeamReportState extends State<TeamReport> {
   @override
   void initState() {
     super.initState();
-   readReportJson();
+    readReportJson();
   }
 
   Future<void> _loadData() async {
@@ -98,10 +98,12 @@ class _TeamReportState extends State<TeamReport> {
         onRefresh: _refreshData,
         child: _isLoading
             ? Center(
-                child: LogoLoader(size: 100.0),
+                child: LogoLoader(size: 80.0),
               )
-            : (leaveData.isEmpty &&
-                    dailyLogEntryData.isEmpty) // ✅ Fixed condition
+            // ignore: unnecessary_null_comparison
+            : (leaveData == null || dailyLogEntryData == null) // ✅ Fixed condition
+                ?  Center(child: LogoLoader(size: 80.0))
+                : (leaveData!.isEmpty && dailyLogEntryData!.isEmpty)
                 ? Center(child: Text("No data available"))
                 : SingleChildScrollView(
                    physics: AlwaysScrollableScrollPhysics(),
