@@ -94,17 +94,26 @@ class _ApplyleaveState extends State<Applyleave> {
   }
 
   Future<void> _refreshData() async {
-    if (mounted) {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+      newLeaveType=null;
+      dateinputFrom.text = "";
+      dateinputTo.text = "";
+      reasoncontroller.text = "";
+      
+    });
+
+    await _loadData();
+     if (mounted) {
       setState(() {
-        _isLoading = true;
+        _isLoading = false; // ✅ Stop loading after data loads
       });
     }
-    await _loadData();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         appBar: CommonAppBar(
           menuItems: widget.resultMenu,
@@ -578,7 +587,8 @@ class _ApplyleaveState extends State<Applyleave> {
                                                 await Future.delayed(
                                                     Duration(seconds: 2));
 
-                                                bool success= await requestLeave(
+                                                bool success =
+                                                    await requestLeave(
                                                   newLeaveType,
                                                   dateinputFrom.text,
                                                   dateinputTo.text,
@@ -586,10 +596,13 @@ class _ApplyleaveState extends State<Applyleave> {
                                                   context,
                                                 );
                                                 if (!success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Failed to submit request")),
-                        );
-                      }
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                        content: Text(
+                                                            "Failed to submit request")),
+                                                  );
+                                                }
                                                 setState(() {
                                                   _isRequesting =
                                                       false; // Stop loader
@@ -615,8 +628,8 @@ class _ApplyleaveState extends State<Applyleave> {
                                                 Text(
                                                   "Requesting...",
                                                   style: TextStyle(
-                                                    color: AppColors
-                                                        .primaryColor,
+                                                    color:
+                                                        AppColors.primaryColor,
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w500,
                                                   ),
@@ -864,7 +877,7 @@ class _ApplyleaveState extends State<Applyleave> {
   }
 
 // method to request leave to api
- requestLeave(String symbol, String fromDate, String toDate, String reason,
+  requestLeave(String symbol, String fromDate, String toDate, String reason,
       context) async {
     var response = await applyleaveservice.applyLeave(
         symbol, fromDate, toDate, reason, context);

@@ -35,7 +35,7 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   final TimeSheetService timesheetservice = TimeSheetService();
 
   String? newProcessData;
-  var newProjectData;
+  String? newProjectData;
   var newTimesheetData;
   List<Map<String, dynamic>> _itemProject = [];
   // var _itemProcess = [];
@@ -233,12 +233,26 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   }
 
   Future<void> _refreshData() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+
+      newProjectData = null; // ✅ Reset Project Dropdown
+      newProcessData = null; // ✅ Reset Process Dropdown
+      descriptionController.text = "";
+      actualTimeController.text = "";
+      billTypeController.text = "";
+
+      _itemProcess.clear(); // ✅ Clear Process List
+    });
+
+    await _loadData();
     if (mounted) {
       setState(() {
-        _isLoading = true;
+        _isLoading = false; // ✅ Stop loading after data loads
       });
     }
-    await _loadData();
   }
 
   @override
@@ -462,6 +476,8 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
               setState(() {
                 newProjectData = value!;
                 print("Project selected: $newProjectData");
+                newProcessData = null; // ✅ Reset process when project changes
+                _itemProcess.clear(); // ✅ Clear process list
                 getprocess(newProjectData!);
               });
             },
@@ -708,14 +724,37 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                           // await Future.delayed(Duration(seconds: 2));
                           try {
                             bool isSuccess = await addDailgLog(
-                              newProjectData,
+                              newProjectData!,
                               newProcessData!,
                               timesheetId,
                               actualTimeInMinutes,
                               descriptionController.text,
                               tsDate,
                             );
-                            if (!isSuccess) {
+
+                            if (isSuccess) {
+                              await Future.delayed(Duration(
+                                  milliseconds: 100)); // Force UI update
+                              // ✅ Reset dropdowns & description if API call is successful
+                              setState(() {
+                                newProjectData = null;
+                                newProcessData = null;
+                                // ✅ Clear Related Lists
+                                _itemProcess.clear();
+
+                                descriptionController.text = "";
+                                billTypeController.clear();
+                                // ✅ Reset form validation state to remove red border
+                                // ✅ Reset form validation state to remove red border
+                                if (_formKey.currentState != null) {
+                                  _formKey.currentState!.reset();
+                                }
+
+                                print("Project reset: $newProjectData");
+                                print("Process reset: $newProcessData");
+                                print("Dropdowns should now be empty!");
+                              });
+                            } else {
                               // If API fails, keep "Adding..." visible for 2 more seconds
                               await Future.delayed(Duration(seconds: 2));
                             }
@@ -986,7 +1025,8 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   // }
 
   bool _isSubmitting = false;
-  Widget _buildSubmitButton(bool isSubmitButtonEnabled, Future<bool> Function() onSubmit) {
+  Widget _buildSubmitButton(
+      bool isSubmitButtonEnabled, Future<bool> Function() onSubmit) {
     return Padding(
       padding: EdgeInsets.all(5.0),
       child: Column(
@@ -1007,17 +1047,18 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
                           _isSubmitting = true; // ✅ Start loader inside button
                         });
 
-                         bool isSuccess = false;
+                        bool isSuccess = false;
 
                         try {
-                         isSuccess= await onSubmit(); // Call the submit function
+                          isSuccess =
+                              await onSubmit(); // Call the submit function
                         } catch (e) {
                           print("Error in onSubmit: $e");
                         }
                         if (!isSuccess) {
-                        // ❌ If API fails, keep "Submitting..." for 2 more seconds
-                        await Future.delayed(Duration(seconds: 2));
-                      }
+                          // ❌ If API fails, keep "Submitting..." for 2 more seconds
+                          await Future.delayed(Duration(seconds: 2));
+                        }
 
                         setState(() {
                           _isSubmitting = false; // ✅ Stop loader inside button
@@ -1092,8 +1133,19 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
       isSubmitButtonEnabled = (totalTime >= workingHoursInMinutes);
 
       // ✅ Clear input fields
+
+      _itemProcess.clear(); // Ensure Process dropdown resets
+
+      // ✅ Clear Text Fields
       actualTimeController.clear();
-      descriptionController.clear();
+      descriptionController.text = "";
+      billTypeController.clear();
+
+      // ✅ Debugging Logs
+
+      print("✅ Project reset: $newProjectData");
+      print("✅ Process reset: $newProcessData");
+      print("✅ Dropdowns should now be empty!");
 
       // ✅ Reset form validation to remove error messages
       if (_formKey.currentState != null) {
@@ -1104,11 +1156,11 @@ class _FillTimeSheetState extends State<FillTimeSheet> {
   }
 
 // method to updateUserTimesheet()
-  Future <bool> updateUserTimesheet() async {
+  Future<bool> updateUserTimesheet() async {
     print("timesheet");
     await timesheetservice.updateTimesheet(timesheetId, totalBMinutesInt,
         totalNBNPMinutesInt, totalNBPMinutesInt, context);
-        return true;
+    return true;
   }
 
 // method to deleteLogByAutoId
