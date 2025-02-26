@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:focusontime/l10n/app_localizations.dart';
 import 'package:focusontime/modules/lms/screens/calender.dart';
 import 'package:focusontime/modules/ticketing/screens/ticket.dart';
 
@@ -98,6 +99,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appLoc = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     //  final screenHeight = MediaQuery.of(context).size.height;
 
@@ -145,6 +147,7 @@ class _welcomeScreenState extends State<welcomeScreen> {
 
   // ✅ Main Content (After Loading)
   Widget _buildMainContent(double screenWidth) {
+    final appLoc = AppLocalizations.of(context)!; // Access translations
     return Column(
       children: [
         Row(
@@ -157,8 +160,9 @@ class _welcomeScreenState extends State<welcomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 padding: EdgeInsets.all(5.0),
-                child: Text(
-                  "Mark Attendance",
+                child: Text(appLoc.mark_attendance,
+                  // "Mark Attendance",
+
                   style: TextStyle(
                     color: AppColors.textColor,
                     fontSize: screenWidth < 400 ? 14 : 16,
@@ -168,6 +172,29 @@ class _welcomeScreenState extends State<welcomeScreen> {
                 ),
               ),
             ),
+            // Expanded(
+            //   child: Padding(
+            //     padding: EdgeInsets.all(10),
+            //     child: Container(
+            //       decoration: BoxDecoration(
+            //         color: AppColors.backgroundColor.withOpacity(1),
+            //         borderRadius: BorderRadius.circular(10),
+            //       ),
+            //       padding: EdgeInsets.all(5.0),
+            //       child: Text(
+            //         appLoc.mark_attendance,
+            //         style: TextStyle(
+            //           color: AppColors.textColor,
+            //           fontSize: screenWidth < 400 ? 14 : 16,
+            //           fontWeight: FontWeight.w500,
+            //         ),
+            //         maxLines: 2,
+            //         softWrap: true,
+            //         overflow: TextOverflow.visible,
+            //       ),
+            //     ),
+            //   ),
+            // ),
             Wrap(
               spacing: 5.0,
               children: [
@@ -178,19 +205,20 @@ class _welcomeScreenState extends State<welcomeScreen> {
             ),
           ],
         ),
-        SizedBox(height: 60),
+         SizedBox(height: 60),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
           children: <Widget>[
-            Padding(padding: EdgeInsets.all(40)),
-            _buildButton("LMS", () {
+            // Padding(padding: EdgeInsets.all(10)),
+            _buildButton(appLoc.lms, () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
                           CalenderScreen(resultMenu: widget.resultMenu)));
             }),
-            SizedBox(width: 60),
-            _buildButton("Ticket", () {
+            // SizedBox(width: 60),
+            _buildButton(appLoc.ticket, () {
               Navigator.push(
                   context,
                   MaterialPageRoute(

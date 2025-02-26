@@ -1,0 +1,11 @@
+{
+  "login": "Login",
+  "welcome": "Welcome!",
+  "email": "Email",
+  "username": "User Name",
+  "password": "Password",
+  "dashboard": "Dashboard",
+  "mark_attendance": "Mark Attendance",
+  "lms": "LMS",
+  "ticket": "Ticket"
+}

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:focusontime/modules/lms/screens/applyleave.dart';
 import 'package:focusontime/modules/lms/screens/calender.dart';
@@ -5,9 +6,11 @@ import 'package:focusontime/modules/lms/screens/login.dart';
 import 'package:focusontime/modules/lms/screens/myreport.dart';
 import 'package:focusontime/modules/lms/screens/teamreport.dart';
 import 'package:focusontime/modules/lms/screens/welcome.dart';
+import 'package:focusontime/provider/locale_provider.dart';
 import 'package:focusontime/screens/changepassword_modal.dart';
 import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/services/sharedpreferences.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final shareddata = SharedPref();
@@ -364,6 +367,7 @@ class _buildDrawerState extends State<buildDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final localeProvider = Provider.of<LocaleProvider>(context);
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -462,6 +466,35 @@ class _buildDrawerState extends State<buildDrawer> {
           ListTile(
             title: Text('Email Id: ${emailId ?? "Loading..."}  '),
             onTap: () {},
+          ),
+
+          // Divider(),
+// Language Toggle Inside Drawer (Smaller)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                vertical: 10, horizontal: 16), // Add left padding
+            child: Align(
+              alignment: Alignment.centerLeft, // Align to the left
+              child: SizedBox(
+                width: 150, // Keep it small
+                child: CupertinoSlidingSegmentedControl<String>(
+                  groupValue: localeProvider.locale.languageCode,
+                  onValueChanged: (String? value) {
+                    if (value != null) {
+                      localeProvider.setLocale(Locale(value));
+                    }
+                  },
+                  children: const {
+                    'en': Padding(
+                        padding: EdgeInsets.all(4),
+                        child: Text('EN', style: TextStyle(fontSize: 14))),
+                    'ta': Padding(
+                        padding: EdgeInsets.all(4),
+                        child: Text('தமிழ்', style: TextStyle(fontSize: 14))),
+                  },
+                ),
+              ),
+            ),
           ),
 
           ListTile(

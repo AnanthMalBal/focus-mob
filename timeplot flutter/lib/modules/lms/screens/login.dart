@@ -2,14 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:focusontime/l10n/app_localizations.dart';
+import 'package:focusontime/provider/locale_provider.dart';
 import 'package:focusontime/screens/appbar.dart';
 import 'package:focusontime/screens/colors.dart';
 import 'package:focusontime/services/loginservice.dart';
+import 'package:provider/provider.dart';
 
 List<dynamic> loginData = [];
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key,});
+   
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -52,7 +56,31 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appLoc = AppLocalizations.of(context)!; // Access translations
+    final localeProvider = Provider.of<LocaleProvider>(context);
+    String selectedLanguage = localeProvider.locale.languageCode;
     return Scaffold(
+      // appBar: AppBar(
+      //   // title: Text(appLoc.login),
+      //   actions: [
+      //     // Language Toggle
+      //     Padding(
+      //       padding: const EdgeInsets.symmetric(horizontal: 10),
+      //       child: CupertinoSlidingSegmentedControl<String>(
+      //         groupValue: selectedLanguage,
+      //         onValueChanged: (String? value) {
+      //           if (value != null) {
+      //             localeProvider.setLocale(Locale(value));
+      //           }
+      //         },
+      //         children: const {
+      //           'en': Padding(padding: EdgeInsets.all(8), child: Text('EN')),
+      //           'ta': Padding(padding: EdgeInsets.all(8), child: Text('தமிழ்')),
+      //         },
+      //       ),
+      //     ),
+      //   ],
+      // ),
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: SingleChildScrollView(
@@ -108,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.red,
                               width: 2), // Red when focused on error
                         ),
-                        label: Text("User Name"),
+                        label: Text(appLoc.username),
                         prefixIcon: Icon(Icons.person),
                       ),
                       validator: (val) {
@@ -146,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           focusedErrorBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.red, width: 2),
                           ),
-                          label: Text("Password"),
+                          label: Text(appLoc.password),
                           prefixIcon: Icon(Icons.lock),
                           suffixIcon: InkWell(
                             onTap: () {
@@ -251,7 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     ],
                                   )
-                                : Text("Login",
+                                : Text(appLoc.login,
                                     style: TextStyle(
                                       color: AppColors.backgroundColor,
                                       fontSize: 16,

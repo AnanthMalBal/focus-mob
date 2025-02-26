@@ -1,11 +1,16 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:focusontime/l10n/app_localizations.dart';
 
 import 'package:focusontime/modules/lms/screens/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:focusontime/provider/locale_provider.dart';
 
 import 'package:focusontime/services/notification_service.dart';
+import 'package:provider/provider.dart';
+
 
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -41,13 +46,11 @@ Future<void> main() async {
   // Load environment variables from the appropriate .env file
   await dotenv.load(fileName: ".env");
   runApp(
-// MultiProvider(
-//       providers: [
-//         ChangeNotifierProvider(create: (_) => LoadingProvider()),
-//       ],
-//       child: MyApp(),
-// )
-   const MyApp()
+ChangeNotifierProvider(
+      create: (_) => LocaleProvider(), // Provide LocaleProvider globally
+      child: const MyApp(),
+    ),
+  //  const MyApp()
   );
   
 }
@@ -59,16 +62,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     final localeProvider = Provider.of<LocaleProvider>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      //  theme: ThemeData.light(useMaterial3: true),
+       locale: localeProvider.locale, // Use locale from provider
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
        home: LoginScreen(),
-      // home: Stack(
-      //   children: [
-      //     LoginScreen(),
-      //     GlobalLoader(), // This keeps the loader available in the whole app
-      //   ],
-      // ),
       
       // routes: {
       //   '/': (context) =>  welcomeScreen(),
@@ -78,4 +83,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
 
