@@ -21,12 +21,16 @@ class MyReport extends StatefulWidget {
 }
 
 class _MyReportState extends State<MyReport> {
-  Map<String, dynamic>? employeesById;
+  List<Map<String, dynamic>> myLeaveReport=[];
+  List<Map<String, dynamic>> myDailyLogReport=[];
   final ReportService reportservice = ReportService();
   String? empId;
   bool _isLoading = true;
   DateTime? startDate;
   DateTime? endDate;
+  List<String>?  roles;
+  String employee ="";
+  String? empType ;
 
   @override
   void initState() {
@@ -34,63 +38,111 @@ class _MyReportState extends State<MyReport> {
     transferdata();
   }
 
-  void transferdata() async {
-    setState(() {
-      _isLoading = true; // Start loading
-    });
-    final empData = await shareddata.getpatdata();
-    setState(() {
-      empId = empData.userId;
-      print("idreport: " + empId.toString());
-    });
-    fetchEmployeesById(empId);
-    setState(() {
-      _isLoading = false; // Stop loading after fetching data
-    });
-  }
+
+
+// fetch Data from local sharedpreferences
+void transferdata() async {
+  setState(() {
+    _isLoading = true;
+  });
+
+  final empData = await shareddata.getpatdata();
+
+  setState(() {
+    empId = empData.userId;
+    roles = empData.roles;
+
+    print("idreport: $empId");
+    print("idreportroles: $roles");
+
+    String employee = (roles != null && roles!.length > 1) ? roles![0] : "";
+
+    print("Employee: $employee");
+
+    empType = (employee == "Employee") ? "emp" : (employee.isNotEmpty ? employee : "Default");
+
+    print("empType: $empType");
+  });
+
+  setState(() {
+    _isLoading = false;
+  });
+}
 
 // method fetch from api by employeeId
-  Future<void> fetchEmployeesById(String? empId) async {
-    if (empId == null) return;
-    print("Fetching report for empId: $empId");
+  // Future<void> fetchEmployeesById(String? empId) async {
+  //   if (empId == null) return;
+  //   print("Fetching report for empId: $empId");
 
-    try {
-      Map<String, dynamic>? data = await reportservice.fetchReportById(empId);
-      setState(() {
-        employeesById = data;
-      });
-      print("employeesById: $employeesById");
-    } catch (e) {
-      print("Error fetching employees: $e");
-    }
+  //   try {
+  //     Map<String, dynamic>? data = await reportservice.fetchReportById(empId);
+  //     setState(() {
+  //       employeesById = data;
+  //     });
+  //     print("employeesById: $employeesById");
+  //   } catch (e) {
+  //     print("Error fetching employees: $e");
+  //   }
+  // }
+
+
+//  method to fetch from api
+  Future<void> fetchMyReport(String? empType,String? startDate, String? endDate) async {
+   print("date:$empType,$startDate,$endDate");
+  List<Map<String, dynamic>> employees = await reportservice.myLeaveReport(empType,startDate,endDate);
+  List<Map<String, dynamic>> employeesDailyLog = await reportservice.myDailyLogReport(empType,startDate,endDate);
+   setState(() {
+    myLeaveReport = employees; // Store data in state
+    myDailyLogReport = employeesDailyLog;
+  });
+ print("✅ Employee Report Fetched: ${myLeaveReport} records");
+ print("✅ Employee Report Fetched: ${myDailyLogReport} records");
   }
 
-  // for datepicker
+
+// method for date picker
+
   Future<void> _pickDateRange(BuildContext context) async {
-    final DateTimeRange? picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      initialDateRange: startDate != null && endDate != null
-          ? DateTimeRange(start: startDate!, end: endDate!)
-          : null,
-    );
+  print("DEBUG: _pickDateRange() called");
 
-    if (picked != null) {
-      setState(() {
-        startDate = picked.start;
-        endDate = picked.end;
-        _isLoading = true; // Show loading when fetching new data
-      });
-      print("startDate:$startDate, endDate:$endDate");
-       if (empId != null) {
-      await fetchEmployeesById(empId!); // ✅ Wait until data is fetched
-    }
-    setState(() {
-      _isLoading = false; // ✅ Stop loading after fetching data
-    });
-    }
+  final DateTimeRange? picked = await showDateRangePicker(
+    context: context,
+    firstDate: DateTime(2000),
+    lastDate: DateTime(2100),
+    initialDateRange: startDate != null && endDate != null
+        ? DateTimeRange(start: startDate!, end: endDate!)
+        : null,
+  );
+
+  if (picked == null) {
+    print("DEBUG: No date range was selected.");
+    return;
   }
+
+  setState(() {
+    startDate = picked.start;
+    endDate = picked.end;
+    // _isLoading = true;
+  });
+
+  print("DEBUG: Dates selected - startDate: $startDate, endDate: $endDate");
+
+  try {
+    String formattedStartDate = DateFormat('yyyy-MM-dd').format(startDate!);
+    String formattedEndDate = DateFormat('yyyy-MM-dd').format(endDate!);
+
+    print("Formatted startDate: $formattedStartDate, Formatted endDate: $formattedEndDate");
+
+    await fetchMyReport(empType, formattedStartDate, formattedEndDate);
+   
+  } catch (e) {
+    print("ERROR: $e");
+  }
+
+  setState(() {
+    // _isLoading = false;
+  });
+}
 
 
 
@@ -109,6 +161,8 @@ class _MyReportState extends State<MyReport> {
     if (mounted) {
       setState(() {
         _isLoading = true;
+        myLeaveReport.clear();
+    myDailyLogReport.clear();
       });
     }
     await _loadData();
@@ -117,158 +171,187 @@ class _MyReportState extends State<MyReport> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: CommonAppBar(
-          menuItems: widget.resultMenu,
-          title: "MyReport",
-          showProfile: true,
-          // showProfile: true,
-          // // onProfileTap: () {
-          // //   print('Profile tapped!');
-
-          // },
-        ),
-        body: RefreshIndicator(
-          onRefresh: _refreshData,
-          child: _isLoading
+      appBar: CommonAppBar(
+        menuItems: widget.resultMenu,
+        title: 'MyReport',
+        showProfile: true,
+      ),
+      body: RefreshIndicator(
+        onRefresh: _refreshData, 
+       
+        child: _isLoading
               ? Center(
-                  // ✅ Ensures the loader is centered on the entire screen
-                  child: LogoLoader(
-                    size: 80.0, // Customize size
-                  ),
+                  child: LogoLoader(size: 80.0), // ✅ Your custom loading widget
                 )
-              : SingleChildScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
-                  child: _isLoading
-                      ? LogoLoader(size: 80.0)
-                      : employeesById == null
-                          ? Center(
-                              child: Center(
-                              child: LogoLoader(
-                                size: 100.0, // Customize size
-                              ),
-                            ))
-                          // Text("No data available"))
-                          : Column(children: [
-                              // Date Range Picker Button (Aligned to Right)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 10.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .end, // ✅ Aligns button to the right
-                                  children: [
-                                    ElevatedButton.icon(
-                                      onPressed: () => _pickDateRange(context),
-                                      icon: const Icon(Icons.date_range),
-                                      label: const Text("Pick Date Range"),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.primaryColor,
-                                        foregroundColor: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // for piechart
-                              Container(
-                                //  height: MediaQuery.of(context).size.height, // ✅ Make it full screen
-                                padding: EdgeInsets.only(
-                                    top: 50), // ✅ Added space at the top
-                                child: Column(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .center, // ✅ Centers content vertically
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .center, // ✅ Centers content horizontally
-                                    children: [
-                                      // Employee Pie Chart
-                                      Text(
-                                        "Employee Report: ${employeesById?['empId'] ?? 'Unknown'}",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(height: 10),
-                                      // 🎨 Color Explanation for Employee Pie Chart
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          LegendIndicator(
-                                              color: Colors.blue,
-                                              text: "Leave"),
-                                          SizedBox(width: 10),
-                                          LegendIndicator(
-                                              color: Colors.green,
-                                              text: "Days Present"),
-                                          SizedBox(width: 10),
-                                          LegendIndicator(
-                                              color: Colors.orange,
-                                              text: "Holidays"),
-                                        ],
-                                      ),
-                                      SizedBox(height: 20),
-                                      SizedBox(
-                                          height: 300,
-                                          child:
-                                              EmployeePieChart(employeesById!)),
-                                    ]),
-                              )
-                            ])),
-        ));
-  }
-}
-
-// PieChart  employeeId Leave Report Chart (Leave Taken, Days Present, Holidays)
-
-class EmployeePieChart extends StatelessWidget {
-  final Map<String, dynamic> employeeData;
-
-  EmployeePieChart(this.employeeData);
-
-  @override
-  Widget build(BuildContext context) {
-    return PieChart(
-      PieChartData(
-        sections: [
-          PieChartSectionData(
-            value: (employeeData["leave"] ?? 0).toDouble(),
-            color: Colors.blue,
-            // title: 'Leave (${employeeData["leave"]})',
-            radius: 50,
-            titleStyle: TextStyle(
-                fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+              :
+        SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              // datePicker
+              Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => _pickDateRange(context),
+                      icon: const Icon(Icons.date_range),
+                      label: const Text("Pick Date Range"),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+              /// ✅ Show Loader while Data is Loading
+          // _isLoading
+          //     ? Center(
+          //         child: LogoLoader(size: 80.0), // ✅ Your custom loading widget
+          //       )
+          //     :
+              myLeaveReport.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Employee Attendance Report: ${myLeaveReport[0]['empId'] ?? 'Unknown'}",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 10),
+                          // ✅ Legend Indicators Below Pie Chart
+                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              LegendIndicator(color: Colors.blue, text: "Leave"),
+                              SizedBox(width: 10),
+                              LegendIndicator(color: Colors.green, text: "Present Days"),
+                              SizedBox(width: 10),
+                              LegendIndicator(color: Colors.orange, text: "Holidays"),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          PieChartWidget(myLeaveReport),
+                          SizedBox(height: 10),
+                          Text(
+                            "Employee Daily Log Report: ${myLeaveReport[0]['empId'] ?? 'Unknown'}",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 10),
+                           DailyLogPieChart(myDailyLogReport),
+                          
+                        ],
+                      ),
+                    )
+                  : Text("No employee data found.", style: TextStyle(fontSize: 16)),
+            ],
           ),
-          PieChartSectionData(
-            value: (employeeData["daysPresent"] ?? 0).toDouble(),
-            color: Colors.green,
-            // title: 'Days Present (${employeeData["daysPresent"]})',
-            radius: 50,
-            titleStyle: TextStyle(
-                fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          PieChartSectionData(
-            value: (employeeData["holiday"] ?? 0).toDouble(),
-            color: Colors.orange,
-            // title: 'Holidays (${employeeData["holiday"]})',
-            radius: 50,
-            titleStyle: TextStyle(
-                fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        ],
-        borderData: FlBorderData(show: false),
-        sectionsSpace: 4, // Space between sections
-        centerSpaceRadius: 30, // Empty space in the center
+        ),
       ),
     );
   }
 }
 
+// PieChart  employeeId Leave Report Chart (Leave Taken, Days Present, Holidays)
+
+// class EmployeePieChart extends StatelessWidget {
+//   final Map<String, dynamic> employeeData;
+
+//   EmployeePieChart(this.employeeData);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return PieChart(
+//       PieChartData(
+//         sections: [
+//           PieChartSectionData(
+//             value: (employeeData["leave"] ?? 0).toDouble(),
+//             color: Colors.blue,
+//             // title: 'Leave (${employeeData["leave"]})',
+//             radius: 50,
+//             titleStyle: TextStyle(
+//                 fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+//           ),
+//           PieChartSectionData(
+//             value: (employeeData["daysPresent"] ?? 0).toDouble(),
+//             color: Colors.green,
+//             // title: 'Days Present (${employeeData["daysPresent"]})',
+//             radius: 50,
+//             titleStyle: TextStyle(
+//                 fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+//           ),
+//           PieChartSectionData(
+//             value: (employeeData["holiday"] ?? 0).toDouble(),
+//             color: Colors.orange,
+//             // title: 'Holidays (${employeeData["holiday"]})',
+//             radius: 50,
+//             titleStyle: TextStyle(
+//                 fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+//           ),
+//         ],
+//         borderData: FlBorderData(show: false),
+//         sectionsSpace: 4, // Space between sections
+//         centerSpaceRadius: 30, // Empty space in the center
+//       ),
+//     );
+//   }
+// }
+
+// ✅ Pie Chart Widget for Leave
+class PieChartWidget extends StatelessWidget {
+  final List<Map<String, dynamic>> employees;
+
+  PieChartWidget(this.employees);
+
+  @override
+  Widget build(BuildContext context) {
+    if (employees.isEmpty) {
+      return Center(child: Text("No data available"));
+    }
+
+    var empData = employees[0];
+    int leaveDays = empData['leaveDays'] ?? 0;
+    int presentDays = empData['presentDays'] ?? 0;
+    int holidays = empData['holiday'] ?? 0;
+
+    return SizedBox(
+      height: 200,
+      child: PieChart(
+        PieChartData(
+          sections: [
+            PieChartSectionData(
+              value: leaveDays.toDouble(),
+              color: Colors.blue,
+              title: '$leaveDays',
+              titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            PieChartSectionData(
+              value: presentDays.toDouble(),
+              color: Colors.green,
+              title: '$presentDays',
+              titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            PieChartSectionData(
+              value: holidays.toDouble(),
+              color: Colors.orange,
+              title: '$holidays',
+              titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ],
+          sectionsSpace: 2, // Spacing between sections
+          centerSpaceRadius: 40, // Adjust to fit labels inside
+        ),
+      ),
+    );
+  }
+}
+
+// // ✅ Legend Indicator Widget for Leave
 class LegendIndicator extends StatelessWidget {
   final Color color;
   final String text;
 
-  LegendIndicator({required this.color, required this.text});
+  const LegendIndicator({Key? key, required this.color, required this.text}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -277,13 +360,134 @@ class LegendIndicator extends StatelessWidget {
         Container(
           width: 12,
           height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        SizedBox(width: 6),
+        Text(text, style: TextStyle(fontSize: 14)),
+      ],
+    );
+  }
+}
+
+// ✅ Pie Chart Widget for DailyLog
+class DailyLogPieChart extends StatelessWidget {
+  final List<Map<String, dynamic>> myDailyLogReport;
+
+  DailyLogPieChart(this.myDailyLogReport);
+
+  @override
+  Widget build(BuildContext context) {
+    if (myDailyLogReport.isEmpty) {
+      return Center(child: Text("No Data Available"));
+    }
+
+    /// Get First Employee Data (If list has multiple employees, you can loop)
+    final employeeData = myDailyLogReport[0];
+
+    int leaveDays = employeeData['leaveDays'] ?? 0;
+    int presentDays = employeeData['presentDays'] ?? 0;
+    int holidays = employeeData['holiday'] ?? 0;
+    int missedDays = employeeData['missedDays'] ?? 0;
+    int dailyLogEntry = employeeData['dailylogEntry'] ?? 0;
+
+    return Column(
+      children: [
+        /// **Legend for the Pie Chart (Two Rows)**
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  LegendIndicator(color: Colors.blue, text: "Leave"),
+                  SizedBox(width: 10),
+                  LegendIndicator(color: Colors.green, text: "Present"),
+                  SizedBox(width: 10),
+                  LegendIndicator(color: Colors.orange, text: "Holidays"),
+                ],
+              ),
+              SizedBox(height: 5),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  LegendIndicator(color: Colors.red, text: "Missed Days"),
+                  SizedBox(width: 10),
+                  LegendIndicator(color: Colors.purple, text: "Daily Log"),
+                ],
+              ),
+            ],
           ),
         ),
-        SizedBox(width: 5),
-        Text(text, style: TextStyle(fontSize: 14)),
+
+        /// **Pie Chart**
+        SizedBox(
+          height: 250,
+          child: PieChart(
+            PieChartData(
+              sections: [
+                PieChartSectionData(
+                  value: leaveDays.toDouble(),
+                  color: Colors.blue,
+                  title: '$leaveDays',
+                  titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                PieChartSectionData(
+                  value: presentDays.toDouble(),
+                  color: Colors.green,
+                  title: '$presentDays',
+                  titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                PieChartSectionData(
+                  value: holidays.toDouble(),
+                  color: Colors.orange,
+                  title: '$holidays',
+                  titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                PieChartSectionData(
+                  value: missedDays.toDouble(),
+                  color: Colors.red,
+                  title: '$missedDays',
+                  titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                PieChartSectionData(
+                  value: dailyLogEntry.toDouble(),
+                  color: Colors.purple,
+                  title: '$dailyLogEntry',
+                  titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ],
+              sectionsSpace: 2,
+              centerSpaceRadius: 40,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+
+/// **Legend Indicator Widget** for DailyLog
+class LegendIndicatorDailyLog extends StatelessWidget {
+  final Color color;
+  final String text;
+
+  LegendIndicatorDailyLog({required this.color, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        SizedBox(width: 6),
+        Text(text, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
       ],
     );
   }
