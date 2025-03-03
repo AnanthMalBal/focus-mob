@@ -35,6 +35,7 @@ class _MyReportState extends State<MyReport> {
   @override
   void initState() {
     super.initState();
+    
     transferdata();
   }
 
@@ -62,6 +63,7 @@ void transferdata() async {
     empType = (employee == "Employee") ? "emp" : (employee.isNotEmpty ? employee : "Default");
 
     print("empType: $empType");
+    main();
   });
 
   setState(() {
@@ -84,7 +86,18 @@ void transferdata() async {
   //     print("Error fetching employees: $e");
   //   }
   // }
+// method for currentDate and 1week from currentDate
+Future<void> main() async {
+  DateTime currentDate = DateTime.now();
+  DateTime oneWeekLater = currentDate.add(Duration(days: 7));
 
+  String formattedCurrentDate = DateFormat('yyyy-MM-dd').format(currentDate);
+  String formattedOneWeekLater = DateFormat('yyyy-MM-dd').format(oneWeekLater);
+   await fetchMyReport(empType, formattedCurrentDate, formattedOneWeekLater);
+
+  print("Current Date: $formattedCurrentDate");
+  print("One Week Later: $formattedOneWeekLater");
+}
 
 //  method to fetch from api
   Future<void> fetchMyReport(String? empType,String? startDate, String? endDate) async {
@@ -161,8 +174,8 @@ void transferdata() async {
     if (mounted) {
       setState(() {
         _isLoading = true;
-        myLeaveReport.clear();
-    myDailyLogReport.clear();
+    //     myLeaveReport.clear();
+    // myDailyLogReport.clear();
       });
     }
     await _loadData();

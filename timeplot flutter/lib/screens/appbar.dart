@@ -487,7 +487,7 @@ class _buildDrawerState extends State<buildDrawer> {
                   children: const {
                     'en': Padding(
                         padding: EdgeInsets.all(4),
-                        child: Text('EN', style: TextStyle(fontSize: 14))),
+                        child: Text('ENG', style: TextStyle(fontSize: 14))),
                     'ta': Padding(
                         padding: EdgeInsets.all(4),
                         child: Text('தமிழ்', style: TextStyle(fontSize: 14))),

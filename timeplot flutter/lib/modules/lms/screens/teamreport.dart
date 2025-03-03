@@ -60,6 +60,7 @@ class _TeamReportState extends State<TeamReport> {
   @override
   void initState() {
     super.initState();
+     
     transferdata();
     // readReportJson();
   }
@@ -128,12 +129,26 @@ class _TeamReportState extends State<TeamReport> {
       print("empType: $empType");
 
       print("empType: $empType");
+      main();
     });
 
     setState(() {
       _isLoading = false;
     });
   }
+
+// method for currentDate and 1week from currentDate
+Future<void> main() async {
+  DateTime currentDate = DateTime.now();
+  DateTime oneWeekLater = currentDate.add(Duration(days: 7));
+
+  String formattedCurrentDate = DateFormat('yyyy-MM-dd').format(currentDate);
+  String formattedOneWeekLater = DateFormat('yyyy-MM-dd').format(oneWeekLater);
+   await fetchTeamReport(empType, formattedCurrentDate,  formattedOneWeekLater );
+
+  print("Current Date: $formattedCurrentDate");
+  print("One Week Later: $formattedOneWeekLater");
+}
 
 //  method to fetch from api
   Future<void> fetchTeamReport(
@@ -216,18 +231,18 @@ class _TeamReportState extends State<TeamReport> {
     if (mounted) {
       setState(() {
         _isLoading = true; // ✅ Ensure UI updates before refresh
-        teamLeaveData.clear(); // ✅ Clear old data before reloading
-        teamDailyLogData.clear();
+        // teamLeaveData.clear(); // ✅ Clear old data before reloading
+        // teamDailyLogData.clear();
       });
     }
 
-  
+   await _loadData();
 
-    if (mounted) {
-      setState(() {
-        _isLoading = false; // ✅ Hide loader after refresh
-      });
-    }
+    // if (mounted) {
+    //   setState(() {
+    //     _isLoading = false; // ✅ Hide loader after refresh
+    //   });
+    // }
   }
 
   @override
@@ -241,7 +256,11 @@ class _TeamReportState extends State<TeamReport> {
       ),
       body: RefreshIndicator(
         onRefresh: _refreshData,
-        child: SingleChildScrollView(
+        child: _isLoading
+              ? Center(
+                  child: LogoLoader(size: 80.0), // ✅ Your custom loading widget
+                )
+        :SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
